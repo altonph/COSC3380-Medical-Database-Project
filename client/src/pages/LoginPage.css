@@ -5,58 +5,50 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #f9f9f9;
-}
-
-.form-group {
+  }
+  
+  .login-container h2 {
+    text-align: center;
+  }
+  
+  .form-group {
     margin-bottom: 20px;
-}
-
-label {
+  }
+  
+  label {
     display: block;
     margin-bottom: 5px;
-}
-
-h2 {
-    padding-bottom: 25px; 
-}
-
-
-input[type="email"],
-input[type="password"] {
+  }
+  
+  input[type="email"],
+  input[type="password"] {
     width: 100%;
     padding: 10px;
-    font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
-}
-
-.login-button {
+  }
+  
+  .login-button {
     width: 100%;
-    padding: 20px;
-    background-color: #28a745 !important; /* Add !important */
-    color: #fff;
+    padding: 10px;
     border: none;
     border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 30px;
-}
-
-
-
-
-.register-button {
-    width: 100%;
-    padding: 20px;
-    background-color: #28a745;
+    background-color: #28a745 !important;
     color: #fff;
-    border: none;
-    border-radius: 5px;
     cursor: pointer;
-    margin-bottom: 10px;
-}
+  }
+  
 
-
-
-
-
-
+  
+  .register-button {
+    display: block;
+    text-align: center;
+    color: #28a745;
+    text-decoration: none;
+    margin-top: 10px;
+  }
+  
+  .register-button:hover {
+    text-decoration: underline;
+  }
+  
