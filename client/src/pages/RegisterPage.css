@@ -1,0 +1,49 @@
+.register-container {
+    max-width: 400px;
+    margin: 100px auto 0;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] { 
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-button,
+.register-button {
+    width: 100%;
+    padding: 20px;
+    color: #0d0d0d;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none; /* Remove default link underline */
+    display: inline-block; /* Make the link behave like a block-level element */
+    text-align: center; /* Center the text */
+}
+
+.login-button {
+    background-color: #28a745;
+}
+
+.register-button {
+    background-color: #28a745;
+    color: #fff; /* Adjusted the text color for the register button */
+}
