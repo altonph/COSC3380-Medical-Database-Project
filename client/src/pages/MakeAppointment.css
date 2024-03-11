@@ -1,0 +1,41 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 200px;
+    width: 600px;
+    background: #fff;
+    padding-bottom: 30px;
+}
+  
+.header {
+    display: flex;
+    flex-direction: column;
+    margin-left: 25px;
+    gap: 9px;
+    width: 100%;
+    margin-top: 30px;
+    font-size: 30px;
+}
+  
+.name {
+    display: flex;
+    gap: 50px; 
+    align-items: center;
+    margin-left: 10px;
+    width: 500px;
+    height: 30px;
+    background: #f8f8f8;
+}
+
+.text{
+    margin-left: 25px;
+}
+  
+.name input {
+    flex: 1; 
+    height: 100%;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+}
