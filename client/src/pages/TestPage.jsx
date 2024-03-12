@@ -5,7 +5,7 @@ import Footer from "../components/Footer";
 const TestPage = () => {
     return (
         <>
-            <div classNameName="flex h-screen flex-col">
+            <div className="flex h-screen flex-col">
                 <nav>
                     <Header />
                 </nav>

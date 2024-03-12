@@ -4,9 +4,9 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import TestPage from "./pages/TestPage";
 import MakeAppointment from "./pages/MakeAppointment";
+import HomePortal from "./pages/HomePortal";
 import "preline/preline";
 
-//for testing, will be adjusted
 function App() {
   return (
     <>
@@ -19,11 +19,12 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/test" element={<TestPage />} />
             <Route path="/appointment" element= {<MakeAppointment/>} />
+            <Route path="/home" element= {<HomePortal/>} />
           </Routes>
         </Router>
       </div>
     </>
-  )
+  );
 };
 
 export default App
