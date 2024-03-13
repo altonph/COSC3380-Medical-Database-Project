@@ -31,26 +31,74 @@ const PaymentPortal= () => {
                         <h1 className="text-3xl font-bold p-8 ml-8">Billing & Payments</h1>
                         
                         {/* Note */}
-                        <h1 className= "ml-16 font-bold pb-4">Note:</h1>
-                        <p className= "ml-16 mb-4">
-                        Or if you prefer, for information about your balance or to pay on your bill, 
-                        you can reach our Customer Support from 8am-5pm CST by calling 123-456-7890. 
-                        The Customer Support Team will be happy to answer your questions, set up a payment plan or 
-                        take your payment over the phone using a credit card.
-                        </p>
-                        <p className= "ml-16 mb-8">
-                            Please find below details on your account 
-                            balance, payment history, and past statements.
-                        </p>
-                        
+                        <div className="ml-16">
+                            <h1 className="font-bold pb-4">Note:</h1>
+                            <p className="mb-4">
+                                Or if you prefer, for information about your balance or to pay on your bill, 
+                                you can reach our Customer Support from 8am-5pm CST by calling 123-456-7890. 
+                                The Customer Support Team will be happy to answer your questions, set up a payment plan or 
+                                take your payment over the phone using a credit card.
+                            </p>
+                            <p className="mb-8">
+                                Please find below details on your current payments and billing history.
+                            </p>
+                        </div>
 
                         {/* Payments */}
-                        <h1 className= "text-xl font-bold pt-16 py-4 ml-16">Payments</h1>
-                        <p className= "ml-16 mb-8"> You don't have any payments due.</p>
+                        <div className="ml-16">
+                            <h1 className="text-xl font-bold pt-16 py-4">Payments</h1>
+
+                            <table className="border-collapse border border-gray-400">
+                                <thead>
+                                    <tr>
+                                        <th className="border border-gray-400 px-20 py-2">Date</th>
+                                        <th className="border border-gray-400 px-20 py-2">Description</th>
+                                        <th className="border border-gray-400 px-20 py-2">Amount</th>
+                                        {/* <th className="border border-gray-400 px-20 py-2">Make Payment</th> */}
+                                    </tr>
+                                </thead>
+                                {/* sample table (edit with api calls) */}
+                                <tbody>
+                                    <tr>
+                                        <td className="border border-gray-400 px-20 py-4">03/12/2024</td>
+                                        <td className="border border-gray-400 px-20 py-4">Dental Checkup</td>
+                                        <td className="border border-gray-400 px-20 py-4">$50.00</td>
+                                        <td className="border border-gray-400 px-20 py-4"><a href="#" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 hover:text-white">Make Payment</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                        </div>
+
+                        <p className= "ml-16 my-8"> You don't have any payments due.</p>
 
                         {/* Billing History */}
-                        <h1 className= "text-xl font-bold pt-16 py-4 ml-16">Billing History</h1>
-                        <p className= "ml-16 mb-8"> You don't have any past payments.</p>
+                        <div className="ml-16">
+                            <h1 className="text-xl font-bold pt-16 py-4">Billing History</h1>
+
+                            <table className="border-collapse border border-gray-400">
+                                <thead>
+                                    <tr>
+                                        <th className="border border-gray-400 px-20 py-2">Date</th>
+                                        <th className="border border-gray-400 px-20 py-2">Description</th>
+                                        <th className="border border-gray-400 px-20 py-2">Status</th>
+                                        <th className="border border-gray-400 px-32 py-2">Amount</th>
+                                    </tr>
+                                </thead>
+                                {/* sample table (edit with api calls) */}
+                                <tbody>
+                                    <tr>
+                                        <td className="border border-gray-400 px-20 py-4">03/12/2024</td>
+                                        <td className="border border-gray-400 px-20 py-4">Dental Checkup</td>
+                                        <td className="border border-gray-400 px-20 py-4 text-green-700">Paid</td>
+                                        <td className="border border-gray-400 px-32 py-4">$50.00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                        
+                        <p className= "ml-16 my-8"> You don't have any past payments.</p>
 
                         <h1 className= "text-xl font-bold pt-16 py-4 ml-16">Questions?</h1>
                         <p className= "ml-16 mb-8"> Call your practice at 123-456-7890 or email at shasta@shastadental.com.</p>
