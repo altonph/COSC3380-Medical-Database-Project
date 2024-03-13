@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="flex justify-center items-center">
           <div className="mr-4">
             <span className="mr-2">Email:</span>
-            <a href="mailto:info@example.com" className="hover:text-gray-300">info@example.com</a>
+            <a href="mailto:info@example.com" className="hover:text-gray-300">shasta@shastadental.com</a>
           </div>
           <div className="mr-4">
             <span className="mr-2">Phone:</span>
