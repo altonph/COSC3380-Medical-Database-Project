@@ -7,6 +7,7 @@ import MakeAppointment from "./pages/patient/MakeAppointment";
 import HomePortal from "./pages/patient/HomePortal";
 import PaymentPortal from "./pages/patient/PaymentPortal";
 import "preline/preline";
+import DoctorLoginPage from "./pages/doctor/doctorLoginPage";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="/patient/appointment" element= {<MakeAppointment/>} />
             <Route path="/patient/home" element= {<HomePortal/>} />
             <Route path="/patient/payment" element= {<PaymentPortal/>} />
+            <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
           </Routes>
         </Router>
       </div>

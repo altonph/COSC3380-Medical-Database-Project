@@ -17,7 +17,7 @@ const LoginPage = (props) => {
             <Header />
             <div className="flex-grow container mx-auto px-4 flex justify-center items-center mt-10 mb-10">
                 <div className="max-w-md w-full">
-                    <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+                    <h2 className="text-2xl font-bold mb-4 text-center">Patient Login</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
                             <label htmlFor="email" className="block">Email</label>
