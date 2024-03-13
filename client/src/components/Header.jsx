@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 
-
-
 const Header = () => {
     return (
 
@@ -12,10 +10,10 @@ const Header = () => {
         <nav>
           <ul className="flex space-x-4">
             <li><a href="#" className="hover:text-gray-300">Home</a></li>
-            <li><a href="#" className="hover:text-gray-300">Patient Portal</a></li>
-            <li><a href="#" className="hover:text-gray-300">Provider Portal</a></li>
-            <li><a href="#" className="hover:text-gray-300">About</a></li>
-            <li><a href="#" className="hover:text-gray-300">Contact</a></li>
+            <li><a href="/patient/login" className="hover:text-gray-300">Patient Portal</a></li>
+            <li><a href="/doctor/login" className="hover:text-gray-300">Provider Portal</a></li>
+            <li><a href="/about" className="hover:text-gray-300">About</a></li>
+            <li><a href="/contact" className="hover:text-gray-300">Contact</a></li>
           </ul>
         </nav>
 

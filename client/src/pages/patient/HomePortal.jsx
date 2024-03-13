@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Header from "../../components/Header";
-import HeaderPortal from "../../components/HeaderPortal";
+import HeaderPortalPatient from "../../components/HeaderPortalPatient";
 import Footer from "../../components/Footer";
 
 const HomePortal= () => {
@@ -8,7 +8,7 @@ const HomePortal= () => {
         <>
             <div className="flex h-screen flex-col">
                 <nav>
-                    <HeaderPortal />
+                    <HeaderPortalPatient />
                 </nav>
 
                 <div className="flex flex-1">
@@ -35,7 +35,7 @@ const HomePortal= () => {
                         <h1 className= "text-xl font-bold pb-4 ml-4">Appointments</h1>
                         <div className= "flex p-4 justify-between border rounded-lg mx-8 px-4 py-2 bg-white py-4">
                             <p className= "ml-8 p-2 flex-grow">Need to schedule a new appointment?</p>
-                            <button className="bg-blue-500 text-white px-4 py-2 mr-4 rounded-md hover:bg-blue-600 hover:text-white">Schedule Now</button>
+                            <a className="bg-blue-500 text-white px-4 py-2 mr-4 rounded-md hover:bg-blue-600 hover:text-white" href="/patient/appointment">Schedule Now</a>
                         </div>
 
                         {/* Visit Summary */}

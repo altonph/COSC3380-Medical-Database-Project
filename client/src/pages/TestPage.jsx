@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import HeaderPortal from "../components/HeaderPortal";
+import HeaderPortal from "../components/HeaderPortalPatient";
 
 const TestPage = () => {
     return (

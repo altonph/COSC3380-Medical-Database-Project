@@ -11,7 +11,7 @@ const HeaderPortal = () => {
 
   return (
     <header className="flex max-w-screen justify-between items-center bg-teal-100 text-black p-4">
-      <div className="font-bold text-xl">ShastaDental</div>
+      <div className="font-bold text-xl"><a href="/">ShastaDental Patient Portal</a></div>
       <nav>
         <ul className="flex space-x-4">
           <li>
@@ -25,10 +25,10 @@ const HeaderPortal = () => {
               {isDropdownOpen && (
                 <ul className="absolute top-10 right-0 bg-white shadow-md rounded-md py-1">
                   <li className="px-4 py-2 hover:bg-gray-200">
-                    <a href="#">Profile</a>
+                    <a href="/patient/profile">Profile</a>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-200">
-                    <a href="#">Settings</a>
+                    <a href="/patient/settings">Settings</a>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-200">
                     <a href="#">Log Out</a>
