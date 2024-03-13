@@ -5,6 +5,7 @@ import RegisterPage from "./pages/patient/RegisterPage";
 import TestPage from "./pages/TestPage";
 import MakeAppointment from "./pages/patient/MakeAppointment";
 import HomePortal from "./pages/patient/HomePortal";
+import PaymentPortal from "./pages/patient/PaymentPortal";
 import "preline/preline";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/test" element={<TestPage />} />
             <Route path="/patient/appointment" element= {<MakeAppointment/>} />
             <Route path="/patient/home" element= {<HomePortal/>} />
+            <Route path="/patient/payment" element= {<PaymentPortal/>} />
           </Routes>
         </Router>
       </div>
