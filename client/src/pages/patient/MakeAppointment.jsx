@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './MakeAppointment.css';
+import HeaderPortalPatient from "../../components/HeaderPortalPatient";
+import Footer from "../../components/Footer";
 
 const MakeAppointment = () => {
   const [firstName, setFirstName] = useState('');
@@ -29,112 +31,160 @@ const MakeAppointment = () => {
   };
 
   return (
-    <div className = "container">
-      <h2 className = "header">Request an Appointment</h2>
-      <form onSubmit={handleSubmit}>
-        <div className = "name">
-        <label className = "text">Name: </label>
-        <input
-            type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-        </div>
+    <div className="flex h-screen flex-col">
+      <nav>
+        <HeaderPortalPatient />
+      </nav>
 
-        <div>
-          <label>Phone Number:</label>
-          <input
-            type="tel"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-        </div>
+      <div className="flex flex-1">
+        <aside className="w-1/6 bg-gray-200 text-black">
+          <nav className="p-4 text-xl">
+            <ul>
+              <li><a href="/patient/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
+              <li><a href="/patient/appointment" className="block py-2 text-center font-bold underline">Appointments</a></li>
+              <li><a href="/patient/payment" className="block py-2 text-center text-gray-600 hover:text-black">Billing & Payments</a></li>
+              <li><a href="/patient/visit" className="block py-2 text-center text-gray-600 hover:text-black">Visit Details</a></li>
+              <li><a href="/patient/history" className="block py-2 text-center text-gray-600 hover:text-black">Medical History</a></li>
+              <li><a href="/patient/prescription" className="block py-2 text-center text-gray-600 hover:text-black">Prescriptions</a></li>
+            </ul>
+          </nav>
+        </aside>
 
-        <div>
-          <label>Preferred Date:</label>
-          <input
-            type="date"
-            value={preferredDate}
-            onChange={(e) => setPreferredDate(e.target.value)}
-          />
-          <label>Preferred Time:</label>
-          <select
-            value={preferredTime}
-            onChange={(e) => setPreferredTime(e.target.value)}
-          >
-            {generateTimeOptions().map((time) => (
-              <option key={time} value={time}>
-                {time}
-              </option>
-            ))}
-          </select>
-        </div>
+        <main className="flex-1 p-4">
+          <h1 className="text-3xl font-bold p-2 ml-8 mb-4">Request an Appointment</h1>
 
-        <div>
-          <label>Alternate Date:</label>
-          <input
-            type="date"
-            value={alternateDate}
-            onChange={(e) => setAlternateDate(e.target.value)}
-          />
-          <label>Alternate Time:</label>
-          <select
-            value={alternateTime}
-            onChange={(e) => setAlternateTime(e.target.value)}
-          >
-            {generateTimeOptions().map((time) => (
-              <option key={time} value={time}>
-                {time}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className="container mx-auto">
+            <form onSubmit={handleSubmit} className="px-4 py-8">
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Name:</label>
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md mt-2 py-2 px-3 focus:outline-none focus:border-blue-500"
+                />
+              </div>
 
-        <div>
-          <label>Practitioner:</label>
-          <select
-            value={practitioner}
-            onChange={(e) => setPractitioner(e.target.value)}
-          >
-            <option value="" disabled selected>
-            Select Practitioner
-            </option>
-            <option value="Practitioner 1">Practitioner 1</option>
-            <option value="Practitioner 2">Practitioner 2</option>
-          </select>
-        </div>
+              {/* Phone Number */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Phone Number:</label>
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                />
+              </div>
 
-        <div>
-          <label>Location:</label>
-          <select
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          >
-          <option value="" disabled selected>
-          Select Location
-          </option>
-          <option value="Location 1">Location 1</option>
-          <option value="Location 2">Location 2</option>
-          </select>
-        </div>
+              {/* Preferred Date */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Preferred Date:</label>
+                <input
+                  type="date"
+                  value={preferredDate}
+                  onChange={(e) => setPreferredDate(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                />
+              </div>
 
-        <div>
-          <label>Reason for Appointment:</label>
-          <textarea
-            value={reasonForAppointment}
-            onChange={(e) => setReasonForAppointment(e.target.value)}
-          />
-        </div>
+              {/* Preferred Time */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Preferred Time:</label>
+                <select
+                  value={preferredTime}
+                  onChange={(e) => setPreferredTime(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                >
+                  {generateTimeOptions().map((time) => (
+                    <option key={time} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-        <button type="submit">Submit</button>
-      </form>
+              {/* Alternate Date */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Alternate Date:</label>
+                <input
+                  type="date"
+                  value={alternateDate}
+                  onChange={(e) => setAlternateDate(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {/* Alternate Time */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Alternate Time:</label>
+                <select
+                  value={alternateTime}
+                  onChange={(e) => setAlternateTime(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                >
+                  {generateTimeOptions().map((time) => (
+                    <option key={time} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Practitioner */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Practitioner:</label>
+                <select
+                  value={practitioner}
+                  onChange={(e) => setPractitioner(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                >
+                  <option value="" disabled selected>Select Practitioner</option>
+                  <option value="Practitioner 1">Practitioner 1</option>
+                  <option value="Practitioner 2">Practitioner 2</option>
+                </select>
+              </div>
+
+              {/* Location */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Location:</label>
+                <select
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                >
+                  <option value="" disabled selected>Select Location</option>
+                  <option value="Location 1">Location 1</option>
+                  <option value="Location 2">Location 2</option>
+                </select>
+              </div>
+
+              {/* Reason for Appointment */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Reason for Appointment:</label>
+                <textarea
+                  value={reasonForAppointment}
+                  onChange={(e) => setReasonForAppointment(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 h-40 resize-none"
+                />
+              </div>
+
+              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Submit</button>
+            </form>
+          </div>
+        </main>
+      </div>
+
+      <nav>
+        <Footer />
+      </nav>
     </div>
   );
 };
