@@ -50,10 +50,10 @@ const MakeAppointment = () => {
           </nav>
         </aside>
 
-        <main className="flex-1 p-4">
+        <main className="flex-1 p-4 mt-4">
           <h1 className="text-3xl font-bold p-2 ml-8 mb-4">Request an Appointment</h1>
 
-          <div className="container mx-auto">
+          <div className="container mx-auto mt-4">
             <form onSubmit={handleSubmit} className="px-4 py-8">
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Name:</label>
