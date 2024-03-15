@@ -7,6 +7,7 @@ import MakeAppointment from "./pages/patient/MakeAppointment";
 import HomePortal from "./pages/patient/HomePortal";
 import PaymentPortal from "./pages/patient/PaymentPortal";
 import PatientProfile from "./pages/patient/PatientProfile";
+import PatientProfileSettings from "./pages/patient/PatientProfileSettings";
 import "preline/preline";
 import DoctorLoginPage from "./pages/doctor/doctorLoginPage";
 
@@ -25,6 +26,7 @@ function App() {
             <Route path="/patient/home" element= {<HomePortal/>} />
             <Route path="/patient/payment" element= {<PaymentPortal/>} />
             <Route path="/patient/profile" element= {<PatientProfile/>} />
+            <Route path="/patient/settings" element= {<PatientProfileSettings/>} />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
           </Routes>
         </Router>
