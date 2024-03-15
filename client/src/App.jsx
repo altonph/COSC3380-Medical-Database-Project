@@ -10,6 +10,8 @@ import PatientProfile from "./pages/patient/PatientProfile";
 import PatientProfileSettings from "./pages/patient/PatientProfileSettings";
 import "preline/preline";
 import DoctorLoginPage from "./pages/doctor/doctorLoginPage";
+import PatientPrescriptions from "./pages/patient/PatientPrescriptions"
+
 
 function App() {
   return (
@@ -26,6 +28,7 @@ function App() {
             <Route path="/patient/home" element= {<HomePortal/>} />
             <Route path="/patient/payment" element= {<PaymentPortal/>} />
             <Route path="/patient/profile" element= {<PatientProfile/>} />
+            <Route path="/patient/prescriptions" element= {<PatientPrescriptions/>} />
             <Route path="/patient/settings" element= {<PatientProfileSettings/>} />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
           </Routes>

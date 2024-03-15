@@ -22,10 +22,10 @@ const RegisterPage = (props) => {
             <nav>
                 <Header />
             </nav>
-            <div className="flex-grow container mx-auto px-4 mt-10 mb-10">
-                <div className="flex flex-col justify-center items-center">
+            <div className="container mx-auto items-center mt-50 mb-50">
+                <div className="w-full max-w-md">
                     <h1 className="text-2xl font-bold mb-6">Patient Registration</h1>
-                    <form onSubmit={handleSubmit} className="max-w-md">
+                    <form onSubmit={handleSubmit} className="flex flex-col">
                         <label htmlFor="name" className="block">Full Name</label>
                         <input 
                             value={name} 
@@ -34,7 +34,7 @@ const RegisterPage = (props) => {
                             placeholder="Full Name" 
                             id="name" 
                             name="name"
-                            className="w-full border py-2 px-3 mb-3 rounded focus:outline-none focus:ring focus:border-blue-300"
+                            className="border py-2 px-3 mb-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                         />
                 <label htmlFor="gender" className="block">Gender</label>
                 <select 
@@ -96,8 +96,8 @@ const RegisterPage = (props) => {
                     name="address"
                     className="w-full border py-2 px-3 mb-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                 />
-                <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300">Register</button>
-                </form>
+                <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300">Register</button>
+                    </form>
                     <Link to="/patient/login" className="block text-center mt-4 text-blue-500">Already have an account? Log in here.</Link>
                 </div>
             </div>
