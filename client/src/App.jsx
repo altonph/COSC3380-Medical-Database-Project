@@ -11,6 +11,8 @@ import PatientProfileSettings from "./pages/patient/PatientProfileSettings";
 import "preline/preline";
 import DoctorLoginPage from "./pages/doctor/doctorLoginPage";
 import PatientPrescriptions from "./pages/patient/PatientPrescriptions"
+import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
+import PatientMedicalHistory from "./pages/patient/PatientMedicalHistory";
 
 
 function App() {
@@ -31,6 +33,8 @@ function App() {
             <Route path="/patient/prescriptions" element= {<PatientPrescriptions/>} />
             <Route path="/patient/settings" element= {<PatientProfileSettings/>} />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
+            <Route path="/patient/visit" element= {<PatientVisitDetails/>} />
+            <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
           </Routes>
         </Router>
       </div>
