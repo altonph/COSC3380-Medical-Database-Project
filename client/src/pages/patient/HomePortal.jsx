@@ -41,6 +41,10 @@ const HomePortal= () => {
                         <h1 className= "text-xl font-bold pt-16 py-4 ml-4">Recent Visit Summary</h1>
                         <p className= "ml-16 mb-8"> You don't have any recent visits.</p>
 
+                        {/* Visit Summary */}
+                        <h1 className= "text-xl font-bold pt-16 py-4 ml-4">Your prescriptions</h1>
+                        <p className= "ml-16 mb-8"> You don't have any current prescriptions.</p>
+
                         {/* Billing Summary */}
                         <h1 className= "text-xl font-bold pt-16 py-4 ml-4">Billing Summary</h1>
                         <p className= "ml-16 mb-8"> You don't have any bills due.</p>
