@@ -20,7 +20,7 @@ const HomePortal= () => {
                                 <li><a href="/patient/payment" className="block py-2 text-center text-gray-600 hover:text-black">Billing & Payments</a></li>
                                 <li><a href="/patient/visit" className="block py-2 text-center text-gray-600 hover:text-black">Visit Details</a></li>
                                 <li><a href="/patient/history" className="block py-2 text-center text-gray-600 hover:text-black">Medical History</a></li>
-                                <li><a href="/patient/prescription" className= "block py-2 text-center text-gray-600 hover:text-black">Prescriptions</a></li>
+                                <li><a href="/patient/prescriptions" className= "block py-2 text-center text-gray-600 hover:text-black">Prescriptions</a></li>
                             </ul>
                         </nav>
                     </aside>
