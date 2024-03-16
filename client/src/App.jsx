@@ -15,6 +15,7 @@ import HistoryPortal from "./pages/patient/HistoryPortal";
 import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
 import PatientMedicalHistory from "./pages/patient/PatientMedicalHistory";
 import AdminPortal from "./pages/admin/AdminPortal";
+import EditAppointment from "./pages/admin/EditAppointments";
 
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
             <Route path="/patient/visit" element= {<PatientVisitDetails/>} />
             <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
             <Route path="/admin/portal" element= {<AdminPortal/>} />
+            <Route path="/admin/appointments" element={<EditAppointment/>}/>
           </Routes>
         </Router>
   );
