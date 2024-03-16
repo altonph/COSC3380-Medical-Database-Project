@@ -3,17 +3,18 @@ import React, { useState } from "react";
 const Header = () => {
     return (
 
-      <header className="flex max-w-screen justify-between items-center bg-teal-100 text-black p-4">
+      <header className="fixed top-0 left-0 right-0 flex justify-between items-center bg-blue-900 text-white p-4 z-10">
 
         <div className="font-bold text-xl"> <a href="/">ShastaDental</a></div>
 
-        <nav>
+        <nav className="sticky top-0" >
           <ul className="flex space-x-4">
-            <li><a href="/" className="hover:text-gray-300">Home</a></li>
-            <li><a href="/patient/login" className="hover:text-gray-300">Patient Portal</a></li>
-            <li><a href="/doctor/login" className="hover:text-gray-300">Provider Portal</a></li>
-            <li><a href="/about" className="hover:text-gray-300">About</a></li>
-            <li><a href="/contact" className="hover:text-gray-300">Contact</a></li>
+            <li><a href="/" className="hover:text-gray-300">HOME</a></li>
+            <li><a href="/services" className="hover:text-gray-300">SERVICES</a></li>
+            <li><a href="/patient/login" className="hover:text-gray-300">PATIENT PORTAL</a></li>
+            <li><a href="/doctor/login" className="hover:text-gray-300">PROVIDER PORTAL</a></li>
+            <li><a href="/about" className="hover:text-gray-300">ABOUT</a></li>
+            <li><a href="/contact" className="hover:text-gray-300">CONTACT</a></li>
           </ul>
         </nav>
 

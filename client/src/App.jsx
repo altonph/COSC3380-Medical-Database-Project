@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
+import ServicesPage from "./pages/ServicesPage";
 import LoginPage from "./pages/patient/LoginPage";
 import RegisterPage from "./pages/patient/RegisterPage";
 import TestPage from "./pages/TestPage";
@@ -18,12 +19,12 @@ import AdminPortal from "./pages/admin/AdminPortal";
 
 function App() {
   return (
-    <>
-      <div className="mx-auto my-auto h-screen bg-white text-black">
         <Router>
           <Routes>
             <Route index element= {<LandingPage />} />
             <Route path="/" element={<LandingPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/home" element={<LandingPage />} />
             <Route path="/patient/login" element={<LoginPage />} />
             <Route path="/patient/register" element={<RegisterPage />} />
             <Route path="/test" element={<TestPage />} />
@@ -40,8 +41,6 @@ function App() {
             <Route path="/admin/portal" element= {<AdminPortal/>} />
           </Routes>
         </Router>
-      </div>
-    </>
   );
 };
 
