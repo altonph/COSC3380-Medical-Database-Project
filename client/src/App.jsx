@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
+import ServicesPage from "./pages/ServicesPage";
 import LoginPage from "./pages/patient/LoginPage";
 import RegisterPage from "./pages/patient/RegisterPage";
 import TestPage from "./pages/TestPage";
@@ -15,12 +16,12 @@ import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
 
 function App() {
   return (
-    <>
-      <div className="mx-auto my-auto h-screen bg-white text-black">
         <Router>
           <Routes>
             <Route index element= {<LandingPage />} />
             <Route path="/" element={<LandingPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/home" element={<LandingPage />} />
             <Route path="/patient/login" element={<LoginPage />} />
             <Route path="/patient/register" element={<RegisterPage />} />
             <Route path="/test" element={<TestPage />} />
@@ -35,8 +36,6 @@ function App() {
             <Route path="/patient/visit" element= {<PatientVisitDetails/>} />
           </Routes>
         </Router>
-      </div>
-    </>
   );
 };
 

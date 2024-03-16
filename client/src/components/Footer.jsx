@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 const Footer = () => {
     return (
-      <footer className="bg-teal-100 text-black p-4 text-center">
+      <footer className="bg-blue-900 text-white p-4 text-center">
         <div className="flex justify-center items-center mb-4">
           <span className="mr-2">&#169;</span>
           <span>2024 ShastaDental</span>
