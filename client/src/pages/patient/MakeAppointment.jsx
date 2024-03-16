@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './MakeAppointment.css';
 import HeaderPortalPatient from "../../components/HeaderPortalPatient";
 import Footer from "../../components/Footer";
 
