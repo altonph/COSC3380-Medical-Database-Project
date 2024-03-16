@@ -3,7 +3,7 @@ import React, { useState } from "react";
 const Header = () => {
     return (
 
-      <header className="sticky top-0 flex justify-between items-center bg-blue-900 text-white p-4">
+      <header className="fixed top-0 left-0 right-0 flex justify-between items-center bg-blue-900 text-white p-4 z-10">
 
         <div className="font-bold text-xl"> <a href="/">ShastaDental</a></div>
 

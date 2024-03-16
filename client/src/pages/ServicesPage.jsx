@@ -9,7 +9,7 @@ import cosmeticImage from './images/cosmetic.png';
 const Card = (props) => {
     return (
         <div className="flex flex-col items-center mx-4">
-            <div style={{'box-shadow': '0 0 15px rgba(0,0,0,0.4)'}} className="flex flex-1 flex-col items-center bg-white p-4 my-10 w-full md:max-w-80">
+            <div style={{'box-shadow': '0 0 15px rgba(0,0,0,0.4)'}} className="flex flex-1 flex-col items-center bg-white p-4 my-20 w-full md:max-w-80">
                 <img className="object-scale-down h-48 w-96" src={props.image} />
                 <div className="text-center text-xl font-bold">{props.title}</div>
                 <div className="py-6">{props.description}</div>
