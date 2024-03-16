@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "../../components/Header";
+import HeaderPortalAdmin from "../../components/HeaderPortalAdmin";
 import Footer from "../../components/Footer";
 
 const AdminPortal = () => {
@@ -7,7 +7,7 @@ const AdminPortal = () => {
         <>
             <div className="flex h-screen flex-col">
                 <nav>
-                    <Header />
+                    <HeaderPortalAdmin />
                 </nav>
 
                 <div className="flex flex-1">
