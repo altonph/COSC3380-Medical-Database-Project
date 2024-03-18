@@ -8,15 +8,70 @@ const RegisterPage = () => {
     const [lastName, setLastName] = useState('');
     const [gender, setGender] = useState('');
     const [dob, setDob] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [Email, setEmail] = useState('');
+    const [Password, setPassword] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [address, setAddress] = useState('');
+    const [Username, setUsername] = useState('');
 
-    const handleSubmit = (e) => { 
+    // const handleSubmit = async (e) => { 
+    //     e.preventDefault();
+    //     try {
+    //         const response = await fetch('http://localhost:5000/register', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify({
+    //                 firstName,
+    //                 lastName,
+    //                 gender,
+    //                 dob,
+    //                 Email,  // Use Email instead of Email: Email
+    //                 Username,
+    //                 Password,  // Use Password instead of Password: Password
+    //                 phoneNumber,
+    //                 address
+    //             })
+    //         });
+            
+    //         if (!response.ok) {
+    //             throw new Error('Registration failed');
+    //         }
+            
+    //         // Registration successful
+    //         console.log('Registration successful');
+    //         // Redirect the user to a new page or show a success message
+    //     } catch (error) {
+    //         console.error('Error registering:', error.message);
+    //         setError('Registration failed. Please try again.');
+    //     }
+    // }
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(firstName, lastName, gender, dob, email, password, phoneNumber, address);
-        // Here you would typically submit the form data to your backend for registration
+        try {
+            const body = {
+                firstName: firstName,
+                lastName: lastName,
+                gender: gender,
+                dob: dob,
+                Email: Email,
+                Username: Username,
+                Password: Password,
+                phoneNumber: phoneNumber,
+                address: address
+            }
+            const response = await fetch("http://localhost:5000/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+
+            window.location = "/patient/register";
+            
+        } catch (err) {
+            console.log(err.message);
+        }
     }
 
     return (
@@ -80,7 +135,7 @@ const RegisterPage = () => {
                         <div className="mb-4">
                             <label htmlFor="email" className="block">Email</label>
                             <input 
-                                value={email} 
+                                value={Email} 
                                 onChange={(e) => setEmail(e.target.value)} 
                                 type="email" 
                                 placeholder="youremail@gmail.com" 
@@ -90,9 +145,21 @@ const RegisterPage = () => {
                             />
                         </div>
                         <div className="mb-4">
+                            <label htmlFor="username" className="block">Username</label>
+                            <input 
+                                value={Username} 
+                                onChange={(e) => setUsername(e.target.value)} 
+                                type="text" 
+                                placeholder="Username" 
+                                id="username" 
+                                name="username"
+                                className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
+                            />
+                        </div>
+                        <div className="mb-4">
                             <label htmlFor="password" className="block">Password</label>
                             <input 
-                                value={password} 
+                                value={Password} 
                                 onChange={(e) => setPassword(e.target.value)} 
                                 type="password" 
                                 placeholder="********" 
@@ -124,6 +191,7 @@ const RegisterPage = () => {
                                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                             />
                         </div>
+                        
                         <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300">Register</button>
                     </form>
                     <Link to="/patient/login" className="block text-center mt-4 text-blue-500">Already have an account? Log in here.</Link>
