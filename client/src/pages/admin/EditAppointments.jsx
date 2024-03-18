@@ -101,7 +101,7 @@ const EditAppointment = () => {
         </nav>
 
         <div className="flex flex-1">
-          <aside className="w-1/6 bg-gray-200 text-black">
+          <aside className="w-1/6 bg-gray-200 text-black mt-14">
             <nav className="p-4 text-xl">
               <ul>
               <li><a href="#" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
@@ -114,7 +114,7 @@ const EditAppointment = () => {
           </aside>
           
           <main className="flex-1 p-4">
-            <h1 className="text-3xl font-bold mb-4 p-8">Edit Appointments</h1>
+            <h1 className="text-3xl font-bold mt-14 mb-4 p-8">Edit Appointments</h1>
             
             <div className="flex justify-center items-center">
               <div className="mr-8">
