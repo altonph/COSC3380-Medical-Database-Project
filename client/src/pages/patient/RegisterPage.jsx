@@ -64,15 +64,16 @@ const RegisterPage = () => {
                 Password: Password,
                 Phone_num: Phone_num,
                 Address: Address,
-                Is_admin: false
+                Is_admin: false,
+                User_role: "Patient"
             }
-            console.log("Registration Successful");
+            
             const response = await fetch("http://localhost:5000/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)
             });
-            
+            console.log("Registration Successful");
         } catch (err) {
             console.log(err.message);
         }
