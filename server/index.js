@@ -1,4 +1,37 @@
 const http = require('http');
+const { handleRegister, handleLogin } = require('./routes/authRoutes');
+
+const server = http.createServer((req, res) => {
+    // Allow CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE, UPDATE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === 'OPTIONS') {
+        res.writeHead(200);
+        res.end();
+        return;
+    }
+
+    if (req.url === '/register' && req.method === 'POST') {
+        handleRegister(req, res);
+    } else if (req.url === '/login' && req.method === 'POST') {
+        handleLogin(req, res);
+    } else {
+        res.writeHead(404);
+        res.end('Not Found');
+    }
+});
+
+// Start the server
+const PORT = 5000;
+server.listen(PORT, () => {
+    console.log(`Server has started on port ${PORT}`);
+});
+
+
+/*
+const http = require('http');
 const pool = require('./models/db');
 const bcrypt = require('bcrypt');
 
@@ -126,7 +159,7 @@ const PORT = 5000;
 server.listen(PORT, () => {
     console.log(`Server has started on port ${PORT}`);
 });
-
+*/
 
 /*
 const express = require("express");
