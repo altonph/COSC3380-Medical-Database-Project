@@ -10,20 +10,20 @@ const HeaderPortalAdmin = () => {
   };
 
   return (
-    <header className="flex max-w-screen justify-between items-center bg-teal-100 text-black p-4">
-      <div className="font-bold text-xl"><a href="/">Admin Portal</a></div>
+    <header className="flex max-w-screen justify-between items-center bg-blue-900 text-white p-4">
+      <div className="font-bold text-xl"><a href="/">ShastaDental Admin Portal</a></div>
       <nav>
         <ul className="flex space-x-4">
           <li>
             <div className="relative">
-              <button className={isNameClicked ? "text-blue-500" : ""} onClick={toggleDropdown}>
+              <button className={isNameClicked ? "text-blue-300" : ""} onClick={toggleDropdown}>
                 "Admin Name" 
                 <svg className={`w-6 h-6 inline-block ml-1 ${isNameClicked ? "transform rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </button>
               {isDropdownOpen && (
-                <ul className="absolute top-10 right-0 bg-white shadow-md rounded-md py-1">
+                <ul className="absolute top-10 right-0 bg-white text-black shadow-md rounded-md py-1">
                   <li className="px-4 py-2 hover:bg-gray-200">
                     <a href="/admin/profile">Profile</a>
                   </li>
