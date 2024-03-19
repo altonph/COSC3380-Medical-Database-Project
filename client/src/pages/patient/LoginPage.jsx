@@ -1,15 +1,40 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; // Import useHistory
+import { useNavigate } from 'react-router-dom';
 import Header from "../../components/Header"; 
 import Footer from "../../components/Footer";
 
 const LoginPage = (props) => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [Username, setUsername] = useState('');
+    const [Password, setPassword] = useState('');
+    const navigateTo = useNavigate(); // Get the history object
 
-    const handleSubmit = (e) => { 
+    const handleSubmit = async (e) => { 
         e.preventDefault();
-        console.log(email);
+        try {
+            const body = {
+                Username: Username,
+                Password: Password,
+                //User_role: "Patient"
+            }
+            
+            const response = await fetch("http://localhost:5000/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+            
+            if (response.ok) {
+                navigateTo('/patient/home');
+                console.log("Login Successful");
+            }
+            else {
+                const data = await response.json();
+                console.error('Login failed:', data.message);
+            }
+        } catch (err) {
+            console.log(err.message);
+        }
     }
 
     return (
@@ -20,26 +45,26 @@ const LoginPage = (props) => {
                     <h2 className="text-2xl font-bold mb-4 text-center">Patient Login</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
-                            <label htmlFor="email" className="block">Email</label>
+                            <label htmlFor="Username" className="block">Username</label>
                             <input 
-                                value={email} 
-                                onChange={(e) => setEmail(e.target.value)} 
-                                type="email" 
-                                placeholder="youremail@gmail.com" 
-                                id="email" 
-                                name="email"
+                                value={Username} 
+                                onChange={(e) => setUsername(e.target.value)} 
+                                type="text" 
+                                placeholder="Username" 
+                                id="Username" 
+                                name="Username"
                                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="password" className="block">Password</label>
+                            <label htmlFor="Password" className="block">Password</label>
                             <input 
-                                value={password} 
+                                value={Password} 
                                 onChange={(e) => setPassword(e.target.value)} 
-                                type="password" 
+                                type="Password" 
                                 placeholder="********" 
-                                id="password" 
-                                name="password"
+                                id="Password" 
+                                name="Password"
                                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                             />
                         </div>
