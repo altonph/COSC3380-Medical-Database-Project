@@ -16,7 +16,7 @@ import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
 import PatientMedicalHistory from "./pages/patient/PatientMedicalHistory";
 import AdminPortal from "./pages/admin/AdminPortal";
 import EditAppointment from "./pages/admin/EditAppointments";
-
+import ViewStaff from "./pages/admin/ViewStaff";
 
 function App() {
   return (
@@ -41,6 +41,7 @@ function App() {
             <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
             <Route path="/admin/portal" element= {<AdminPortal/>} />
             <Route path="/admin/appointments" element={<EditAppointment/>}/>
+            <Route path="/admin/staff" element={<ViewStaff/>}/>
           </Routes>
         </Router>
   );
