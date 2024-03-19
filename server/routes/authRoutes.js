@@ -8,6 +8,7 @@ function handleRegister(req, res) {
     req.on('end', () => {
         try {
             const userData = JSON.parse(data);
+            console.log(userData);
             registerUser(userData, res);
         } catch (error) {
             console.error('Error parsing JSON data:', error);

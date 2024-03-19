@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import Header from "../../components/Header"; 
 import Footer from "../../components/Footer";
 
@@ -13,6 +14,7 @@ const RegisterPage = () => {
     const [Phone_num, setPhone_num] = useState('');
     const [Address, setAddress] = useState('');
     const [Username, setUsername] = useState('');
+    const navigateTo = useNavigate(); 
 
     // const handleSubmit = async (e) => { 
     //     e.preventDefault();
@@ -73,7 +75,14 @@ const RegisterPage = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)
             });
-            console.log("Registration Successful");
+            if (response.ok) {
+                navigateTo('/patient/login');
+                console.log("Registration Successful");
+            }
+            else {
+                const data = await response.json();
+                console.error('Registration failed:', data.message);
+            }
         } catch (err) {
             console.log(err.message);
         }
