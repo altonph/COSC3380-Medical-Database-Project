@@ -4,14 +4,14 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 
 const RegisterPage = () => {
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [gender, setGender] = useState('');
-    const [dob, setDob] = useState('');
+    const [FName, setFName] = useState('');
+    const [LName, setLName] = useState('');
+    const [Gender, setGender] = useState('');
+    const [DOB, setDOB] = useState('');
     const [Email, setEmail] = useState('');
     const [Password, setPassword] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [address, setAddress] = useState('');
+    const [Phone_num, setPhone_num] = useState('');
+    const [Address, setAddress] = useState('');
     const [Username, setUsername] = useState('');
 
     // const handleSubmit = async (e) => { 
@@ -23,15 +23,15 @@ const RegisterPage = () => {
     //                 'Content-Type': 'application/json'
     //             },
     //             body: JSON.stringify({
-    //                 firstName,
-    //                 lastName,
-    //                 gender,
-    //                 dob,
+    //                 FName,
+    //                 LName,
+    //                 Gender,
+    //                 DOB,
     //                 Email,  // Use Email instead of Email: Email
     //                 Username,
     //                 Password,  // Use Password instead of Password: Password
-    //                 phoneNumber,
-    //                 address
+    //                 Phone_num,
+    //                 Address
     //             })
     //         });
             
@@ -51,23 +51,27 @@ const RegisterPage = () => {
         e.preventDefault();
         try {
             const body = {
-                firstName: firstName,
-                lastName: lastName,
-                gender: gender,
-                dob: dob,
+                PatientID: null,
+                InsuranceID: null,
+                dentistID: null,
+                staffID: null,
+                FName: FName,
+                LName: LName,
+                Gender: Gender,
+                DOB: DOB,
                 Email: Email,
                 Username: Username,
                 Password: Password,
-                phoneNumber: phoneNumber,
-                address: address
+                Phone_num: Phone_num,
+                Address: Address,
+                Is_admin: false
             }
+            console.log("Registration Successful");
             const response = await fetch("http://localhost:5000/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)
             });
-
-            window.location = "/patient/register";
             
         } catch (err) {
             console.log(err.message);
@@ -83,37 +87,37 @@ const RegisterPage = () => {
                     <form onSubmit={handleSubmit}>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label htmlFor="firstName" className="block">First Name</label>
+                                <label htmlFor="FName" className="block">First Name</label>
                                 <input 
-                                    value={firstName} 
-                                    onChange={(e) => setFirstName(e.target.value)} 
+                                    value={FName} 
+                                    onChange={(e) => setFName(e.target.value)} 
                                     type="text" 
                                     placeholder="First Name" 
-                                    id="firstName" 
-                                    name="firstName"
+                                    id="FName" 
+                                    name="FName"
                                     className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                                 />
                             </div>
                             <div>
-                                <label htmlFor="lastName" className="block">Last Name</label>
+                                <label htmlFor="LName" className="block">Last Name</label>
                                 <input 
-                                    value={lastName} 
-                                    onChange={(e) => setLastName(e.target.value)} 
+                                    value={LName} 
+                                    onChange={(e) => setLName(e.target.value)} 
                                     type="text" 
                                     placeholder="Last Name" 
-                                    id="lastName" 
-                                    name="lastName"
+                                    id="LName" 
+                                    name="LName"
                                     className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                                 />
                             </div>
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="gender" className="block">Gender</label>
+                            <label htmlFor="Gender" className="block">Gender</label>
                             <select 
-                                value={gender} 
+                                value={Gender} 
                                 onChange={(e) => setGender(e.target.value)} 
-                                id="gender" 
-                                name="gender"
+                                id="Gender" 
+                                name="Gender"
                                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                             >
                                 <option value="">Select Gender</option>
@@ -122,13 +126,13 @@ const RegisterPage = () => {
                             </select>
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="dob" className="block">Date of Birth</label>
+                            <label htmlFor="DOB" className="block">Date of Birth</label>
                             <input 
-                                value={dob} 
-                                onChange={(e) => setDob(e.target.value)} 
+                                value={DOB} 
+                                onChange={(e) => setDOB(e.target.value)} 
                                 type="date" 
-                                id="dob" 
-                                name="dob"
+                                id="DOB" 
+                                name="DOB"
                                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                             />
                         </div>
@@ -169,25 +173,25 @@ const RegisterPage = () => {
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="phoneNumber" className="block">Phone Number</label>
+                            <label htmlFor="Phone_num" className="block">Phone Number</label>
                             <input 
-                                value={phoneNumber} 
-                                onChange={(e) => setPhoneNumber(e.target.value)} 
+                                value={Phone_num} 
+                                onChange={(e) => setPhone_num(e.target.value)} 
                                 type="tel" 
                                 placeholder="Phone Number" 
-                                id="phoneNumber" 
-                                name="phoneNumber"
+                                id="Phone_num" 
+                                name="Phone_num"
                                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="address" className="block">Address</label>
+                            <label htmlFor="Address" className="block">Address</label>
                             <textarea 
-                                value={address} 
+                                value={Address} 
                                 onChange={(e) => setAddress(e.target.value)} 
                                 placeholder="Address" 
-                                id="address" 
-                                name="address"
+                                id="Address" 
+                                name="Address"
                                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                             />
                         </div>

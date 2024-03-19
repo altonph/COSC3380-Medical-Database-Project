@@ -16,6 +16,7 @@ import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
 import PatientMedicalHistory from "./pages/patient/PatientMedicalHistory";
 import AdminPortal from "./pages/admin/AdminPortal";
 import EditAppointment from "./pages/admin/EditAppointments";
+import AdminPatients from "./pages/admin/AdminPatients";
 
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
             <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
             <Route path="/admin/portal" element= {<AdminPortal/>} />
             <Route path="/admin/appointments" element={<EditAppointment/>}/>
+            <Route path="/admin/patients" element={<AdminPatients/>}/>
           </Routes>
         </Router>
   );

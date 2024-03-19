@@ -12,5 +12,14 @@ const pool = mysql.createPool({
     connectionLimit: 10 // Adjust according to your needs
 });
 
+// pool.getConnection((err, connection) => {
+//     if (err) {
+//         console.error('Database connection failed:', err.stack);
+//         return;
+//     }
+//     console.log('Connected to database as ID', connection.threadId);
+//     connection.release();
+// });
+
 // Export the pool to be used in other modules
 module.exports = pool;
