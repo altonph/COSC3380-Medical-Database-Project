@@ -8,7 +8,6 @@ function handleRegister(req, res) {
     req.on('end', () => {
         try {
             const userData = JSON.parse(data);
-            console.log(userData);
             registerUser(userData, res);
         } catch (error) {
             console.error('Error parsing JSON data:', error);
@@ -18,7 +17,7 @@ function handleRegister(req, res) {
     });
 }
 
-function handleLogin(req, res) {
+function handleLogin(req, res, jwt) {
     let data = '';
     req.on('data', chunk => {
         data += chunk;
@@ -26,7 +25,7 @@ function handleLogin(req, res) {
     req.on('end', () => {
         try {
             const { Username: username, Password: password } = JSON.parse(data);
-            loginUser(username, password, res);
+            loginUser(username, password, res, jwt);
         } catch (error) {
             console.error('Error parsing JSON data:', error);
             res.writeHead(400);
