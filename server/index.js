@@ -5,6 +5,10 @@ const { handleRegister, handleLogin } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
 
 const server = http.createServer((req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, UPDATE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
     if (req.method === 'OPTIONS') {
         res.writeHead(200);
         res.end();

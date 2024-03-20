@@ -47,15 +47,10 @@ INSERT INTO login (Username, Password, Email, patientID, dentistID, staffID, Is_
 VALUES ('user1', 'password123', 'user1@example.com', 1, NULL, NULL, FALSE);
 
 -- @block
-SELECT * FROM office;
-SELECT * FROM dentist;
-SELECT * FROM staff;
-SELECT * FROM insurance;
-SELECT * FROM patient;
-SELECT * FROM schedule;
-SELECT * FROM appointment;
-SELECT * FROM prescription;
-SELECT * FROM invoice;
-SELECT * FROM medical_records;
-SELECT * FROM visit_details;
 SELECT * FROM login;
+SELECT * FROM patient;
+
+
+-- @block
+DELETE FROM login;
+DELETE FROM patient;
