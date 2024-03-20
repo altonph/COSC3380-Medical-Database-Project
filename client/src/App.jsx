@@ -3,7 +3,6 @@ import LandingPage from "./pages/LandingPage";
 import ServicesPage from "./pages/ServicesPage";
 import LoginPage from "./pages/patient/LoginPage";
 import RegisterPage from "./pages/patient/RegisterPage";
-import TestPage from "./pages/TestPage";
 import MakeAppointment from "./pages/patient/MakeAppointment";
 import HomePortal from "./pages/patient/HomePortal";
 import PaymentPortal from "./pages/patient/PaymentPortal";
@@ -29,7 +28,6 @@ function App() {
             <Route path="/home" element={<LandingPage />} />
             <Route path="/patient/login" element={<LoginPage />} />
             <Route path="/patient/register" element={<RegisterPage />} />
-            <Route path="/test" element={<TestPage />} />
             <Route path="/patient/appointment" element= {<MakeAppointment/>} />
             <Route path="/patient/home" element= {<HomePortal/>} />
             <Route path="/patient/payment" element= {<PaymentPortal/>} />
@@ -37,9 +35,9 @@ function App() {
             <Route path= "/patient/history" element= {<HistoryPortal/>} />
             <Route path="/patient/prescriptions" element= {<PatientPrescriptions/>} />
             <Route path="/patient/settings" element= {<PatientProfileSettings/>} />
-            <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
             <Route path="/patient/visit" element= {<PatientVisitDetails/>} />
             <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
+            <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
             <Route path="/admin/portal" element= {<AdminPortal/>} />
             <Route path="/admin/appointments" element={<EditAppointment/>}/>
             <Route path="/admin/patients" element={<AdminPatients/>}/>
