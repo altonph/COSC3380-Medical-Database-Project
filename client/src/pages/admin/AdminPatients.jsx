@@ -36,9 +36,8 @@ const AdminPatients = () => {
                     
                     {/* Main Section */}
                     <main className="flex-1 p-4">
-                        <h1 className="text-3xl font-bold mb-4 p-8">Admin Patients Overview</h1>
+                        <h1 className="text-3xl font-bold mb-4 p-8">Patients Overview</h1>
                         <table className="table-auto">
-                            <caption>Patients</caption>
                             <thead>
                                 <tr>
                                     <th className="px-4 py-2 text-sm">PatientID</th>
