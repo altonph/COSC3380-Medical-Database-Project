@@ -17,6 +17,7 @@ import AdminPortal from "./pages/admin/AdminPortal";
 import EditAppointment from "./pages/admin/EditAppointments";
 import AdminPatients from "./pages/admin/AdminPatients";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 
 function App() {
   return (
@@ -38,9 +39,9 @@ function App() {
             <Route path="/patient/visit" element= {<ProtectedRoute><PatientVisitDetails/></ProtectedRoute>} />
             <Route path="/patient/history" element= {<ProtectedRoute><PatientMedicalHistory/></ProtectedRoute>} />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
-            <Route path="/admin/portal" element= {<AdminPortal/>} />
-            <Route path="/admin/appointments" element={<EditAppointment/>}/>
-            <Route path="/admin/patients" element={<AdminPatients/>}/>
+            <Route path="/admin/portal" element= {<AdminRoute><AdminPortal/></AdminRoute>} />
+            <Route path="/admin/appointments" element={<AdminRoute><EditAppointment/></AdminRoute>}/>
+            <Route path="/admin/patients" element={<AdminRoute><AdminPatients/></AdminRoute>}/>
           </Routes>
         </Router>
   );
