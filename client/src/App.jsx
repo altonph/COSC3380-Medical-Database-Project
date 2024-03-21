@@ -16,7 +16,7 @@ import PatientMedicalHistory from "./pages/patient/PatientMedicalHistory";
 import AdminPortal from "./pages/admin/AdminPortal";
 import EditAppointment from "./pages/admin/EditAppointments";
 import AdminPatients from "./pages/admin/AdminPatients";
-
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -28,15 +28,15 @@ function App() {
             <Route path="/home" element={<LandingPage />} />
             <Route path="/patient/login" element={<LoginPage />} />
             <Route path="/patient/register" element={<RegisterPage />} />
-            <Route path="/patient/appointment" element= {<MakeAppointment/>} />
-            <Route path="/patient/home" element= {<HomePortal/>} />
-            <Route path="/patient/payment" element= {<PaymentPortal/>} />
-            <Route path="/patient/profile" element= {<PatientProfile/>} />
-            <Route path= "/patient/history" element= {<HistoryPortal/>} />
-            <Route path="/patient/prescriptions" element= {<PatientPrescriptions/>} />
-            <Route path="/patient/settings" element= {<PatientProfileSettings/>} />
-            <Route path="/patient/visit" element= {<PatientVisitDetails/>} />
-            <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
+            <Route path="/patient/appointment" element= {<ProtectedRoute><MakeAppointment/></ProtectedRoute>} />
+            <Route path="/patient/home" element= {<ProtectedRoute><HomePortal/></ProtectedRoute>} />
+            <Route path="/patient/payment" element= {<ProtectedRoute><PaymentPortal/></ProtectedRoute>} />
+            <Route path="/patient/profile" element= {<ProtectedRoute><PatientProfile/></ProtectedRoute>} />
+            <Route path= "/patient/history" element= {<ProtectedRoute><HistoryPortal/></ProtectedRoute>} />
+            <Route path="/patient/prescriptions" element= {<ProtectedRoute><PatientPrescriptions/></ProtectedRoute>} />
+            <Route path="/patient/settings" element= {<ProtectedRoute><PatientProfileSettings/></ProtectedRoute>} />
+            <Route path="/patient/visit" element= {<ProtectedRoute><PatientVisitDetails/></ProtectedRoute>} />
+            <Route path="/patient/history" element= {<ProtectedRoute><PatientMedicalHistory/></ProtectedRoute>} />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
             <Route path="/admin/portal" element= {<AdminPortal/>} />
             <Route path="/admin/appointments" element={<EditAppointment/>}/>

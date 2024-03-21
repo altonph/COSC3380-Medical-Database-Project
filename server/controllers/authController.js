@@ -65,8 +65,8 @@ function loginUser(username, password, res, jwt) {
 
             if (result) {
                 const token = jwt.sign({ username: user.Username, role: user.User_role }, process.env.JWT_SECRET, { expiresIn: '2m' });
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.end(JSON.stringify({ token }));
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ token, role: user.User_role })); // Include the role in the response
             } else {
                 res.writeHead(401, { 'Content-Type': 'text/plain' });
                 res.end('Incorrect password');
@@ -74,6 +74,7 @@ function loginUser(username, password, res, jwt) {
         });
     });
 }
+
 
 function verifyToken(req, jwt) {
     const authHeader = req.headers['authorization'];
