@@ -16,6 +16,10 @@ import PatientMedicalHistory from "./pages/patient/PatientMedicalHistory";
 import AdminPortal from "./pages/admin/AdminPortal";
 import EditAppointment from "./pages/admin/EditAppointments";
 import AdminPatients from "./pages/admin/AdminPatients";
+import AdminLogin from "./pages/admin/AdminLogin";
+import DataReports from "./pages/admin/DataReports";
+import AdminStaff from "./pages/admin/AdminStaff";
+import DoctorPortal from "./pages/doctor/DoctorPortal";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -40,9 +44,13 @@ function App() {
             <Route path="/patient/visit" element= {<PatientVisitDetails/>} />
             <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
+            <Route path="/doctor/portal" element= {<DoctorPortal/>} />
             <Route path="/admin/portal" element= {<AdminPortal/>} />
             <Route path="/admin/appointments" element={<EditAppointment/>}/>
             <Route path="/admin/patients" element={<AdminPatients/>}/>
+            <Route path="/admin/login" element={<AdminLogin/>}/>
+            <Route path="/admin/data-reports" element={<DataReports/>}/>
+            <Route path="/admin/staff" element={<AdminStaff/>}/>
 
             {/* <Route index element= {<LandingPage />} />
             <Route path="/" element={<LandingPage />} />
