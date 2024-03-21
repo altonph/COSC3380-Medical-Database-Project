@@ -7,6 +7,9 @@ export function useRequireAuth(role = 'Patient') {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userRole = localStorage.getItem('role');
+
+    // console.log(token);
+    // console.log(userRole);
     
     if (!token || !userRole || userRole.toLowerCase() !== role.toLowerCase()) {
       navigate('/home'); // Redirect to home page if not authenticated or role doesn't match
@@ -15,12 +18,13 @@ export function useRequireAuth(role = 'Patient') {
     // Handle token expiry
     const checkTokenExpiry = async () => {
       try {
-        const response = await fetch("http://localhost:5000/check-token", {
-          method: "POST",
+        const response = await fetch("http://localhost:5000/protected-route", {
+          method: "GET",
           headers: { "Authorization": `Bearer ${token}` }
         });
 
-        if (!response.ok) {
+        if (response.status === 401) {
+          console.log("Patient has expired");
           localStorage.removeItem('token'); // Clear token from local storage
           localStorage.removeItem('role'); // Clear role from local storage
           navigate('/home'); // Redirect to home page if token is expired
@@ -33,7 +37,7 @@ export function useRequireAuth(role = 'Patient') {
     checkTokenExpiry();
 
     // Set up interval to periodically check token expiry
-    const interval = setInterval(checkTokenExpiry, 60000); // Check every minute
+    const interval = setInterval(checkTokenExpiry, 15000); // Check every minute
 
     // Clean up interval on unmount
     return () => clearInterval(interval);

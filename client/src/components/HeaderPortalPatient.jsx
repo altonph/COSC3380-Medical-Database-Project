@@ -1,13 +1,22 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 const HeaderPortal = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNameClicked, setIsNameClicked] = useState(false);
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
     setIsNameClicked(!isNameClicked);
   };
+
+  function handleLogout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    navigate('/home');
+    console.log("Logout Successful");
+  }
 
   return (
     <header className="flex max-w-screen justify-between items-center bg-blue-900 text-white p-4">
@@ -31,7 +40,7 @@ const HeaderPortal = () => {
                     <a href="/patient/settings">Settings</a>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-200">
-                    <a href="#">Log Out</a>
+                    <button onClick={handleLogout}>Log Out</button>
                   </li>
                 </ul>
               )}
