@@ -15,7 +15,7 @@ const AdminPortal = () => {
                     <aside className="w-1/6 bg-gray-200 text-black">
                         <nav className="p-4 text-xl">
                             <ul>
-                                <li><a href="#" className="block py-2 text-center font-bold underline">Home</a></li>
+                                <li><a href="/admin/home" className="block py-2 text-center font-bold underline">Home</a></li>
                                 <li><a href="/admin/appointments" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
                                 <li><a href="/admin/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
                                 <li><a href="/admin/staff" className="block py-2 text-center text-gray-600 hover:text-black">Staff</a></li>

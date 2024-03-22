@@ -44,8 +44,8 @@ function App() {
             <Route path="/patient/visit" element= {<PatientVisitDetails/>} />
             <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
-            <Route path="/doctor/portal" element= {<DoctorPortal/>} />
-            <Route path="/admin/portal" element= {<AdminPortal/>} />
+            <Route path="/doctor/home" element= {<DoctorPortal/>} />
+            <Route path="/admin/home" element= {<AdminPortal/>} />
             <Route path="/admin/appointments" element={<EditAppointment/>}/>
             <Route path="/admin/patients" element={<AdminPatients/>}/>
             <Route path="/admin/login" element={<AdminLogin/>}/>

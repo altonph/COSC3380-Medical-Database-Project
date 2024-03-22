@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import Footer from "../../components/Footer";
-import Header from "../../components/Header";
+import HeaderPortalAdmin from '../../components/HeaderPortalAdmin';
 
 const EditAppointment = () => {
   const [date, setDate] = useState(new Date());
@@ -97,14 +97,14 @@ const EditAppointment = () => {
     <>
       <div className="flex h-screen flex-col">
         <nav>
-          <Header />
+          <HeaderPortalAdmin/>
         </nav>
 
         <div className="flex flex-1">
-          <aside className="w-1/6 bg-gray-200 text-black mt-14">
+          <aside className="w-1/6 bg-gray-200 text-black">
             <nav className="p-4 text-xl">
               <ul>
-              <li><a href="/admin/portal" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
+              <li><a href="/admin/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
                 <li><a href="/admin/appointments" className="block py-2 text-center font-bold underline">Appointments</a></li>
                 <li><a href="/admin/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
                 <li><a href="/admin/staff" className="block py-2 text-center text-gray-600 hover:text-black">Staff</a></li>

@@ -5,19 +5,19 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [Username, setUsername] = useState('');
+  const [Password, setPassword] = useState('');
   const navigateTo = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const body = {
-        Email: email,
-        Password: password,
+        Username: Username,
+        Password: Password,
       };
 
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch('http://localhost:5000/login/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -27,7 +27,7 @@ const AdminLogin = () => {
         const data = await response.json();
         localStorage.setItem('token', data.token);
         localStorage.setItem('role', data.role);
-        navigateTo('/admin/dashboard');
+        navigateTo('/admin/home');
         console.log('Login Successful');
       } else {
         const data = await response.json();
@@ -46,30 +46,30 @@ const AdminLogin = () => {
           <h2 className="text-2xl font-bold mb-4 text-center">Admin Login</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label htmlFor="email" className="block">
-                Email
+              <label htmlFor="Username" className="block">
+                Username
               </label>
               <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                type="email"
-                placeholder="youremail@gmail.com"
-                id="email"
-                name="email"
+                value={Username}
+                onChange={(e) => setUsername(e.target.value)}
+                type="Username"
+                placeholder="Username"
+                id="Username"
+                name="Username"
                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="password" className="block">
+              <label htmlFor="Password" className="block">
                 Password
               </label>
               <input
-                value={password}
+                value={Password}
                 onChange={(e) => setPassword(e.target.value)}
-                type="password"
+                type="Password"
                 placeholder="********"
-                id="password"
-                name="password"
+                id="Password"
+                name="Password"
                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
               />
             </div>
