@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 const HeaderPortal = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [firstName, setFirstName] = useState('Patient');
+  const [lastName, setLastName] = useState('Name');
   const navigate = useNavigate();
 
   useEffect(() => {
