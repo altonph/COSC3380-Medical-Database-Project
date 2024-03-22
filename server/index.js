@@ -1,7 +1,7 @@
 const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const { handleRegister, handleLogin } = require('./routes/authRoutes');
+const { handleRegister, handleLogin, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
 
 const server = http.createServer((req, res) => {
@@ -15,13 +15,17 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    if (req.url === '/register' && req.method === 'POST') {
+    if (req.url === '/patient/register' && req.method === 'POST') {
         handleRegister(req, res);
-    } else if (req.url === '/login' && req.method === 'POST') {
+    } else if (req.url === '/patient/login' && req.method === 'POST') {
         handleLogin(req, res, jwt);
-    } else if (req.url === '/protected-route' && req.method === 'GET') {
+    } else if (req.url === '/protected-patient' && req.method === 'GET') {
         handleProtectedRoute(req, res, jwt);
-    } else {
+    } else if (req.url === '/register/admin' && req.method === 'POST') {
+        handleRegisterAdmin(req, res, jwt);
+    } else if (req.url === '/login/admin' && req.method === 'POST') {
+        handleLoginAdmin(req, res, jwt);
+    }  else {
         res.writeHead(404);
         res.end('Not Found');
     }
