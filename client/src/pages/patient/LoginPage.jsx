@@ -25,9 +25,12 @@ const LoginPage = (props) => {
     
             if (response.ok) {
                 const data = await response.json();
+                console.log(data);
                 //console.log(data);
                 localStorage.setItem('token', data.token); // Store token in local storage
                 localStorage.setItem('role', data.role); // Store role in local storage
+                localStorage.setItem('firstName', data.firstName);
+                localStorage.setItem('lastName', data.lastName);
                 navigateTo('/patient/home');
                 console.log("Login Successful");
             } else {
