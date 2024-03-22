@@ -3,7 +3,7 @@ import HeaderPortalPatient from '../../components/HeaderPortalPatient';
 import Footer from '../../components/Footer';
 
 const HomePortal = () => {
-    const [patientName, setPatientName] = useState('');
+    const [patientName, setPatientName] = useState('Patient Name');
 
     useEffect(() => {
         // Retrieve first and last name from local storage
