@@ -76,46 +76,59 @@ function registerAdmin(userData, res) {
 }
 
 function loginUser(username, password, res, jwt) {
-    pool.query('SELECT * FROM login WHERE Username = ?', [username], async (error, results) => {
-        if (error) {
-            console.error('Error retrieving user:', error);
-            res.writeHead(500, { 'Content-Type': 'text/plain' });
-            res.end('Internal Server Error');
-            return;
-        }
-
-        if (results.length === 0) {
-            res.writeHead(400, { 'Content-Type': 'text/plain' });
-            res.end('User not found');
-            return;
-        }
-
-        const user = results[0];
-        bcrypt.compare(password, user.Password, (err, result) => {
-            if (err) {
-                console.error('Error comparing passwords:', err);
+    pool.query(
+        'SELECT login.*, patient.FName, patient.LName FROM login JOIN patient ON login.patientID = patient.patientID WHERE login.Username = ?',
+        [username],
+        async (error, results) => {
+            if (error) {
+                console.error('Error retrieving user:', error);
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
                 res.end('Internal Server Error');
                 return;
             }
 
-            if (result) {
-                if (user.User_role !== 'Patient') {
-                    res.writeHead(403, { 'Content-Type': 'text/plain' });
-                    res.end('Forbidden');
+            if (results.length === 0) {
+                res.writeHead(400, { 'Content-Type': 'text/plain' });
+                res.end('User not found');
+                return;
+            }
+
+            const user = results[0];
+            bcrypt.compare(password, user.Password, (err, result) => {
+                if (err) {
+                    console.error('Error comparing passwords:', err);
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.end('Internal Server Error');
                     return;
                 }
 
-                const token = jwt.sign({ username: user.Username, role: user.User_role }, process.env.JWT_SECRET, { expiresIn: '1m' });
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ token, role: user.User_role })); // Include the role in the response
-            } else {
-                res.writeHead(401, { 'Content-Type': 'text/plain' });
-                res.end('Incorrect password');
-            }
-        });
-    });
+                if (result) {
+                    if (user.User_role !== 'Patient') {
+                        res.writeHead(403, { 'Content-Type': 'text/plain' });
+                        res.end('Forbidden');
+                        return;
+                    }
+                    
+                    //console.log(user.FName);
+                    //console.log(user.LName);
+                    const token = jwt.sign({ 
+                        username: user.Username, 
+                        role: user.User_role, 
+                        firstName: user.FName, 
+                        lastName: user.LName,
+                        patientID: user.patientID
+                    }, process.env.JWT_SECRET, { expiresIn: '1m' });
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ token, role: user.User_role, firstName: user.FName, lastName: user.LName, patientID: user.patientID }));
+                } else {
+                    res.writeHead(401, { 'Content-Type': 'text/plain' });
+                    res.end('Incorrect password');
+                }
+            });
+        }
+    );
 }
+
 
 
 function loginAdmin(username, password, res, jwt) {
@@ -149,7 +162,7 @@ function loginAdmin(username, password, res, jwt) {
                     return;
                 }
 
-                const token = jwt.sign({ username: admin.Username, role: admin.User_role }, process.env.JWT_SECRET, { expiresIn: '1m' });
+                const token = jwt.sign({ username: admin.Username, role: admin.User_role }, process.env.JWT_SECRET, { expiresIn: '2h' });
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ token, role: admin.User_role })); // Include the role in the response
             } else {
