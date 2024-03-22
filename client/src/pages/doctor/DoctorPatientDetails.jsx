@@ -166,7 +166,7 @@ const PatientDetails = () => {
                     <th className="border border-gray-400 px-20 py-2">Description</th>
                     <th className="border border-gray-400 px-20 py-2">Status</th>
                     <th className="border border-gray-400 px-32 py-2">Amount</th>
-                    <th className="border border-gray-400 px-20 py-2">Actions</th> {/* New column for actions */}
+                    <th className="border border-gray-400 px-20 py-2">Actions</th> 
                   </tr>
                 </thead>
                 <tbody>
