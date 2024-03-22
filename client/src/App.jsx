@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
-import ServicesPage from "./pages/ServicesPage";
+import AboutPage from "./pages/AboutPage";
 import LoginPage from "./pages/patient/LoginPage";
 import RegisterPage from "./pages/patient/RegisterPage";
 import MakeAppointment from "./pages/patient/MakeAppointment";
@@ -20,6 +20,7 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import DataReports from "./pages/admin/DataReports";
 import AdminStaff from "./pages/admin/AdminStaff";
 import DoctorPortal from "./pages/doctor/DoctorPortal";
+import AdminProfile from "./pages/admin/AdminProfile";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -30,7 +31,7 @@ function App() {
           <Routes>
             <Route index element= {<LandingPage />} />
             <Route path="/" element={<LandingPage />} />
-            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="/home" element={<LandingPage />} />
             <Route path="/patient/login" element={<LoginPage />} />
             <Route path="/patient/register" element={<RegisterPage />} />
@@ -51,27 +52,7 @@ function App() {
             <Route path="/admin/login" element={<AdminLogin/>}/>
             <Route path="/admin/data-reports" element={<DataReports/>}/>
             <Route path="/admin/staff" element={<AdminStaff/>}/>
-
-            {/* <Route index element= {<LandingPage />} />
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/home" element={<LandingPage />} />
-            <Route path="/patient/login" element={<LoginPage />} />
-            <Route path="/patient/register" element={<RegisterPage />} />
-            <Route path="/patient/appointment" element= {<ProtectedRoute><MakeAppointment/></ProtectedRoute>} />
-            <Route path="/patient/home" element= {<ProtectedRoute><HomePortal/></ProtectedRoute>} />
-            <Route path="/patient/payment" element= {<ProtectedRoute><PaymentPortal/></ProtectedRoute>} />
-            <Route path="/patient/profile" element= {<ProtectedRoute><PatientProfile/></ProtectedRoute>} />
-            <Route path= "/patient/history" element= {<ProtectedRoute><HistoryPortal/></ProtectedRoute>} />
-            <Route path="/patient/prescriptions" element= {<ProtectedRoute><PatientPrescriptions/></ProtectedRoute>} />
-            <Route path="/patient/settings" element= {<ProtectedRoute><PatientProfileSettings/></ProtectedRoute>} />
-            <Route path="/patient/visit" element= {<ProtectedRoute><PatientVisitDetails/></ProtectedRoute>} />
-            <Route path="/patient/history" element= {<ProtectedRoute><PatientMedicalHistory/></ProtectedRoute>} />
-            <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
-            <Route path="/admin/portal" element= {<AdminPortal/>} />
-            <Route path="/admin/appointments" element={<EditAppointment/>}/>
-            <Route path="/admin/patients" element={<AdminPatients/>}/> */}
-
+            <Route path="/admin/profile" element={<AdminProfile/>}/>
           </Routes>
         </Router>
   );
