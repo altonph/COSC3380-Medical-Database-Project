@@ -70,7 +70,7 @@ const RegisterPage = () => {
                 User_role: "Patient"
             }
             
-            const response = await fetch("http://localhost:5000/register", {
+            const response = await fetch("http://localhost:5000/patient/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)
@@ -131,8 +131,8 @@ const RegisterPage = () => {
                                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                             >
                                 <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
                             </select>
                         </div>
                         <div className="mb-4">

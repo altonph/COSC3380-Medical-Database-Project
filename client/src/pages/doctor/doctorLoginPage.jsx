@@ -45,6 +45,7 @@ const DoctorLoginPage = (props) => {
                         </div>
                         <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300">Log In</button>
                     </form>
+                    <p className="text-center mt-4">Are you an administrator? Login <Link to="/admin/login" className="text-blue-500">here</Link>.</p>
                 </div>
             </div>
             <Footer />

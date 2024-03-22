@@ -1,8 +1,22 @@
-import React, { useState } from "react";
-import HeaderPortalPatient from "../../components/HeaderPortalPatient";
-import Footer from "../../components/Footer";
+import React, { useEffect, useState } from 'react';
+import HeaderPortalPatient from '../../components/HeaderPortalPatient';
+import Footer from '../../components/Footer';
 
-const HomePortal= () => {
+const HomePortal = () => {
+    const [patientName, setPatientName] = useState('');
+
+    useEffect(() => {
+        // Retrieve first and last name from local storage
+        const firstName = localStorage.getItem('firstName');
+        const lastName = localStorage.getItem('lastName');
+        // console.log(firstName);
+        // console.log(lastName);
+        // Check if both first and last name are available
+        if (firstName && lastName) {
+            setPatientName(`${firstName} ${lastName}`);
+        }
+    }, []);
+
     return (
         <>
             <div className="flex h-screen flex-col">
@@ -28,7 +42,7 @@ const HomePortal= () => {
                     {/* main section */}
                     <main className="flex-1 p-4">
                         {/* title */}
-                        <h1 className="text-3xl font-bold mb-4 p-8">Welcome "Patient Name"!</h1>
+                        <h1 className="text-3xl font-bold mb-4 p-8">Welcome {patientName}!</h1>
                         
                         {/* Appointments */}
                         <h1 className= "text-xl font-bold pb-4 ml-4">Appointments</h1>

@@ -1,5 +1,5 @@
 //TODO: Connect database to backend
-const mysql = require('mysql');
+const mysql = require('mysql2');
 require('dotenv').config();
 
 // Create a connection pool

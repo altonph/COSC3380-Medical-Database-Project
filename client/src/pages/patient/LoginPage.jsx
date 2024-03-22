@@ -9,26 +9,31 @@ const LoginPage = (props) => {
     const [Password, setPassword] = useState('');
     const navigateTo = useNavigate(); // Get the history object
 
-    const handleSubmit = async (e) => { 
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const body = {
                 Username: Username,
                 Password: Password,
-                //User_role: "Patient"
             }
-            
-            const response = await fetch("http://localhost:5000/login", {
+    
+            const response = await fetch("http://localhost:5000/patient/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)
             });
-            
+    
             if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+                //console.log(data);
+                localStorage.setItem('token', data.token); // Store token in local storage
+                localStorage.setItem('role', data.role); // Store role in local storage
+                localStorage.setItem('firstName', data.firstName);
+                localStorage.setItem('lastName', data.lastName);
                 navigateTo('/patient/home');
                 console.log("Login Successful");
-            }
-            else {
+            } else {
                 const data = await response.json();
                 console.error('Login failed:', data.message);
             }
@@ -36,6 +41,7 @@ const LoginPage = (props) => {
             console.log(err.message);
         }
     }
+    
 
     return (
         <div className="flex flex-col min-h-screen">

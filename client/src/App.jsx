@@ -16,7 +16,13 @@ import PatientMedicalHistory from "./pages/patient/PatientMedicalHistory";
 import AdminPortal from "./pages/admin/AdminPortal";
 import EditAppointment from "./pages/admin/EditAppointments";
 import AdminPatients from "./pages/admin/AdminPatients";
+import AdminLogin from "./pages/admin/AdminLogin";
+import DataReports from "./pages/admin/DataReports";
+import AdminStaff from "./pages/admin/AdminStaff";
+import DoctorPortal from "./pages/doctor/DoctorPortal";
 
+//import ProtectedRoute from "./components/ProtectedRoute";
+//import AdminRoute from "./components/AdminRoute";
 
 function App() {
   return (
@@ -38,9 +44,34 @@ function App() {
             <Route path="/patient/visit" element= {<PatientVisitDetails/>} />
             <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
-            <Route path="/admin/portal" element= {<AdminPortal/>} />
+            <Route path="/doctor/home" element= {<DoctorPortal/>} />
+            <Route path="/admin/home" element= {<AdminPortal/>} />
             <Route path="/admin/appointments" element={<EditAppointment/>}/>
             <Route path="/admin/patients" element={<AdminPatients/>}/>
+            <Route path="/admin/login" element={<AdminLogin/>}/>
+            <Route path="/admin/data-reports" element={<DataReports/>}/>
+            <Route path="/admin/staff" element={<AdminStaff/>}/>
+
+            {/* <Route index element= {<LandingPage />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/home" element={<LandingPage />} />
+            <Route path="/patient/login" element={<LoginPage />} />
+            <Route path="/patient/register" element={<RegisterPage />} />
+            <Route path="/patient/appointment" element= {<ProtectedRoute><MakeAppointment/></ProtectedRoute>} />
+            <Route path="/patient/home" element= {<ProtectedRoute><HomePortal/></ProtectedRoute>} />
+            <Route path="/patient/payment" element= {<ProtectedRoute><PaymentPortal/></ProtectedRoute>} />
+            <Route path="/patient/profile" element= {<ProtectedRoute><PatientProfile/></ProtectedRoute>} />
+            <Route path= "/patient/history" element= {<ProtectedRoute><HistoryPortal/></ProtectedRoute>} />
+            <Route path="/patient/prescriptions" element= {<ProtectedRoute><PatientPrescriptions/></ProtectedRoute>} />
+            <Route path="/patient/settings" element= {<ProtectedRoute><PatientProfileSettings/></ProtectedRoute>} />
+            <Route path="/patient/visit" element= {<ProtectedRoute><PatientVisitDetails/></ProtectedRoute>} />
+            <Route path="/patient/history" element= {<ProtectedRoute><PatientMedicalHistory/></ProtectedRoute>} />
+            <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
+            <Route path="/admin/portal" element= {<AdminPortal/>} />
+            <Route path="/admin/appointments" element={<EditAppointment/>}/>
+            <Route path="/admin/patients" element={<AdminPatients/>}/> */}
+
           </Routes>
         </Router>
   );

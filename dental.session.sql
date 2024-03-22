@@ -1,6 +1,22 @@
 -- @block Dummy data for office table
 INSERT INTO office (officeID, office_address, Phone_num, email) 
-VALUES (1, '123 Main St, Anytown, USA', '1234567890', 'office1@example.com');
+VALUES (1, '123 Main St, Houston, TX', '1234567890', 'office1@example.com');
+INSERT INTO office (officeID, office_address, Phone_num, email) 
+VALUES (2, '321 2nd St, Katy, TX', '1234567890', 'office2@example.com');
+
+-- @block
+SELECT * FROM office;
+
+-- @block
+DELETE FROM office;
+
+-- @block
+SELECT * FROM dentist;
+SELECT * FROM login;
+
+-- @block
+DELETE FROM dentist;
+DELETE FROM login;
 
 -- @block Dummy data for dentist table
 INSERT INTO dentist (officeID, FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary) 
@@ -47,10 +63,20 @@ INSERT INTO login (Username, Password, Email, patientID, dentistID, staffID, Is_
 VALUES ('user1', 'password123', 'user1@example.com', 1, NULL, NULL, FALSE);
 
 -- @block
-SELECT * FROM login;
 SELECT * FROM patient;
-
+SELECT * FROM login;
 
 -- @block
-DELETE FROM login;
+SELECT * FROM office;
+
+-- @block
 DELETE FROM patient;
+DELETE FROM login;
+
+-- @block
+SELECT p.Fname, p.Lname, l.Username, l.User_Role
+FROM patient as p, login as l
+WHERE p.patientID = l.patientID
+
+-- @block
+SELECT * FROM login WHERE Username = "tonal"
