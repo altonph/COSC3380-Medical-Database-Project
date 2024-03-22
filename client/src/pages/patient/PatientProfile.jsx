@@ -51,10 +51,10 @@ const PatientProfile = () => {
 
   const formatDOB = (dob) => {
     const date = new Date(dob);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
     const year = date.getFullYear();
-    return `${month}-${day}-${year}`;
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
+    const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if needed
+    return `${year}-${month}-${day}`;
   };
 
   return (

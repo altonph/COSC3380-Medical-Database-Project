@@ -1,25 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HeaderPortalPatient from "../../components/HeaderPortalPatient";
 
-const PatientProfile = () => {
+const PatientProfileSetting = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  const defaultValues = {
-    firstName: 'Random',
-    lastName: 'Patient',
-    gender: 'Male',
-    dob: '00/00/0000',
-    email: 'randompatient@gmail.com',
-    phoneNumber: '000-000-0000',
-    address: '1234 Random Place',
-    insuranceName: 'Random Insurance',
+  const [editedProfile, setEditedProfile] = useState({
+    patientID: null,
+    insuranceID: null,
+    dentistID: null,
+    FName: '',
+    LName: '',
+    Gender: '',
+    DOB: '',
+    Email: '',
+    Phone_num: '',
+    Address: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
+  });
+
+
+  
+  useEffect(() => {
+    fetchPatientProfile();
+  }, []);
+
+  const fetchPatientProfile = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/patient/profile", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setEditedProfile(data);
+      } else {
+        console.error("Failed to fetch patient profile:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching patient profile:", error);
+    }
   };
 
-  const [editedProfile, setEditedProfile] = useState(defaultValues);
+  const formatDOB = (dob) => {
+    const date = new Date(dob);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
+    const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if needed
+    return `${year}-${month}-${day}`;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -29,9 +64,29 @@ const PatientProfile = () => {
     });
   };
 
-  const handleProfileUpdate = () => {
-    console.log('Updated profile:', editedProfile);
-    setIsEditing(false); 
+  
+
+  const handleProfileUpdate = async () => {
+  
+    try {
+      const response = await fetch("http://localhost:5000/api/patient/profile/update", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('token')}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(editedProfile)
+      });
+
+      if (response.ok) {
+        console.log('Profile updated successfully');
+        setIsEditing(false);
+      } else {
+        console.error("Failed to update patient profile:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error updating patient profile:", error);
+    }
   };
 
   const handlePasswordChange = () => {
@@ -53,13 +108,13 @@ const PatientProfile = () => {
             {isEditing ? (
               <input
                 type="text"
-                name="firstName"
-                value={editedProfile.firstName}
+                name="FName"
+                value={editedProfile.FName}
                 onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
               />
             ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.firstName}</div>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.FName}</div>
             )}
           </div>
 
@@ -69,13 +124,13 @@ const PatientProfile = () => {
             {isEditing ? (
               <input
                 type="text"
-                name="lastName"
-                value={editedProfile.lastName}
+                name="LName"
+                value={editedProfile.LName}
                 onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
               />
             ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.lastName}</div>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.LName}</div>
             )}
           </div>
 
@@ -84,8 +139,8 @@ const PatientProfile = () => {
             <label className="block mb-2">Gender:</label>
             {isEditing ? (
               <select
-                name="gender"
-                value={editedProfile.gender}
+                name="Gender"
+                value={editedProfile.Gender}
                 onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
               >
@@ -93,7 +148,7 @@ const PatientProfile = () => {
                 <option value="Female">Female</option>
               </select>
             ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.gender}</div>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.Gender}</div>
             )}
           </div>
 
@@ -103,13 +158,13 @@ const PatientProfile = () => {
             {isEditing ? (
               <input
                 type="date"
-                name="dob"
-                value={editedProfile.dob}
+                name="DOB"
+                value={editedProfile.DOB}
                 onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
               />
             ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.dob}</div>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{formatDOB(editedProfile.DOB)}</div>
             )}
           </div>
 
@@ -118,14 +173,14 @@ const PatientProfile = () => {
             <label className="block mb-2">Email:</label>
             {isEditing ? (
               <input
-                type="email"
-                name="email"
-                value={editedProfile.email}
+                type="Email"
+                name="Email"
+                value={editedProfile.Email}
                 onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
               />
             ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.email}</div>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.Email}</div>
             )}
           </div>
 
@@ -135,13 +190,13 @@ const PatientProfile = () => {
             {isEditing ? (
               <input
                 type="tel"
-                name="phoneNumber"
-                value={editedProfile.phoneNumber}
+                name="Phone_num"
+                value={editedProfile.Phone_num}
                 onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
               />
             ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.phoneNumber}</div>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.Phone_num}</div>
             )}
           </div>
 
@@ -151,34 +206,46 @@ const PatientProfile = () => {
             {isEditing ? (
               <input
                 type="text"
-                name="address"
-                value={editedProfile.address}
+                name="Address"
+                value={editedProfile.Address}
                 onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
               />
             ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.address}</div>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.Address}</div>
             )}
           </div>
         </div>
+        
         {/* Edit Button */}
         <div>
-            {isEditing ? (
-              <button
-                onClick={handleProfileUpdate}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 block mb-2 mt-4"
-              >
-                Save Changes
-              </button>
-            ) : (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 block mb-2 mt-4"
-              >
-                Edit Information
-              </button>
-            )}
+        {isEditing ? (
+          <div className="flex">
+            <button
+              onClick={handleProfileUpdate}
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 block mb-2 mt-4 mr-2"
+            >
+              Save Changes
+            </button>
+            <button
+              onClick={() => {
+                setIsEditing(false);
+                setEditedProfile(defaultValues); // Reset editedProfile to default values
+              }}
+              className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 block mb-2 mt-4"
+            >
+              Cancel
+            </button>
           </div>
+        ) : (
+          <button
+            onClick={() => setIsEditing(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 block mb-2 mt-4"
+          >
+            Edit Information
+          </button>
+        )}
+      </div>
 
         {/* Password Management */}
         <div className="mt-8">
@@ -236,4 +303,4 @@ const PatientProfile = () => {
   );
 };
 
-export default PatientProfile;
+export default PatientProfileSetting;
