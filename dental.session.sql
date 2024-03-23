@@ -103,3 +103,4 @@ SELECT * FROM invoice;
 
 -- @block
 SELECT * FROM patient;
+SELECT * FROM login;
