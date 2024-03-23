@@ -1,11 +1,12 @@
 // index.js
-
 const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { handleRegister, handleLogin, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
 const { patientRoutes, patientUpdate, appointmentRoutes } = require('./routes/patientRoutes');
+const officeRoutes = require('./routes/officeRoutes');
+const dentistRoutes = require('./routes/dentistRoutes');
 
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,6 +19,7 @@ const server = http.createServer((req, res) => {
         return;
     }
 
+    // Handle patient routes
     if (req.url === '/patient/register' && req.method === 'POST') {
         handleRegister(req, res);
     } else if (req.url === '/patient/login' && req.method === 'POST') {
@@ -34,6 +36,10 @@ const server = http.createServer((req, res) => {
         patientUpdate(req, res, jwt);
     } else if (req.url === '/api/appointment/schedule' && req.method === 'POST') {
         appointmentRoutes(req, res, jwt);
+    } else if (req.url.startsWith('/api/office') && req.method === 'GET') {
+        officeRoutes(req, res);
+    } else if (req.url.startsWith('/api/dentist') && req.method === 'GET') {
+        dentistRoutes(req, res);
     } else {
         res.writeHead(404);
         res.end('Not Found');
