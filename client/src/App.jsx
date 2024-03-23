@@ -24,6 +24,7 @@ import DataReports from "./pages/admin/DataReports";
 import AdminStaff from "./pages/admin/AdminStaff";
 import DoctorPortal from "./pages/doctor/DoctorPortal";
 import AdminProfile from "./pages/admin/AdminProfile";
+import DoctorProfile from "./pages/doctor/DoctorProfile";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -52,6 +53,7 @@ function App() {
             <Route path="/doctor/patients" element={<DoctorPatients/>}/>
             <Route path="/doctor/patients/:patientID" element={<PatientDetails />} />
             <Route path="/doctor/home" element= {<DoctorPortal/>} />
+            <Route path="/doctor/profile" element= {<DoctorProfile/>} />
             <Route path="/admin/home" element= {<AdminPortal/>} />
             <Route path="/admin/appointments" element={<AdminAppointment/>}/>
             <Route path="/admin/patients" element={<AdminPatients/>}/>
