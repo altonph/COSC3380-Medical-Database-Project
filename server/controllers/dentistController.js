@@ -25,4 +25,32 @@ const getDentistID = (req, res, fName, lName) => {
     );
 };
 
-module.exports = { getDentistID };
+const getDentistsByOfficeID = (req, res, officeID) => {
+    pool.query(
+        'SELECT * FROM dentist WHERE officeID = ?',
+        [officeID],
+        (error, results) => {
+            if (error) {
+                console.error('Error retrieving dentists:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            }
+
+            if (results.length === 0) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'No dentists found for the given officeID' }));
+                return;
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ results }));
+            
+        }
+    );
+};
+
+module.exports = { 
+    getDentistsByOfficeID,
+    getDentistID 
+};

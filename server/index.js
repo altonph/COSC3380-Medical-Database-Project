@@ -6,7 +6,7 @@ const { handleRegister, handleLogin, handleRegisterAdmin, handleLoginAdmin } = r
 const { handleProtectedRoute } = require('./controllers/authController');
 const { patientRoutes, patientUpdate, appointmentRoutes } = require('./routes/patientRoutes');
 const officeRoutes = require('./routes/officeRoutes');
-const dentistRoutes = require('./routes/dentistRoutes');
+const { dentistRoutes, dentistByOffice } = require('./routes/dentistRoutes');
 
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -40,7 +40,9 @@ const server = http.createServer((req, res) => {
         officeRoutes(req, res);
     } else if (req.url.startsWith('/api/dentist') && req.method === 'GET') {
         dentistRoutes(req, res);
-    } else {
+    } else if (req.url.startsWith('/api/getDentistByOffice') && req.method === 'GET') {
+        dentistByOffice(req, res);
+    }  else {
         res.writeHead(404);
         res.end('Not Found');
     }

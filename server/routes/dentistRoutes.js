@@ -1,4 +1,4 @@
-const { getDentistID } = require('../controllers/dentistController');
+const { getDentistID, getDentistsByOfficeID  } = require('../controllers/dentistController');
 
 const dentistRoutes = (req, res) => {
     const { url, method } = req;
@@ -21,4 +21,30 @@ const dentistRoutes = (req, res) => {
     }
 };
 
-module.exports = dentistRoutes;
+
+
+
+const dentistByOffice = (req, res) => {
+    const { url, method } = req;
+
+    if (method === 'GET' && url.startsWith('/api/getDentistByOffice')) {
+        const params = new URLSearchParams(url.split('?')[1]);
+        const officeID = params.get('officeID');
+
+        if (!officeID) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Office ID is required' }));
+            return;
+        }
+        getDentistsByOfficeID(req, res, officeID);
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
+
+module.exports = { 
+    dentistRoutes,
+    dentistByOffice 
+};
