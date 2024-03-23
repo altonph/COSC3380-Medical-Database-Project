@@ -5,7 +5,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { handleRegister, handleLogin, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
-const { patientRoutes, patientUpdate } = require('./routes/patientRoutes');
+const { patientRoutes, patientUpdate, appointmentRoutes } = require('./routes/patientRoutes');
 
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -32,6 +32,8 @@ const server = http.createServer((req, res) => {
         patientRoutes(req, res, jwt);
     } else if (req.url === '/api/patient/profile/update' && req.method === 'POST') {
         patientUpdate(req, res, jwt);
+    } else if (req.url === '/api/appointment/schedule' && req.method === 'POST') {
+        appointmentRoutes(req, res, jwt);
     } else {
         res.writeHead(404);
         res.end('Not Found');

@@ -34,7 +34,7 @@ const updatePatientProfile = (req, res, patientID, updatedProfile) => {
     pool.query(
         'UPDATE patient SET Gender = ?, FName = ?, LName = ?, DOB = ?, Email = ?, Phone_num = ?, Address = ? WHERE patientID = ?',
         [Gender, FName, LName, DOB, Email, Phone_num, Address, patientID],
-        (error, results) => {
+        (error, patientResults) => {
             if (error) {
                 console.error('Error updating patient profile:', error);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -42,8 +42,42 @@ const updatePatientProfile = (req, res, patientID, updatedProfile) => {
                 return;
             }
             
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ message: 'Patient profile updated successfully' }));
+            // Update email in the login table
+            pool.query(
+                'UPDATE login SET Email = ? WHERE patientID = ?',
+                [Email, patientID],
+                (loginError, loginResults) => {
+                    if (loginError) {
+                        console.error('Error updating email in login table:', loginError);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                        return;
+                    }
+
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ message: 'Patient profile updated successfully' }));
+                }
+            );
+        }
+    );
+};
+
+const scheduleAppointment = (req, res, patientID, appointmentDetails) => {
+    const { officeID, staffID, dentistID, Date, Start_time, End_time, Appointment_Type } = appointmentDetails;
+    console.log(appointmentDetails);
+    pool.query(
+        'INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, 'Scheduled'],
+        (error, results) => {
+            if (error) {
+                console.error('Error scheduling appointment:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            }
+
+            res.writeHead(201, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Appointment scheduled successfully' }));
         }
     );
 };
@@ -51,4 +85,5 @@ const updatePatientProfile = (req, res, patientID, updatedProfile) => {
 module.exports = {
     getPatientProfile,
     updatePatientProfile,
+    scheduleAppointment
 };
