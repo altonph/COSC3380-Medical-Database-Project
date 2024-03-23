@@ -16,39 +16,6 @@ const RegisterPage = () => {
     const [Username, setUsername] = useState('');
     const navigateTo = useNavigate(); 
 
-    // const handleSubmit = async (e) => { 
-    //     e.preventDefault();
-    //     try {
-    //         const response = await fetch('http://localhost:5000/register', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json'
-    //             },
-    //             body: JSON.stringify({
-    //                 FName,
-    //                 LName,
-    //                 Gender,
-    //                 DOB,
-    //                 Email,  // Use Email instead of Email: Email
-    //                 Username,
-    //                 Password,  // Use Password instead of Password: Password
-    //                 Phone_num,
-    //                 Address
-    //             })
-    //         });
-            
-    //         if (!response.ok) {
-    //             throw new Error('Registration failed');
-    //         }
-            
-    //         // Registration successful
-    //         console.log('Registration successful');
-    //         // Redirect the user to a new page or show a success message
-    //     } catch (error) {
-    //         console.error('Error registering:', error.message);
-    //         setError('Registration failed. Please try again.');
-    //     }
-    // }
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
