@@ -34,13 +34,13 @@ const server = http.createServer((req, res) => {
         patientRoutes(req, res, jwt);
     } else if (req.url === '/api/patient/profile/update' && req.method === 'POST') {
         patientUpdate(req, res, jwt);
-    } else if (req.url === '/api/appointment/schedule' && req.method === 'POST') {
+    } else if (req.url === '/api/appointment/schedule' && req.method === 'POST') { // schedule an appointment
         appointmentRoutes(req, res, jwt);
-    } else if (req.url.startsWith('/api/office') && req.method === 'GET') {
+    } else if (req.url.startsWith('/api/office') && req.method === 'GET') { //get officeID given officeAddress
         officeRoutes(req, res);
-    } else if (req.url.startsWith('/api/dentist') && req.method === 'GET') {
+    } else if (req.url.startsWith('/api/dentist') && req.method === 'GET') { //get dentistID given dentist first and last name
         dentistRoutes(req, res);
-    } else if (req.url.startsWith('/api/getDentistByOffice') && req.method === 'GET') {
+    } else if (req.url.startsWith('/api/getDentistByOffice') && req.method === 'GET') { //get list of dentist given officeID
         dentistByOffice(req, res);
     }  else {
         res.writeHead(404);
