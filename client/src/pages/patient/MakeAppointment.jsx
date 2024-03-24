@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import HeaderPortalPatient from "../../components/HeaderPortalPatient";
 import Footer from "../../components/Footer";
+import { useNavigate } from 'react-router-dom';
 
 const MakeAppointment = () => {
+  const navigateTo = useNavigate();
   const [preferredDate, setPreferredDate] = useState('');
   const [preferredTime, setPreferredTime] = useState('');
   const [practitioner, setPractitioner] = useState('');
   const [location, setLocation] = useState('');
   const [reasonForAppointment, setReasonForAppointment] = useState('');
   const [dentists, setDentists] = useState([]);
+  const [notification, setNotification] = useState('');
 
   useEffect(() => {
     if (location) {
@@ -71,6 +74,11 @@ const MakeAppointment = () => {
       });
       if (response.ok) {
         console.log('Appointment successfully scheduled!');
+        setNotification('Appointment scheduled successfully!');
+        setTimeout(() => {
+          setNotification('');
+          navigateTo('/patient/home');
+        }, 1000);
       } else {
         console.error('Failed to make appointment:', response.statusText);
       }
@@ -189,6 +197,7 @@ const MakeAppointment = () => {
                 >
                   <option value="" disabled selected>Select Reason</option>
                   <option value="Checkup">Checkup</option>
+                  <option value="Cleaning">Cleaning</option>
                   <option value="Filling">Filling</option>
                   <option value="Extraction">Extraction</option>
                   <option value="Root Canal">Root Canal</option>
@@ -196,6 +205,9 @@ const MakeAppointment = () => {
               </div>
 
               <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Submit</button>
+              {notification && (
+                <span className="text-green-600 ml-2">{notification}</span>
+              )}
             </form>
           </div>
         </main>
