@@ -32,7 +32,7 @@ import ContactPage from "./pages/ContactPage";
 
 function App() {
   return (
-        <Router basename="/main--cosc3380-medical-database-project.netlify.app">
+        <Router>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/about" element={<AboutPage />} />
@@ -67,4 +67,5 @@ function App() {
   );
 };
 
-export default App;
+export default App
+
