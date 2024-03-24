@@ -25,6 +25,7 @@ import AdminStaff from "./pages/admin/AdminStaff";
 import DoctorPortal from "./pages/doctor/DoctorPortal";
 import AdminProfile from "./pages/admin/AdminProfile";
 import DoctorProfile from "./pages/doctor/DoctorProfile";
+import ContactPage from "./pages/ContactPage";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -39,6 +40,7 @@ function App() {
             <Route path="/home" element={<LandingPage />} />
             <Route path="/patient/login" element={<LoginPage />} />
             <Route path="/patient/register" element={<RegisterPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/patient/appointment" element= {<MakeAppointment/>} />
             <Route path="/patient/home" element= {<HomePortal/>} />
             <Route path="/patient/payment" element= {<PaymentPortal/>} />
