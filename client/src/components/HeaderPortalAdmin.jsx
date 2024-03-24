@@ -1,12 +1,23 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 const HeaderPortalAdmin = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNameClicked, setIsNameClicked] = useState(false);
+  const navigate = useNavigate(); // Get the navigate function from react-router-dom
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
     setIsNameClicked(!isNameClicked);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('firstName');
+    localStorage.removeItem('lastName');
+    navigate('/home'); 
+    console.log("Logout Successful");
   };
 
   return (
@@ -31,7 +42,7 @@ const HeaderPortalAdmin = () => {
                     <a href="/admin/settings">Settings</a>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-200">
-                    <a href="#">Log Out</a>
+                    <button onClick={handleLogout}>Log Out</button>
                   </li>
                 </ul>
               )}
