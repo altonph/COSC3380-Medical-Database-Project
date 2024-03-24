@@ -34,7 +34,6 @@ function App() {
   return (
         <Router>
           <Routes>
-            <Route index element= {<LandingPage />} />
             <Route path="/" element={<LandingPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/home" element={<LandingPage />} />
