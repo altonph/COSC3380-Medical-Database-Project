@@ -17,7 +17,7 @@ const AdminLogin = () => {
         Password: Password,
       };
 
-      const response = await fetch('http://localhost:5000/login/admin', {
+      const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/login/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

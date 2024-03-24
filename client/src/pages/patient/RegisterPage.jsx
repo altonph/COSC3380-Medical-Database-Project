@@ -37,7 +37,7 @@ const RegisterPage = () => {
                 User_role: "Patient"
             }
             
-            const response = await fetch("http://localhost:5000/patient/register", {
+            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/patient/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)

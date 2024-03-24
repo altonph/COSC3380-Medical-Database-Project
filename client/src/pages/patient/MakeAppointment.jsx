@@ -21,7 +21,7 @@ const MakeAppointment = () => {
 
   const fetchDentistsByOffice = async (officeID) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/getDentistByOffice?officeID=${officeID}`);
+      const response = await fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/getDentistByOffice?officeID=${officeID}`);
       if (response.ok) {
         const data = await response.json();
         //console.log(data);
@@ -58,7 +58,7 @@ const MakeAppointment = () => {
     console.log('Appointment Type:', reasonForAppointment);
   
     try {
-      const response = await fetch('http://localhost:5000/api/appointment/schedule', {
+      const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/appointment/schedule', {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`,
