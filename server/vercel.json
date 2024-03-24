@@ -1,5 +1,14 @@
 {
     "version": 2,
-    "builds": [{ "src": "./index.js", "use": "@vercel/node" }],
-    "routes": [{ "src": "/(.*)", "dest": "/" }]
-}
+    "routes": [
+      { "handle": "vercel", "src": "/api/(.*)", "dest": "index.js" }
+    ],
+    "functions": {
+      "api": {
+        "handler": "index.handler",
+        "memory": 1024,
+        "maxDuration": 10
+      }
+    }
+  }
+  
