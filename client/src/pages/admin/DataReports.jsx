@@ -15,7 +15,7 @@ function DataReports() {
       const token = localStorage.getItem('token');
   
       // Construct the URL with query parameters
-      const url = `http://localhost:5000/api/admin/generate-report?reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`;
+      const url = `http://cosc-3380-medical-database-project.vercel.app/api/admin/generate-report?reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`;
   
       const response = await fetch(url, {
         method: 'GET',
