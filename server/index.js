@@ -1,11 +1,10 @@
-// index.js
-
 const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { handleRegister, handleLogin, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
 const { patientRoutes, patientUpdate, appointmentRoutes } = require('./routes/patientRoutes');
+const { adminRoutes } = require('./routes/adminRoutes'); // Import admin routes
 
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -34,6 +33,12 @@ const server = http.createServer((req, res) => {
         patientUpdate(req, res, jwt);
     } else if (req.url === '/api/appointment/schedule' && req.method === 'POST') {
         appointmentRoutes(req, res, jwt);
+    } else if (req.url.startsWith('/api/admin/generate-report') && req.method === 'GET') {
+        adminRoutes(req, res, jwt);
+    } else if (req.url === '/api/admin/generate-report' && req.method === 'POST') {
+        adminRoutes(req, res, jwt);
+    } else if (req.url.startsWith('/api/report') && req.method === 'GET') {
+        reportRoutes(req, res, jwt);
     } else {
         res.writeHead(404);
         res.end('Not Found');

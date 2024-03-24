@@ -161,8 +161,11 @@ function loginAdmin(username, password, res, jwt) {
                     res.end('Forbidden');
                     return;
                 }
-
-                const token = jwt.sign({ username: admin.Username, role: admin.User_role }, process.env.JWT_SECRET, { expiresIn: '2h' });
+                const token = jwt.sign({ 
+                    username: admin.Username, 
+                    role: admin.User_role,
+                    isAdmin: admin.User_role === 'Admin' // Check if the user is an admin
+                }, process.env.JWT_SECRET, { expiresIn: '2h' });                
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ token, role: admin.User_role })); // Include the role in the response
             } else {

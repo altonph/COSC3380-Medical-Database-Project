@@ -6,11 +6,38 @@ function DataReports() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reportType, setReportType] = useState('');
+  const [reportData, setReportData] = useState(null); // State to store the generated report data
+  const [loading, setLoading] = useState(false); // State to track loading status
 
-  const handleGenerateReport = () => {
-    console.log(`Generating ${reportType} report from ${startDate} to ${endDate}`);
-    
-  };
+  const handleGenerateReport = async () => {
+    try {
+      setLoading(true); // Set loading state to true
+      const token = localStorage.getItem('token');
+  
+      // Construct the URL with query parameters
+      const url = `http://localhost:5000/api/admin/generate-report?reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`;
+  
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to generate report');
+      }
+  
+      const data = await response.json();
+      setReportData(data.report);
+    } catch (error) {
+      console.error('Error generating report:', error);
+      // Handle error condition
+    } finally {
+      setLoading(false); // Set loading state back to false
+    }
+  };  
 
   return (
     <div className="flex h-screen flex-col">
@@ -63,12 +90,24 @@ function DataReports() {
               className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300 bg-gray-100"
             >
               <option value="">Select Report Type</option>
-              <option value="Dentist Salary Data Report">Dentist Salary Data Report</option>
-              <option value="Dental Cleaning Data Report">Dental Cleaning Data Report</option>
-              <option value="Treatment Procedures Report">Treatment Procedures Data Report</option> // Types of treatments?
+              <option value="Dentist Salary Data Report">List Staff Assignments</option>
+              <option value="Dental Cleaning Data Report">Calculate Staff Efficiency</option>
+              <option value="Treatment Procedures Report">Workload Distribution</option>
             </select>
           </div>
           <button onClick={handleGenerateReport} className="bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300 hover:bg-blue-600">Generate Report</button>
+          
+          {/* Display loading message while fetching data */}
+          {loading && <p>Loading...</p>}
+
+          {/* Display the generated report data */}
+          {reportData && (
+            <div className="mt-4">
+              <h2 className="text-2xl font-bold mb-2">Generated Report</h2>
+              {/* Render the report data here */}
+              <pre>{JSON.stringify(reportData, null, 2)}</pre>
+            </div>
+          )}
         </div>
       </div>
       <Footer />
