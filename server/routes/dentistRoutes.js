@@ -1,3 +1,4 @@
+//dentistRoutes.js
 const { getDentistID, getDentistsByOfficeID  } = require('../controllers/dentistController');
 
 const dentistRoutes = (req, res) => {

@@ -1,3 +1,4 @@
+//dentistController.js
 const pool = require('../models/db');
 
 const getDentistID = (req, res, fName, lName) => {

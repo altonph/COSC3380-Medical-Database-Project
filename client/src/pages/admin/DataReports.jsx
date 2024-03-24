@@ -3,13 +3,22 @@ import HeaderPortalAdmin from '../../components/HeaderPortalAdmin';
 import Footer from '../../components/Footer';
 
 function DataReports() {
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [reportType, setReportType] = useState('');
+  const [speciality, setSpeciality] = useState('');
+  const [reportData, setReportData] = useState([]);
+  const [showReport, setShowReport] = useState(false);
 
-  const handleGenerateReport = () => {
-    console.log(`Generating ${reportType} report from ${startDate} to ${endDate}`);
-    
+  const handleGenerateReport = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/admin/salary-report?specialty=${speciality}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      const data = await response.json();
+      setReportData(data);
+      setShowReport(true);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   };
 
   return (
@@ -33,42 +42,48 @@ function DataReports() {
         </aside>
 
         <div className="content p-4">
-          <h1 className="text-3xl font-bold mb-4">Data Reports</h1>
+          <h1 className="text-3xl font-bold mb-4">Dentist Salary Data Report</h1>
+          
           <div className="mb-4">
-            <label htmlFor="startDate" className="block mb-1">Start Date:</label>
-            <input 
-              type="date" 
-              id="startDate" 
-              value={startDate} 
-              onChange={(e) => setStartDate(e.target.value)} 
-              className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300 bg-gray-100"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="endDate" className="block mb-1">End Date:</label>
-            <input 
-              type="date" 
-              id="endDate" 
-              value={endDate} 
-              onChange={(e) => setEndDate(e.target.value)} 
-              className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300 bg-gray-100"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="reportType" className="block mb-1">Report Type:</label>
+            <label htmlFor="speciality" className="block mb-1">Specialty:</label>
             <select
-              id="reportType"
-              value={reportType}
-              onChange={(e) => setReportType(e.target.value)}
+              id="speciality"
+              value={speciality}
+              onChange={(e) => setSpeciality(e.target.value)}
               className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300 bg-gray-100"
             >
-              <option value="">Select Report Type</option>
-              <option value="Dentist Salary Data Report">Dentist Salary Data Report</option>
-              <option value="Dental Cleaning Data Report">Dental Cleaning Data Report</option>
-              <option value="Treatment Procedures Report">Treatment Procedures Data Report</option> // Types of treatments?
+              <option value="" disabled>Select Specialty</option>
+              <option value="All">All</option>
+              <option value="General Dentistry">General Dentistry</option>
+              <option value="Orthodontist">Orthodontist</option>
             </select>
           </div>
           <button onClick={handleGenerateReport} className="bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300 hover:bg-blue-600">Generate Report</button>
+          
+          {showReport && (
+            <table className="mt-4 w-full border-collapse border border-gray-400">
+              <thead>
+                <tr className="bg-gray-200">
+                  <th className="border border-gray-400 px-4 py-2">First Name</th>
+                  <th className="border border-gray-400 px-4 py-2">Last Name</th>
+                  <th className="border border-gray-400 px-4 py-2">Email</th>
+                  <th className="border border-gray-400 px-4 py-2">Start Date</th>
+                  <th className="border border-gray-400 px-4 py-2">Salary</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reportData.map((row, index) => (
+                  <tr key={index} className={index % 2 === 0 ? 'bg-gray-100' : ''}>
+                    <td className="border border-gray-400 px-4 py-2">{row.FName}</td>
+                    <td className="border border-gray-400 px-4 py-2">{row.LName}</td>
+                    <td className="border border-gray-400 px-4 py-2">{row.Email}</td>
+                    <td className="border border-gray-400 px-4 py-2">{new Date(row.Start_date).toLocaleDateString()}</td>
+                    <td className="border border-gray-400 px-4 py-2">${row.Salary.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
       <Footer />
