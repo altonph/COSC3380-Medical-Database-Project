@@ -21,7 +21,12 @@ const server = http.createServer((req, res) => {
     }
 
     // Handle patient routes
-    if (req.url === '/patient/register' && req.method === 'POST') {
+    if (req.url === '/' && req.method === 'GET') {
+        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.end('Hosted on Vercel');
+        return;
+    }
+    else if (req.url === '/patient/register' && req.method === 'POST') {
         handleRegister(req, res);
     } else if (req.url === '/patient/login' && req.method === 'POST') {
         handleLogin(req, res, jwt);
