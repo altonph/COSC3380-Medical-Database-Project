@@ -1,7 +1,7 @@
 const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const { handleRegister, handleLogin, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
+const { handleRegister, handleLogin, handleRegisterDoctor, handleLoginDoctor,handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
 const { patientRoutes, patientUpdate, appointmentRoutes } = require('./routes/patientRoutes');
 const { adminRoutes } = require('./routes/adminRoutes'); // Import admin routes
@@ -23,6 +23,10 @@ const server = http.createServer((req, res) => {
         handleLogin(req, res, jwt);
     } else if (req.url === '/protected-patient' && req.method === 'GET') {
         handleProtectedRoute(req, res, jwt);
+    } else if (req.url === '/doctor/register' && req.method === 'POST') {
+        handleRegisterDoctor(req, res, jwt); 
+    } else if (req.url === '/doctor/login' && req.method === 'POST') {
+        handleLoginDoctor(req, res, jwt); 
     } else if (req.url === '/register/admin' && req.method === 'POST') {
         handleRegisterAdmin(req, res, jwt);
     } else if (req.url === '/login/admin' && req.method === 'POST') {
