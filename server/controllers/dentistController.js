@@ -2,6 +2,7 @@
 const pool = require('../models/db');
 
 const getDentistID = (req, res, fName, lName) => {
+    
     pool.query(
         'SELECT dentistID FROM dentist WHERE FName = ? AND LName = ?',
         [fName, lName],
@@ -24,9 +25,11 @@ const getDentistID = (req, res, fName, lName) => {
             res.end(JSON.stringify({ dentistID }));
         }
     );
+
 };
 
 const getDentistsByOfficeID = (req, res, officeID) => {
+
     pool.query(
         'SELECT * FROM dentist WHERE officeID = ?',
         [officeID],

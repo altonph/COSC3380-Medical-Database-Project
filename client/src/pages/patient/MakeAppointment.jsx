@@ -21,7 +21,7 @@ const MakeAppointment = () => {
 
   const fetchDentistsByOffice = async (officeID) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/getDentistByOffice?officeID=${officeID}`);
+      const response = await fetch(`http://localhost:5000/api/getDentistsByOfficeID?officeID=${officeID}`);
       if (response.ok) {
         const data = await response.json();
         //console.log(data);

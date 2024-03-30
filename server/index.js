@@ -6,7 +6,7 @@ const { handleProtectedRoute } = require('./controllers/authController');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
 const handleGetOfficeID = require('./routes/officeRoutes');
-const { dentistRoutes, dentistByOffice } = require('./routes/dentistRoutes');
+const { handleGetDentistID, handleGetDentistByOfficeID } = require('./routes/dentistRoutes');
 const { handleAdminRoutes } = require('./routes/adminRoutes');
 
 const server = http.createServer((req, res) => {
@@ -38,19 +38,25 @@ const server = http.createServer((req, res) => {
         handleGetPatient(req, res, jwt);
     } else if (req.url === '/api/patient/profile/update' && req.method === 'POST') {
         handlePatientUpdate(req, res, jwt);
-    } else if (req.url === '/api/patient/schedule' && req.method === 'POST') { // schedule an appointment
+    } else if (req.url === '/api/patient/schedule' && req.method === 'POST') {
         handlePatientAppointment(req, res, jwt);
     } 
     
     else if (req.url.startsWith('/api/officeID') && req.method === 'GET') { //get officeID given officeAddress
         handleGetOfficeID(req, res);
-    } else if (req.url.startsWith('/api/dentist') && req.method === 'GET') { //get dentistID given dentist first and last name
-        dentistRoutes(req, res);
-    } else if (req.url.startsWith('/api/getDentistByOffice') && req.method === 'GET') { //get list of dentist given officeID
-        dentistByOffice(req, res);
-    } else if (req.url.startsWith('/api/admin/salary-report') && req.method === 'GET') { //get list of dentist given officeID
+    } 
+    
+    else if (req.url.startsWith('/api/dentist/dentistID') && req.method === 'GET') { //get dentistID given dentist first and last name
+        handleGetDentistID(req, res);
+    } else if (req.url.startsWith('/api/dentist/getDentistsByOfficeID') && req.method === 'GET') { //get list of dentist given officeID
+        handleGetDentistByOfficeID(req, res);
+    } 
+    
+    else if (req.url.startsWith('/api/admin/salary-report') && req.method === 'GET') { //get list of dentist given officeID
         handleAdminRoutes(req, res);
-    }  else {
+    }  
+    
+    else {
         res.writeHead(404);
         res.end('Not Found');
     }
