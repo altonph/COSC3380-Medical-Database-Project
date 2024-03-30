@@ -1,10 +1,12 @@
 const { registerPatient, loginPatient, registerAdmin, loginAdmin } = require('../controllers/authController');
 
 function handleRegisterPatient(req, res) {
+
     let data = '';
     req.on('data', chunk => {
         data += chunk;
     });
+    
     req.on('end', () => {
         try {
             const userData = JSON.parse(data);
@@ -15,13 +17,16 @@ function handleRegisterPatient(req, res) {
             res.end('Invalid JSON data');
         }
     });
+
 }
 
 function handleLoginPatient(req, res, jwt) {
+
     let data = '';
     req.on('data', chunk => {
         data += chunk;
     });
+
     req.on('end', () => {
         try {
             const { Username: username, Password: password } = JSON.parse(data);
@@ -32,13 +37,16 @@ function handleLoginPatient(req, res, jwt) {
             res.end('Invalid JSON data');
         }
     });
+
 }
 
 function handleRegisterAdmin(req, res) {
+
     let data = '';
     req.on('data', chunk => {
         data += chunk;
     });
+
     req.on('end', () => {
         try {
             const userData = JSON.parse(data);
@@ -49,13 +57,16 @@ function handleRegisterAdmin(req, res) {
             res.end('Invalid JSON data');
         }
     });
+
 }
 
 function handleLoginAdmin(req, res, jwt) {
+
     let data = '';
     req.on('data', chunk => {
         data += chunk;
     });
+
     req.on('end', () => {
         try {
             const { Username: username, Password: password } = JSON.parse(data);
@@ -66,6 +77,7 @@ function handleLoginAdmin(req, res, jwt) {
             res.end('Invalid JSON data');
         }
     });
+
 }
 
 module.exports = {

@@ -2,6 +2,7 @@
 const pool = require('../models/db');
 
 const getPatientProfile = (req, res, patientID) => {
+
     pool.query('SELECT * FROM patient WHERE patientID = ?', [patientID], (error, results) => {
         if (error) {
             console.error('Error retrieving patient profile:', error);
@@ -28,6 +29,7 @@ const getPatientProfile = (req, res, patientID) => {
 
 // edit variables
 const updatePatientProfile = (req, res, patientID, updatedProfile) => {
+
     const { Gender, FName, LName, DOB, Email, Phone_num, Address } = updatedProfile;
 
     // Assuming `pool` is the database connection pool
@@ -62,9 +64,10 @@ const updatePatientProfile = (req, res, patientID, updatedProfile) => {
     );
 };
 
-const scheduleAppointment = (req, res, patientID, appointmentDetails) => {
+const schedulePatientAppointment = (req, res, patientID, appointmentDetails) => {
+
     const { officeID, staffID, dentistID, Date, Start_time, End_time, Appointment_Type } = appointmentDetails;
-    console.log(appointmentDetails);
+    //console.log(appointmentDetails);
     pool.query(
         'INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, 'Scheduled'],
@@ -80,10 +83,12 @@ const scheduleAppointment = (req, res, patientID, appointmentDetails) => {
             res.end(JSON.stringify({ message: 'Appointment scheduled successfully' }));
         }
     );
+
 };
 
 module.exports = {
     getPatientProfile,
     updatePatientProfile,
-    scheduleAppointment
+    schedulePatientAppointment
 };
+

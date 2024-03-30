@@ -4,7 +4,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { handleProtectedRoute } = require('./controllers/authController');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
-const { patientRoutes, patientUpdate, appointmentRoutes } = require('./routes/patientRoutes');
+const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
 const officeRoutes = require('./routes/officeRoutes');
 const { dentistRoutes, dentistByOffice } = require('./routes/dentistRoutes');
 const { handleAdminRoutes } = require('./routes/adminRoutes');
@@ -26,19 +26,23 @@ const server = http.createServer((req, res) => {
         handleRegisterPatient(req, res);
     } else if (req.url === '/api/patient/login' && req.method === 'POST') {
         handleLoginPatient(req, res, jwt);
-    } else if (req.url === '/api/protected-patient' && req.method === 'GET') {
+    } else if (req.url === '/api/patient/protected' && req.method === 'GET') {
         handleProtectedRoute(req, res, jwt);
-    } else if (req.url === '/api/register/admin' && req.method === 'POST') {
+    } else if (req.url === '/api/admin/register' && req.method === 'POST') {
         handleRegisterAdmin(req, res, jwt);
-    } else if (req.url === '/api/login/admin' && req.method === 'POST') {
+    } else if (req.url === '/api/admin/login' && req.method === 'POST') {
         handleLoginAdmin(req, res, jwt);
-    } else if (req.url === '/api/patient/profile' && req.method === 'GET') {
-        patientRoutes(req, res, jwt);
+    } 
+    
+    else if (req.url === '/api/patient/profile' && req.method === 'GET') {
+        handleGetPatient(req, res, jwt);
     } else if (req.url === '/api/patient/profile/update' && req.method === 'POST') {
-        patientUpdate(req, res, jwt);
-    } else if (req.url === '/api/appointment/schedule' && req.method === 'POST') { // schedule an appointment
-        appointmentRoutes(req, res, jwt);
-    } else if (req.url.startsWith('/api/office') && req.method === 'GET') { //get officeID given officeAddress
+        handlePatientUpdate(req, res, jwt);
+    } else if (req.url === '/api/patient/schedule' && req.method === 'POST') { // schedule an appointment
+        handlePatientAppointment(req, res, jwt);
+    } 
+    
+    else if (req.url.startsWith('/api/office') && req.method === 'GET') { //get officeID given officeAddress
         officeRoutes(req, res);
     } else if (req.url.startsWith('/api/dentist') && req.method === 'GET') { //get dentistID given dentist first and last name
         dentistRoutes(req, res);

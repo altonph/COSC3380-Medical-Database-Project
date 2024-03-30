@@ -58,7 +58,7 @@ const MakeAppointment = () => {
     console.log('Appointment Type:', reasonForAppointment);
   
     try {
-      const response = await fetch('http://localhost:5000/api/appointment/schedule', {
+      const response = await fetch('http://localhost:5000/api/patient/schedule', {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`,

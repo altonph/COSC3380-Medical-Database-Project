@@ -18,7 +18,7 @@ export function useRequireAuth(role = 'Patient') {
     // Handle token expiry
     const checkTokenExpiry = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/protected-patient", {
+        const response = await fetch("http://localhost:5000/api/patient/protected", {
           method: "GET",
           headers: { "Authorization": `Bearer ${token}` }
         });
