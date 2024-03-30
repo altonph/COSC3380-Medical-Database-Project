@@ -2,14 +2,15 @@
 const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const { handleRegister, handleLogin, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
+const { handleRegisterPatient, handleLoginPatient, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { patientRoutes, patientUpdate, appointmentRoutes } = require('./routes/patientRoutes');
 const officeRoutes = require('./routes/officeRoutes');
 const { dentistRoutes, dentistByOffice } = require('./routes/dentistRoutes');
 const { handleAdminRoutes } = require('./routes/adminRoutes');
 
 const server = http.createServer((req, res) => {
+
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, UPDATE, PATCH, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -21,15 +22,15 @@ const server = http.createServer((req, res) => {
     }
 
     // Handle patient routes
-    if (req.url === '/patient/register' && req.method === 'POST') {
-        handleRegister(req, res);
-    } else if (req.url === '/patient/login' && req.method === 'POST') {
-        handleLogin(req, res, jwt);
-    } else if (req.url === '/protected-patient' && req.method === 'GET') {
+    if (req.url === '/api/patient/register' && req.method === 'POST') {
+        handleRegisterPatient(req, res);
+    } else if (req.url === '/api/patient/login' && req.method === 'POST') {
+        handleLoginPatient(req, res, jwt);
+    } else if (req.url === '/api/protected-patient' && req.method === 'GET') {
         handleProtectedRoute(req, res, jwt);
-    } else if (req.url === '/register/admin' && req.method === 'POST') {
+    } else if (req.url === '/api/register/admin' && req.method === 'POST') {
         handleRegisterAdmin(req, res, jwt);
-    } else if (req.url === '/login/admin' && req.method === 'POST') {
+    } else if (req.url === '/api/login/admin' && req.method === 'POST') {
         handleLoginAdmin(req, res, jwt);
     } else if (req.url === '/api/patient/profile' && req.method === 'GET') {
         patientRoutes(req, res, jwt);
@@ -49,6 +50,7 @@ const server = http.createServer((req, res) => {
         res.writeHead(404);
         res.end('Not Found');
     }
+
 });
 
 const PORT = 5000;

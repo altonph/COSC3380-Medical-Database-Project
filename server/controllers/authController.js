@@ -3,7 +3,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-function registerUser(userData, res) {
+function registerPatient(userData, res) {
+
     bcrypt.hash(userData.Password, 10, (err, hashedPassword) => {
         if (err) {
             console.error('Error hashing password:', err);
@@ -11,6 +12,7 @@ function registerUser(userData, res) {
             res.end('Error hashing password');
             return;
         }
+
         pool.query('INSERT INTO patient (insuranceID, dentistID, Gender, FName, LName, DOB, Email, Phone_num, Address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [userData.insuranceID, userData.dentistID, userData.Gender, userData.FName, userData.LName, userData.DOB, userData.Email, userData.Phone_num, userData.Address],
             (error, results) => {
@@ -37,9 +39,11 @@ function registerUser(userData, res) {
                     });
             });
     });
+
 }
 
 function registerAdmin(userData, res) {
+
     bcrypt.hash(userData.Password, 10, (err, hashedPassword) => {
         if (err) {
             console.error('Error hashing password:', err);
@@ -47,6 +51,7 @@ function registerAdmin(userData, res) {
             res.end('Error hashing password');
             return;
         }
+
         pool.query('INSERT INTO dentist (officeID, FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [userData.officeID, userData.FName, userData.LName, userData.Specialty, userData.Email, userData.Phone_num, userData.Address, userData.DOB, userData.Start_date, userData.End_Date, userData.Is_active, userData.Salary],
             (error, results) => {
@@ -73,13 +78,16 @@ function registerAdmin(userData, res) {
                     });
             });
     });
+
 }
 
-function loginUser(username, password, res, jwt) {
+function loginPatient(username, password, res, jwt) {
+
     pool.query(
         'SELECT login.*, patient.FName, patient.LName FROM login JOIN patient ON login.patientID = patient.patientID WHERE login.Username = ?',
         [username],
         async (error, results) => {
+
             if (error) {
                 console.error('Error retrieving user:', error);
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
@@ -94,6 +102,7 @@ function loginUser(username, password, res, jwt) {
             }
 
             const user = results[0];
+
             bcrypt.compare(password, user.Password, (err, result) => {
                 if (err) {
                     console.error('Error comparing passwords:', err);
@@ -109,15 +118,14 @@ function loginUser(username, password, res, jwt) {
                         return;
                     }
                     
-                    //console.log(user.FName);
-                    //console.log(user.LName);
                     const token = jwt.sign({ 
                         username: user.Username, 
                         role: user.User_role, 
                         firstName: user.FName, 
                         lastName: user.LName,
                         patientID: user.patientID
-                    }, process.env.JWT_SECRET, { expiresIn: '1m' });
+                    }, process.env.JWT_SECRET, { expiresIn: '2h' });
+
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ token, role: user.User_role, firstName: user.FName, lastName: user.LName, patientID: user.patientID }));
                 } else {
@@ -127,11 +135,11 @@ function loginUser(username, password, res, jwt) {
             });
         }
     );
+
 }
 
-
-
 function loginAdmin(username, password, res, jwt) {
+
     pool.query('SELECT * FROM login WHERE Username = ?', [username], async (error, results) => {
         if (error) {
             console.error('Error retrieving admin:', error);
@@ -171,13 +179,16 @@ function loginAdmin(username, password, res, jwt) {
             }
         });
     });
+
 }
 
 
 
 function verifyToken(req, jwt) {
+
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
+
     if (!token) return null;
 
     try {
@@ -187,9 +198,11 @@ function verifyToken(req, jwt) {
         console.error('Error verifying token:', err);
         return null;
     }
+
 }
 
 function handleProtectedRoute(req, res, jwt) {
+
     const decodedToken = verifyToken(req, jwt);
     if (!decodedToken) {
         res.writeHead(401);
@@ -208,8 +221,8 @@ function handleProtectedRoute(req, res, jwt) {
 }
 
 module.exports = {
-    registerUser,
-    loginUser,
+    registerPatient,
+    loginPatient,
     handleProtectedRoute,
     registerAdmin,
     loginAdmin
