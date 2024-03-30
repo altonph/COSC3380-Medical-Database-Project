@@ -2,6 +2,7 @@
 const pool = require('../models/db');
 
 const getOfficeID = (req, res, officeAddress) => {
+
     pool.query(
         'SELECT officeID FROM office WHERE office_address = ?',
         [officeAddress],
@@ -24,6 +25,7 @@ const getOfficeID = (req, res, officeAddress) => {
             res.end(JSON.stringify({ officeID }));
         }
     );
+    
 };
 
 module.exports = { getOfficeID };

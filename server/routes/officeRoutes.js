@@ -1,10 +1,11 @@
 // Import necessary modules
 const { getOfficeID } = require('../controllers/officeController');
 
-const officeRoutes = (req, res) => {
+const handleGetOfficeID = (req, res) => {
+
     const { url, method } = req;
 
-    if (method === 'GET' && url.startsWith('/api/office')) {
+    if (method === 'GET' && url.startsWith('/api/officeID')) {
         const params = new URLSearchParams(url.split('?')[1]);
         const officeAddress = params.get('officeAddress');
 
@@ -19,6 +20,7 @@ const officeRoutes = (req, res) => {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Route not found' }));
     }
+
 };
 
-module.exports = officeRoutes;
+module.exports = handleGetOfficeID ;

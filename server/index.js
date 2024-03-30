@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const { handleProtectedRoute } = require('./controllers/authController');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
-const officeRoutes = require('./routes/officeRoutes');
+const handleGetOfficeID = require('./routes/officeRoutes');
 const { dentistRoutes, dentistByOffice } = require('./routes/dentistRoutes');
 const { handleAdminRoutes } = require('./routes/adminRoutes');
 
@@ -42,8 +42,8 @@ const server = http.createServer((req, res) => {
         handlePatientAppointment(req, res, jwt);
     } 
     
-    else if (req.url.startsWith('/api/office') && req.method === 'GET') { //get officeID given officeAddress
-        officeRoutes(req, res);
+    else if (req.url.startsWith('/api/officeID') && req.method === 'GET') { //get officeID given officeAddress
+        handleGetOfficeID(req, res);
     } else if (req.url.startsWith('/api/dentist') && req.method === 'GET') { //get dentistID given dentist first and last name
         dentistRoutes(req, res);
     } else if (req.url.startsWith('/api/getDentistByOffice') && req.method === 'GET') { //get list of dentist given officeID
