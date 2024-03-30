@@ -2,6 +2,7 @@
 const pool = require('../models/db');
 
 const generateSalaryReport = (req, res, specialty) => {
+
     pool.query(
         specialty && specialty !== 'All' 
             ? 'SELECT FName, LName, Email, Start_date, Salary FROM dentist WHERE Specialty = ?'
@@ -19,8 +20,10 @@ const generateSalaryReport = (req, res, specialty) => {
             res.end(JSON.stringify(rows));
         }
     );
+
 };
 
 module.exports = {
     generateSalaryReport
 };
+

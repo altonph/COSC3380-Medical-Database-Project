@@ -1,7 +1,8 @@
 // adminRoutes.js
 const { generateSalaryReport } = require('../controllers/adminController');
 
-const handleAdminRoutes = (req, res) => {
+const handleGenerateSalaryReport = (req, res) => {
+
     const { url, method } = req;
     
     if (url.startsWith('/api/admin/salary-report') && method === 'GET') {
@@ -11,8 +12,9 @@ const handleAdminRoutes = (req, res) => {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Route not found' }));
     }
+    
 };
 
 module.exports = {
-    handleAdminRoutes
+    handleGenerateSalaryReport
 };
