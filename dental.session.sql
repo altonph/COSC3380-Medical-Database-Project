@@ -95,9 +95,6 @@ SELECT * FROM visit_details;
 SELECT * FROM prescription;
 SELECT * FROM invoice;
 
-
-
-
 -- @block
 SELECT * FROM patient;
 SELECT * FROM dentist;
@@ -144,3 +141,87 @@ WHERE Specialty = 'General Dentistry';
 
 -- @block
 DELETE FROM dentist;
+
+
+-- @block
+SELECT * FROM dentist;
+
+
+-- @block Dummy data for office table
+INSERT INTO office (officeID, office_address, Phone_num, email) 
+VALUES (1, '123 Main St, Houston, TX', '1234567890', 'office1@example.com');
+INSERT INTO office (officeID, office_address, Phone_num, email) 
+VALUES (2, '321 2nd St, Katy, TX', '1234567890', 'office2@example.com');
+
+-- @block
+INSERT INTO dentist (officeID, FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Is_active, Salary)
+VALUES (1, 'Emily', 'Jones', 'Endodontist', 'emily.jones@example.com', '2222222222', '456 Oak St', '1975-05-10', '2023-01-15', true, 90000);
+INSERT INTO dentist (officeID, FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Is_active, Salary)
+VALUES (1, 'Michael', 'Johnson', 'General Dentistry', 'michael.johnson@example.com', '3333333333', '789 Pine St', '1982-08-20', '2023-02-20', true, 95000);
+INSERT INTO dentist (officeID, FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Is_active, Salary)
+VALUES (2, 'Jessica', 'Lee', 'General Dentistry', 'jessica.lee@example.com', '6666666666', '789 Elm St', '1980-07-15', '2023-03-10', true, 85000);
+INSERT INTO dentist (officeID, FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Is_active, Salary)
+VALUES (2, 'Steven', 'Chen', 'Endodontist', 'steven.chen@example.com', '7777777777', '456 Maple St', '1978-12-20', '2023-04-05', true, 92000);
+
+
+-- @block
+INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, Is_active, Salary)
+VALUES (1, 'Sarah', 'Miller', 'sarah.miller@example.com', '4444444444', '1990-03-15', '321 Elm St', 'Receptionist', '2023-01-10', true, 50000);
+INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, Is_active, Salary)
+VALUES (1, 'David', 'Brown', 'david.brown@example.com', '5555555555', '1988-11-05', '987 Maple St', 'Hygienist', '2023-02-05', true, 60000);
+INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, Is_active, Salary)
+VALUES (2, 'Michelle', 'Wong', 'michelle.wong@example.com', '1111111111', '1992-04-25', '123 Elm St', 'Receptionist', '2023-03-01', true, 55000);
+INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, Is_active, Salary)
+VALUES (2, 'Daniel', 'Nguyen', 'daniel.nguyen@example.com', '2222222222', '1991-09-15', '456 Maple St', 'Hygienist', '2023-04-10', true, 60000);
+
+-- @block
+INSERT INTO patient (insuranceID, dentistID, Gender, FName, LName, DOB, Email, Phone_num, Address)
+VALUES (NULL, 1, 'Female', 'Alice', 'Johnson', '1995-09-18', 'alice.johnson@example.com', '6666666666', '654 Birch St');
+INSERT INTO patient (insuranceID, dentistID, Gender, FName, LName, DOB, Email, Phone_num, Address)
+VALUES (NULL, 2, 'Male', 'Bob', 'Williams', '1988-12-05', 'bob.williams@example.com', '7777777777', '987 Cedar St');
+INSERT INTO patient (insuranceID, dentistID, Gender, FName, LName, DOB, Email, Phone_num, Address)
+VALUES (NULL, 3, 'Male', 'Charlie', 'Brown', '1990-05-20', 'charlie.brown@example.com', '8888888888', '321 Oak St');
+INSERT INTO patient (insuranceID, dentistID, Gender, FName, LName, DOB, Email, Phone_num, Address)
+VALUES (NULL, 4, 'Female', 'Emma', 'Davis', '1985-09-12', 'emma.davis@example.com', '9999999999', '654 Pine St');
+
+-- @block
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (1, 1, 1, 1, '2024-03-15', '09:00:00', '10:00:00', 'Checkup', 'Completed');
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (1, 2, 2, 2, '2024-03-20', '10:30:00', '11:30:00', 'Filling', 'Scheduled');
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (2, 3, 3, 3, '2024-03-10', '08:30:00', '09:30:00', 'Cleaning', 'Completed');
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (2, 4, 4, 4, '2024-03-25', '11:00:00', '12:00:00', 'Checkup', 'Scheduled');
+
+-- @block
+SELECT 
+    a.appointmentID, 
+    a.Date, 
+    a.Start_time, 
+    a.End_time, 
+    a.Appointment_Type, 
+    a.Appointment_Status, 
+    CONCAT(p.FName, ' ', p.LName) AS Patient_FullName, 
+    CONCAT(d.FName, ' ', d.LName) AS Dentist_FullName, 
+    CONCAT(s.Fname, ' ', s.Lname) AS Staff_FullName
+FROM 
+    appointment a
+JOIN 
+    patient p ON a.patientID = p.patientID
+JOIN 
+    dentist d ON a.dentistID = d.dentistID
+LEFT JOIN 
+    staff s ON a.staffID = s.staffID
+WHERE 
+    a.Date BETWEEN '2024-03-01' AND '2024-03-31'
+    AND d.Specialty = 'Endodontist'
+    AND a.Appointment_Type = 'Checkup'
+    AND a.Appointment_Status = 'Scheduled'
+ORDER BY 
+    a.Date DESC;
+
+
+
+
+
