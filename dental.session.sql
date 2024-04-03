@@ -223,5 +223,165 @@ ORDER BY
 
 
 
+-- @block
+-- Inserting offices
+INSERT INTO office (officeID, office_address, Phone_num, email) 
+VALUES 
+    (1, '123 Main St, Houston, TX', '1234567890', 'office1@example.com'),
+    (2, '321 2nd St, Katy, TX', '1234567890', 'office2@example.com');
+
+-- @block
+-- Inserting dentists
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Is_active, Salary)
+VALUES 
+    ('John', 'Smith', 'General Dentistry', 'john.smith@example.com', '1111111111', '123 Elm St', '1980-01-15', '2023-01-15', true, 90000),
+    ('Alice', 'Johnson', 'Endodontist', 'alice.johnson@example.com', '2222222222', '456 Oak St', '1975-05-10', '2023-01-15', true, 95000),
+    ('Emily', 'Williams', 'General Dentistry', 'emily.williams@example.com', '3333333333', '789 Maple St', '1982-08-20', '2023-01-15', true, 92000);
+
+-- @block
+-- Inserting office-dentist relationships
+INSERT INTO office_dentist (officeID, dentistID) VALUES
+    (1, 1), -- John works at office 1
+    (2, 2), -- Alice works at office 2
+    (1, 3), -- Emily works at office 1
+    (2, 3); -- Emily also works at office 2
+
+-- @block
+-- Inserting schedules
+-- John's schedule (works every day at office 1)
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
+VALUES (1, 1, TRUE, TRUE, TRUE, TRUE, TRUE);
+-- Alice's schedule (works every day at office 2)
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
+VALUES (2, 2, TRUE, TRUE, TRUE, TRUE, TRUE);
+-- Emily's schedule (works Monday and Friday at office 1, Tuesday to Thursday at office 2)
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
+VALUES (1, 3, TRUE, FALSE, FALSE, FALSE, TRUE),
+       (2, 3, FALSE, TRUE, TRUE, TRUE, FALSE);
 
 
+-- @block
+-- Inserting staff
+INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, Is_active, Salary)
+VALUES
+    (1, 'John', 'Doe', 'john.doe@example.com', '1234567890', '1985-03-15', '123 Elm St', 'Receptionist', '2022-01-01', TRUE, 40000),
+    (2, 'Jane', 'Smith', 'jane.smith@example.com', '9876543210', '1980-06-20', '456 Oak St', 'Hygienist', '2022-01-01', TRUE, 50000);
+
+-- @block
+-- Inserting patients without insurance information
+INSERT INTO patient (Policy_number, Gender, FName, LName, DOB, Email, Phone_num, Address)
+VALUES
+    (NULL, 'Male', 'Michael', 'Johnson', '1990-02-25', 'michael.j@example.com', '5551234567', '789 Maple St'),
+    (NULL, 'Female', 'Emily', 'Brown', '1988-08-12', 'emily.b@example.com', '5559876543', '321 Pine St'),
+    (NULL, 'Male', 'David', 'Clark', '1985-09-12', 'david.c@example.com', '5551112233', '456 Oak St');
+
+-- @block
+INSERT INTO insurance (Policy_number, Insurance_Company_Name)
+VALUES
+    ('XYZ45678912300', 'XYZ Insurance');
+
+-- @block
+UPDATE patient
+SET Policy_number = 'XYZ45678912300'
+WHERE patientID = 1;
+
+-- @block
+-- Scheduling an appointment for the new patient
+-- Let's assume the appointment is for David Clark with Dentist Emily Williams at office 2 on 2024-04-10 at 9:00 AM
+INSERT INTO appointment (officeID, dentistID, patientID, Date, Start_time, Appointment_Type, Appointment_Status)
+VALUES
+    (2, 3, 3, '2024-04-10', '09:00:00', 'Checkup', 'Scheduled');
+
+-- @block
+-- Establishing the patient-dentist relationship after scheduling the appointment
+-- Assuming the appointment was successfully scheduled for David Clark with Dentist Emily Williams at office 2
+-- Inserting the patient-dentist relationship for David Clark and Dentist Emily Williams
+INSERT INTO patient_dentist (patientID, dentistID)
+VALUES
+    (3, 3);
+
+
+
+
+
+
+
+
+
+
+-- testing trigger
+-- @block
+CREATE TRIGGER approve_specialist_appointment
+AFTER UPDATE ON appointment
+FOR EACH ROW
+BEGIN
+    IF NEW.Specialist_Approval = TRUE THEN
+        UPDATE appointment
+        SET Specialist_Approval_Status = 'Approved'
+        WHERE appointmentID = NEW.appointmentID;
+    END IF;
+END;
+
+-- @block
+-- Inserting offices
+INSERT INTO office (officeID, office_address, Phone_num, email) 
+VALUES 
+    (1, '123 Main St, Houston, TX', '1234567890', 'office1@example.com'),
+    (2, '321 2nd St, Katy, TX', '1234567890', 'office2@example.com');
+
+-- Inserting dentists
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Is_active, Salary)
+VALUES 
+    ('John', 'Smith', 'General Dentistry', 'john.smith@example.com', '1111111111', '123 Elm St', '1980-01-15', '2023-01-15', true, 90000),
+    ('Alice', 'Johnson', 'Endodontist', 'alice.johnson@example.com', '2222222222', '456 Oak St', '1975-05-10', '2023-01-15', true, 95000);
+
+-- Inserting office-dentist relationships
+INSERT INTO office_dentist (officeID, dentistID) VALUES
+    (1, 1), -- John works at office 1
+    (2, 2); -- Alice works at office 2
+
+-- Inserting schedules (Assuming all dentists work every day in their respective offices)
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
+VALUES 
+    (1, 1, TRUE, TRUE, TRUE, TRUE, TRUE),
+    (2, 2, TRUE, TRUE, TRUE, TRUE, TRUE);
+
+-- @block
+-- Inserting staff
+INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, Is_active, Salary)
+VALUES
+    (1, 'John', 'Doe', 'john.doe@example.com', '1234567890', '1985-03-15', '123 Elm St', 'Receptionist', '2022-01-01', TRUE, 40000),
+    (2, 'Jane', 'Smith', 'jane.smith@example.com', '9876543210', '1980-06-20', '456 Oak St', 'Hygienist', '2022-01-01', TRUE, 50000);
+
+-- @block
+-- Inserting a new patient
+INSERT INTO patient (Policy_number, Gender, FName, LName, DOB, Email, Phone_num, Address)
+VALUES (NULL, 'Male', 'John', 'Doe', '1990-01-15', 'john.doe@example.com', '5551234567', '123 Main St');
+
+-- @block
+-- Inserting a checkup appointment for the patient with dentist John Smith
+INSERT INTO appointment (officeID, dentistID, patientID, staffID, Date, Start_time, Appointment_Type, Appointment_Status)
+VALUES 
+    (1, 1, 1, 1, '2024-04-15', '09:00:00', 'Checkup', 'Scheduled');
+
+-- @block
+-- Assuming the checkup appointment is completed
+UPDATE appointment
+SET Appointment_Status = 'Completed'
+WHERE officeID = 1 AND dentistID = 1 AND patientID = 1 AND Date = '2024-04-15' AND Start_time = '09:00:00';
+
+-- @block
+-- Inserting a root canal appointment for the patient with dentist Alice Johnson
+-- This appointment needs specialist approval, so Specialist_Approval is set to FALSE initially
+INSERT INTO appointment (officeID, dentistID, patientID, Date, Start_time, Appointment_Type, Appointment_Status, Specialist_Approval)
+VALUES 
+    (2, 2, 1, '2024-04-30', '10:00:00', 'Root Canal', 'Scheduled', FALSE);
+
+-- @block
+SELECT * FROM appointment;
+
+-- @block
+-- After reviewing the appointment, the specialist dentist approves it
+UPDATE appointment
+SET Specialist_Approval = TRUE, Specialist_Approval_Status = 'Approved'
+WHERE officeID = 2 AND dentistID = 2 AND patientID = 1 AND Date = '2024-04-30' AND Start_time = '10:00:00';
