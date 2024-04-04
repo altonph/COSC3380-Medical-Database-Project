@@ -39,6 +39,42 @@ function registerUser(userData, res) {
     });
 }
 
+function registerDoctor(userData, res) {
+    bcrypt.hash(userData.Password, 10, (err, hashedPassword) => {
+        if (err) {
+            console.error('Error hashing password:', err);
+            res.writeHead(500);
+            res.end('Error hashing password');
+            return;
+        }
+        pool.query('INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [userData.FName, userData.LName, userData.Specialty, userData.Email, userData.Phone_num, userData.Address, userData.DOB, userData.Start_date, userData.End_Date, userData.Is_active, userData.Salary],
+            (error, results) => {
+                if (error) {
+                    console.error('Error creating doctor:', error);
+                    res.writeHead(500);
+                    res.end('Error creating doctor');
+                    return;
+                }
+                
+                const doctorID = results.insertId;
+
+                pool.query('INSERT INTO login (Username, Password, User_role, Email, patientID, dentistID, staffID) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    [userData.Username, hashedPassword, 'Dentist', userData.Email, userData.patientID, doctorID, userData.staffID],
+                    (error, results) => {
+                        if (error) {
+                            console.error('Error registering doctor:', error);
+                            res.writeHead(500);
+                            res.end('Error registering doctor');
+                        } else {
+                            res.writeHead(200);
+                            res.end('Doctor registered successfully');
+                        }
+                    });
+            });
+    });
+}
+
 function registerAdmin(userData, res) {
     bcrypt.hash(userData.Password, 10, (err, hashedPassword) => {
         if (err) {
@@ -129,6 +165,56 @@ function loginUser(username, password, res, jwt) {
     );
 }
 
+function loginDoctor(username, password, res, jwt) {
+    pool.query(
+        'SELECT * FROM login WHERE Username = ? AND User_role = "Dentist"',
+        [username],
+        async (error, results) => {
+            if (error) {
+                console.error('Error retrieving doctor:', error);
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end('Internal Server Error');
+                return;
+            }
+
+            if (results.length === 0) {
+                res.writeHead(400, { 'Content-Type': 'text/plain' });
+                res.end('Doctor not found');
+                return;
+            }
+
+            const doctor = results[0];
+            const doctorId = doctor.DentistID;
+
+            bcrypt.compare(password, doctor.Password, (err, result) => {
+                if (err) {
+                    console.error('Error comparing passwords:', err);
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.end('Internal Server Error');
+                    return;
+                }
+
+                if (result) {
+                    if (doctor.User_role !== 'Dentist') {
+                        res.writeHead(403, { 'Content-Type': 'text/plain' });
+                        res.end('Forbidden');
+                        return;
+                    }
+                    const token = jwt.sign({ 
+                        doctorId, 
+                        username: doctor.Username, 
+                        role: doctor.User_role
+                    }, process.env.JWT_SECRET, { expiresIn: '2h' });                
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ token, role: doctor.User_role })); 
+                } else {
+                    res.writeHead(401, { 'Content-Type': 'text/plain' });
+                    res.end('Incorrect password');
+                }
+            });
+        }
+    );
+}
 
 
 function loginAdmin(username, password, res, jwt) {
@@ -161,8 +247,11 @@ function loginAdmin(username, password, res, jwt) {
                     res.end('Forbidden');
                     return;
                 }
-
-                const token = jwt.sign({ username: admin.Username, role: admin.User_role }, process.env.JWT_SECRET, { expiresIn: '2h' });
+                const token = jwt.sign({ 
+                    username: admin.Username, 
+                    role: admin.User_role,
+                    isAdmin: admin.User_role === 'Admin' // Check if the user is an admin
+                }, process.env.JWT_SECRET, { expiresIn: '2h' });                
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ token, role: admin.User_role })); // Include the role in the response
             } else {
@@ -211,6 +300,8 @@ module.exports = {
     registerUser,
     loginUser,
     handleProtectedRoute,
+    registerDoctor,
+    loginDoctor,
     registerAdmin,
     loginAdmin
 };

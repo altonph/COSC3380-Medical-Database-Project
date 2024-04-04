@@ -12,6 +12,8 @@ import DoctorLoginPage from "./pages/doctor/doctorLoginPage";
 import DoctorAppointment from "./pages/doctor/DoctorAppointments";
 import DoctorPatients from "./pages/doctor/DoctorPatients";
 import PatientDetails from "./pages/doctor/DoctorPatientDetails";
+import DoctorEditMedicalHistory from "./pages/doctor/DoctorEditMedicalHistory";
+import DoctorEditPrescriptions from "./pages/doctor/DoctorEditPrescriptions";
 import PatientPrescriptions from "./pages/patient/PatientPrescriptions"
 import HistoryPortal from "./pages/patient/HistoryPortal"; 
 import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
@@ -53,6 +55,8 @@ function App() {
             <Route path="/doctor/appointments" element={<DoctorAppointment/>}/>
             <Route path="/doctor/patients" element={<DoctorPatients/>}/>
             <Route path="/doctor/patients/:patientID" element={<PatientDetails />} />
+            <Route path="/doctor/patients/:patientID/medical-history" element={<DoctorEditMedicalHistory />} />
+            <Route path="/doctor/patients/:patientID/prescriptions" element={<DoctorEditPrescriptions />} />
             <Route path="/doctor/home" element= {<DoctorPortal/>} />
             <Route path="/doctor/profile" element= {<DoctorProfile/>} />
             <Route path="/admin/home" element= {<AdminPortal/>} />

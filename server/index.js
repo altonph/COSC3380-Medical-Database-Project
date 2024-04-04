@@ -2,12 +2,12 @@
 const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const { handleRegister, handleLogin, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
+const { handleRegister, handleLogin, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
 const { patientRoutes, patientUpdate, appointmentRoutes } = require('./routes/patientRoutes');
-const officeRoutes = require('./routes/officeRoutes');
-const { dentistRoutes, dentistByOffice } = require('./routes/dentistRoutes');
-const { handleAdminRoutes } = require('./routes/adminRoutes');
+const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
+const { adminRoutes } = require('./routes/adminRoutes'); 
+const { getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, getAppointmentsByDoctorUsername } = require('./controllers/doctorController');
 
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -27,6 +27,10 @@ const server = http.createServer((req, res) => {
         handleLogin(req, res, jwt);
     } else if (req.url === '/protected-patient' && req.method === 'GET') {
         handleProtectedRoute(req, res, jwt);
+    } else if (req.url === '/doctor/register' && req.method === 'POST') {
+        handleRegisterDoctor(req, res, jwt);
+    } else if (req.url === '/doctor/login' && req.method === 'POST') {
+        handleLoginDoctor(req, res, jwt);
     } else if (req.url === '/register/admin' && req.method === 'POST') {
         handleRegisterAdmin(req, res, jwt);
     } else if (req.url === '/login/admin' && req.method === 'POST') {
@@ -37,15 +41,54 @@ const server = http.createServer((req, res) => {
         patientUpdate(req, res, jwt);
     } else if (req.url === '/api/appointment/schedule' && req.method === 'POST') { // schedule an appointment
         appointmentRoutes(req, res, jwt);
-    } else if (req.url.startsWith('/api/office') && req.method === 'GET') { //get officeID given officeAddress
-        officeRoutes(req, res);
-    } else if (req.url.startsWith('/api/dentist') && req.method === 'GET') { //get dentistID given dentist first and last name
-        dentistRoutes(req, res);
-    } else if (req.url.startsWith('/api/getDentistByOffice') && req.method === 'GET') { //get list of dentist given officeID
-        dentistByOffice(req, res);
-    } else if (req.url.startsWith('/api/admin/salary-report') && req.method === 'GET') { //get list of dentist given officeID
-        handleAdminRoutes(req, res);
-    }  else {
+    } else if (req.url.startsWith('/api/admin/generate-report') && req.method === 'GET') {
+        adminRoutes(req, res, jwt);
+    } else if (req.url === '/api/admin/generate-report' && req.method === 'POST') {
+        adminRoutes(req, res, jwt);
+    } else if (req.url.startsWith('/api/report') && req.method === 'GET') {
+        reportRoutes(req, res, jwt);
+    } else if (req.url === '/api/doctor/patients' && req.method === 'GET') {
+        doctorRoutes(req, res, jwt); 
+    } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/medical-history') && req.method === 'GET') {
+        const parts = req.url.split('/');
+        const patientId = parts[parts.length - 2];
+        getMedicalHistoryByPatientId(req, res, patientId); 
+    } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/prescriptions') && req.method === 'GET') {
+        const parts = req.url.split('/');
+        const patientId = parts[parts.length - 2];
+        getPrescriptionsByPatientId(req, res, patientId); 
+    } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/invoices') && req.method === 'GET') {
+        const parts = req.url.split('/');
+        const patientId = parts[parts.length - 2];
+        getInvoicesByPatientId(req, res, patientId); 
+    } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/visit-details') && req.method === 'GET') {
+        const parts = req.url.split('/');
+        const patientId = parts[parts.length - 2];
+        getVisitDetailsByPatientId(req, res, patientId); 
+    } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/medical-history') && req.method === 'PUT') { 
+        const parts = req.url.split('/');
+        const patientId = parts[parts.length - 2];
+        updateMedicalHistoryByPatientId(req, res, patientId); 
+    } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/prescriptions') && req.method === 'PUT') { 
+        const parts = req.url.split('/');
+        const patientId = parts[parts.length - 2];
+        updatePrescriptionsByPatientId(req, res, patientId); 
+    } else if (req.url.startsWith('/api/doctor/patients/') && req.method === 'GET') {
+        const parts = req.url.split('/');
+        const patientId = parts[parts.length - 1];
+        getPatientById(req, res, patientId);
+    } else if (req.url === '/api/doctor/appointments' && req.method === 'GET') {
+        const authHeader = req.headers.authorization; 
+        if (!authHeader) {
+            return unauthorizedResponse(res);
+        }
+        const decodedToken = verifyToken(authHeader);
+        if (!decodedToken) {
+            return unauthorizedResponse(res);
+        }
+        const { username } = decodedToken;
+        getAppointmentsByDoctorUsername(req, res, username);
+    } else {
         res.writeHead(404);
         res.end('Not Found');
     }

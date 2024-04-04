@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import Footer from "../../components/Footer";
@@ -6,78 +6,21 @@ import HeaderPortalAdmin from '../../components/HeaderPortalDoctor';
 
 const DoctorAppointment = () => {
     const [date, setDate] = useState(new Date());
-    const [appointments, setAppointments] = useState([
-      { 
-          visitId: '1',
-          date: '2024-01-15', 
-          time: '10:00 AM', 
-          officeName: 'Random Office 1',
-          dentistId: '101',
-          dentistName: 'Dr. First',
-          staffName: 'Staff 1',
-          patientId: '001',
-          patientName: 'Patient 1',
-          visitType: 'Regular Checkup',
-          diagnosis: 'Tooth decay',
-          treatment: 'Filling',
-          notes: 'Patient needs to follow up in 6 months.'
-        },
-        { 
-            visitId: '2',
-            date: '2024-01-15', 
-            time: '2:00 PM', 
-            officeName: 'Random Office 1',
-            dentistId: '101',
-            dentistName: 'Dr. First',
-            staffName: 'Staff 1',
-            patientId: '001',
-            patientName: 'Patient 1',
-            visitType: 'Dental Cleaning',
-            diagnosis: 'Healthy teeth and gums',
-            treatment: 'Cleaning',
-            notes: 'No additional instructions.'
-          },
-          { 
-            visitId: '3',
-            date: '2024-01-17', 
-            time: '02:00 PM', 
-            officeName: 'Random Office 2',
-            dentistId: '102',
-            dentistName: 'Dr. Second',
-            staffName: 'Staff 2',
-            patientId: '002',
-            patientName: 'Patient 2',
-            visitType: 'Tooth Extraction',
-            diagnosis: 'Impacted wisdom tooth',
-            treatment: 'Extraction',
-            notes: 'Patient should avoid hard foods for a few days.'
-          },
-          { 
-            visitId: '4',
-            date: '2024-01-25', 
-            time: '09:30 AM', 
-            officeName: 'Random Office 3',
-            dentistId: '103',
-            dentistName: 'Dr. Third',
-            staffName: 'Staff 3',
-            patientId: '003',
-            patientName: 'Patient 3',
-            visitType: 'Root Canal Treatment',
-            diagnosis: 'Infected tooth pulp',
-            treatment: 'Root canal therapy',
-            notes: 'Patient needs to take antibiotics as prescribed.'
-          }
-    ]);
+    const [appointments, setAppointments] = useState([]);
     const [editMode, setEditMode] = useState(false);
     const [editedAppointment, setEditedAppointment] = useState(null);
 
     const isAppointmentDay = (day) => {
       const formattedDay = formatDate(day);
-      return appointments.some((appointment) => appointment.date === formattedDay);
+      return appointments.some((appointment) => {
+        const appointmentDate = new Date(appointment.Date);
+        const formattedAppointmentDate = formatDate(appointmentDate);
+        return formattedAppointmentDate === formattedDay;
+      });
     };
   
     const getAppointmentsForDate = (formattedDate) => {
-      return appointments.filter((appointment) => appointment.date === formattedDate);
+      return appointments.filter((appointment) => appointment.Date === formattedDate);
     };
   
     const formatDate = (date) => {
@@ -85,7 +28,7 @@ const DoctorAppointment = () => {
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
-    };
+    };     
   
     const handleDateChange = (date) => {
       setDate(date);
@@ -106,8 +49,36 @@ const DoctorAppointment = () => {
       setEditedAppointment(null);
     };
 
+    useEffect(() => {
+      const fetchAppointments = async () => {
+        try {
+          const token = localStorage.getItem('token'); 
+          const response = await fetch('http://localhost:5000/api/doctor/appointments', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (!response.ok) {
+            throw new Error('Failed to fetch appointments');
+          }
+          const data = await response.json();
+          setAppointments(data);
+          console.log(data);
+        } catch (error) {
+          console.error('Error fetching appointments:', error);
+        }
+      };
+
+      fetchAppointments();
+    }, []); 
+  
     const formattedDate = formatDate(date);
+    console.log(formattedDate);
     const appointmentsForDate = getAppointmentsForDate(formattedDate);
+
+    const [calendarDate, setCalendarDate] = useState(new Date(formattedDate));
   
     return (
       <>
@@ -135,7 +106,7 @@ const DoctorAppointment = () => {
                   <h2 className="text-lg font-semibold mb-2">Select Date:</h2>
                   <Calendar
                     onChange={handleDateChange}
-                    value={date}
+                    value={calendarDate}
                     tileClassName={({ date, view }) =>
                       view === 'month' && isAppointmentDay(date) ? 'bg-green-500' : ''
                     }
@@ -147,61 +118,52 @@ const DoctorAppointment = () => {
                     <ul>
                       {appointmentsForDate.map((appointment, index) => (
                         <li key={index} className="mb-4 flex justify-between">
-                          {editMode && editedAppointment === appointment ? (
-                            <>
-                              <div>
-                                <select value={appointment.time}>
-                                  {[...Array(10)].map((_, i) => (
-                                    <option key={i} value={`${i + 8}:00 AM`}>{`${i + 8}:00 AM`}</option>
-                                  ))}
-                                  {[...Array(6)].map((_, i) => (
-                                    <option key={i} value={`${i + 1}:00 PM`}>{`${i + 1}:00 PM`}</option>
-                                  ))}
-                                </select>
-                                <select value={appointment.officeName}>
-                                  <option value="Random Office 1">Random Office 1</option>
-                                  <option value="Random Office 2">Random Office 2</option>
-                                  <option value="Random Office 3">Random Office 3</option>
-                                </select>
-                                <select value={appointment.dentistName}>
-                                  <option value="Dr. First">Dr. First</option>
-                                  <option value="Dr. Second">Dr. Second</option>
-                                  <option value="Dr. Third">Dr. Third</option>
-                                </select>
-                                <select value={appointment.staffName}>
-                                  <option value="Staff 1">Staff 1</option>
-                                  <option value="Staff 2">Staff 2</option>
-                                  <option value="Staff 3">Staff 3</option>
-                                </select>
-                              </div>
-                              <div>
-                                <input type="text" value={appointment.patientName} />
-                                <input type="text" value={appointment.patientId} />
-                              </div>
-                              <div>
-                                <button onClick={handleSave} className="bg-green-500 text-white px-2 py-1 mr-2 ml-4">Save</button>
-                                <button onClick={handleCancel} className="bg-red-500 text-white px-2 py-1 ml-4">Cancel</button>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div>
-                                <p><span className="font-semibold">Time:</span> {appointment.time}</p>
-                                <p><span className="font-semibold">Office Name:</span> {appointment.officeName}</p>
-                                <p><span className="font-semibold">Dentist Name:</span> {appointment.dentistName}</p>
-                              </div>
-                              <div className="ml-4">
-                                <p><span className="font-semibold">Staff Name:</span> {appointment.staffName}</p>
-                                <p><span className="font-semibold">Patient Name:</span> {appointment.patientName}</p>
-                                <p><span className="font-semibold">Patient ID:</span> {appointment.patientId}</p>
-                              </div>
-                              <div>
-                                <button onClick={() => handleEdit(appointment)} className="bg-blue-500 text-white px-2 py-1 mr-2 ml-4">Edit</button>
-                                <button className="bg-red-500 text-white px-2 py-1 ml-4">Delete</button>
-                              </div>
-                            </>
-                          )}
-                        </li>
+                        {editMode && editedAppointment === appointment ? (
+                          <>
+                            <div>
+                              <p><span className="font-semibold">Start Time:</span> {appointment.Start_time}</p>
+                              <p><span className="font-semibold">End Time:</span> {appointment.End_time}</p>
+                              <p><span className="font-semibold">Appointment Type:</span> {appointment.Appointment_Type}</p>
+                              <p><span className="font-semibold">Appointment Status:</span> {appointment.Appointment_Status}</p>
+                              <p><span className="font-semibold">Cancellation Reason:</span> {appointment.Cancellation_Reason}</p>
+                              <p><span className="font-semibold">Specialist Approval:</span> {appointment.Specialist_Approval}</p>
+                              <p><span className="font-semibold">Is Active:</span> {appointment.Is_active}</p>
+                            </div>
+                            <div>
+                              <p><span className="font-semibold">Office ID:</span> {appointment.officeID}</p>
+                              <p><span className="font-semibold">Dentist ID:</span> {appointment.dentistID}</p>
+                              <p><span className="font-semibold">Staff ID:</span> {appointment.staffID}</p>
+                              <p><span className="font-semibold">Patient ID:</span> {appointment.patientID}</p>
+                            </div>
+                            <div>
+                              <button onClick={handleSave} className="bg-green-500 text-white px-2 py-1 mr-2 ml-4">Save</button>
+                              <button onClick={handleCancel} className="bg-red-500 text-white px-2 py-1 ml-4">Cancel</button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div>
+                              <p><span className="font-semibold">Start Time:</span> {appointment.Start_time}</p>
+                              <p><span className="font-semibold">End Time:</span> {appointment.End_time}</p>
+                              <p><span className="font-semibold">Appointment Type:</span> {appointment.Appointment_Type}</p>
+                              <p><span className="font-semibold">Appointment Status:</span> {appointment.Appointment_Status}</p>
+                              <p><span className="font-semibold">Cancellation Reason:</span> {appointment.Cancellation_Reason}</p>
+                              <p><span className="font-semibold">Specialist Approval:</span> {appointment.Specialist_Approval}</p>
+                              <p><span className="font-semibold">Is Active:</span> {appointment.Is_active}</p>
+                            </div>
+                            <div>
+                              <p><span className="font-semibold">Office ID:</span> {appointment.officeID}</p>
+                              <p><span className="font-semibold">Dentist ID:</span> {appointment.dentistID}</p>
+                              <p><span className="font-semibold">Staff ID:</span> {appointment.staffID}</p>
+                              <p><span className="font-semibold">Patient ID:</span> {appointment.patientID}</p>
+                            </div>
+                            <div>
+                              <button onClick={() => handleEdit(appointment)} className="bg-blue-500 text-white px-2 py-1 mr-2 ml-4">Edit</button>
+                              <button className="bg-red-500 text-white px-2 py-1 ml-4">Delete</button>
+                            </div>
+                          </>
+                        )}
+                      </li>
                       ))}
                     </ul>
                   ) : (
@@ -209,43 +171,8 @@ const DoctorAppointment = () => {
                   )}
                 </div>
               </div>
-              
-              <div className="mt-8 ml-8">
-              {appointmentsForDate.map((appointment, index) => (
-                <div key={index} className="border-t mt-4 pt-4">
-                  <div>
-                    <h2 className="text-lg font-semibold mb-2">Visit Details:</h2>
-                    <ul>
-                      <li>
-                        <p><span className="font-semibold">Visit ID:</span> {appointment.visitId}</p>
-                        <p><span className="font-semibold">Dentist ID and Name:</span> {appointment.dentistId} - {appointment.dentistName}</p>
-                        <p><span className="font-semibold">Patient Name:</span> {appointment.patientName}</p>
-                        <p><span className="font-semibold">Patient ID:</span> {appointment.patientId}</p>
-                        <p><span className="font-semibold">Visit Type:</span> {appointment.visitType}</p>
-                        <p><span className="font-semibold">Diagnosis:</span> {appointment.diagnosis}</p>
-                        <p><span className="font-semibold">Treatment:</span> {appointment.treatment}</p>
-                        <p><span className="font-semibold">Notes:</span> {appointment.notes}</p>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="mt-4">
-                    <h2 className="text-lg font-semibold mb-2">Medical History:</h2>
-                    <ul>
-                      <li>
-                        <p><span className="font-semibold">Allergies:</span> {appointment.allergies}</p>
-                        <p><span className="font-semibold">Height:</span> {appointment.height}</p>
-                        <p><span className="font-semibold">Weight:</span> {appointment.weight}</p>
-                        <p><span className="font-semibold">Notes:</span> {appointment.medicalNotes}</p>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              ))}
-            </div>
             </main>
           </div>
-  
           <nav>
             <Footer/>
           </nav>

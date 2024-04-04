@@ -1,0 +1,87 @@
+-- @block
+INSERT INTO office (officeID, office_address, Phone_num, email)
+VALUES (1, '123 Main Street', '1234567890', 'office@example.com');
+
+-- @block
+SELECT * FROM office;
+
+-- @block
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary)
+VALUES ('John', 'Doe', 'General Dentistry', 'johndoe@example.com', '1234567890', '123 Main Street', '1990-01-01', '2022-01-01', NULL, TRUE, 60000);
+
+-- @block
+SELECT * FROM dentist;
+
+-- @block
+INSERT INTO office_dentist (officeID, dentistID)
+VALUES (1, 1);
+
+-- @block
+SELECT * FROM office_dentist;
+
+-- @block
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
+VALUES (1, 1, TRUE, FALSE, TRUE, FALSE, TRUE);
+
+-- @block
+SELECT * FROM schedule;
+
+-- @block
+INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, Salary)
+VALUES (1, 'John', 'Doe', 'johndoe@example.com', '1234567890', '1990-05-15', '123 Main St, Anytown, USA', 'Receptionist', '2022-01-01', 30000);
+
+-- @block
+SELECT * FROM staff;
+
+-- @block
+INSERT INTO insurance (Policy_number, Insurance_Company_Name)
+VALUES ('ABC123456789', 'XYZ Insurance Company');
+
+-- @block
+SELECT * FROM insurance;
+
+-- @block
+INSERT INTO patient (Policy_number, Gender, FName, LName, DOB, Email, Phone_num, Address)
+VALUES ('ABC123456789', 'Male', 'John', 'Doe', '1990-01-01', 'johndoe@example.com', '1234567890', '123 Main St');
+
+-- @block
+SELECT * FROM patient;
+
+-- @block
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (1, 1, 1, 1, '2024-04-03', '09:00:00', '10:00:00', 'Checkup', 'Scheduled');
+
+-- @block
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (1, 2, 1, 1, '2024-04-03', '09:00:00', '10:00:00', 'Checkup', 'Scheduled');
+
+-- @block
+INSERT INTO visit_details (patientID, dentistID, Visit_Type, Diagnosis, Treatment, Notes)
+VALUES (1, 1, 'Checkup', 'No specific diagnosis', 'Routine checkup', 'Patient seems to be in good health overall.');
+
+-- @block
+SELECT * FROM visit_details;
+
+-- @block
+INSERT INTO prescription (dentistID, patientID, visitID, National_Drug_Code, Medication_Name, Medication_Dosage, Refills, notes, Date_prescribed)
+VALUES (1, 1, 1, '1234567890123', 'Medicine X', '10mg', 3, 'Take with food', '2024-04-03');
+
+-- @block
+SELECT * FROM prescription;
+
+-- @block
+INSERT INTO invoice (Policy_number, patientID, visitID, Date, Description, Total_Amount, Paid_Amount)
+VALUES ('ABC123456789', 1, 1, '2024-04-03', 'Medical Consultation', 100.00, 0.00);
+
+-- @block
+SELECT * FROM invoice;
+
+-- @block
+INSERT INTO medical_records (patientID, Date_Created, Allergies, Feet, Inches, Weight, Notes)
+VALUES (1, '2024-04-03', 'None', 6, 2, 70, 'No significant notes at this time.');
+
+-- @block
+SELECT * FROM medical_records;
+
+-- @block
+DELETE FROM medical_records;
