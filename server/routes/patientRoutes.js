@@ -27,7 +27,7 @@ const handlePatientUpdate = (req, res, jwt) => {
 
     const { url, method } = req;
     
-    if (method === 'POST' && url === '/api/patient/profile/update') {
+    if (method === 'PATCH' && url === '/api/patient/profile/update') {
         const decodedToken = verifyToken(req.headers.authorization, jwt);
         if (!decodedToken) {
             res.writeHead(401, { 'Content-Type': 'application/json' });

@@ -34,9 +34,9 @@ const server = http.createServer((req, res) => {
         handleLoginAdmin(req, res, jwt);
     } 
     // Handle patient routes
-    else if (req.url === '/api/patient/profile' && req.method === 'GET') {
+    else if (req.url === '/api/patient/profile' && req.method === 'GET') { //todo: update frontend fetch
         handleGetPatient(req, res, jwt);
-    } else if (req.url === '/api/patient/profile/update' && req.method === 'POST') {
+    } else if (req.url === '/api/patient/profile/update' && req.method === 'PATCH') { //todo: update frontend fetch
         handlePatientUpdate(req, res, jwt);
     } else if (req.url === '/api/patient/schedule' && req.method === 'POST') {
         handlePatientAppointment(req, res, jwt);

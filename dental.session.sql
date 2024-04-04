@@ -142,5 +142,7 @@ UPDATE invoice SET Total_Amount = Total_Amount * 0.8 WHERE Policy_number IS NOT 
 UPDATE invoice SET Paid_Amount = Total_Amount WHERE Policy_number IS NOT NULL;
 
 -- @block
-SELECT * FROM invoice;
-
+SELECT * FROM patient;
+SELECT * FROM login;
+SELECT * FROM dentist;
+SELECT * FROM insurance;
