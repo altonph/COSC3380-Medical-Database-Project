@@ -141,3 +141,6 @@ UPDATE invoice SET Total_Amount = Total_Amount * 0.8 WHERE Policy_number IS NOT 
 -- @block Updating the Paid_Amount to reflect Total_Amount
 UPDATE invoice SET Paid_Amount = Total_Amount WHERE Policy_number IS NOT NULL;
 
+-- @block
+SELECT * FROM invoice;
+
