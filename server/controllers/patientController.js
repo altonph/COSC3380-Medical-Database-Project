@@ -108,10 +108,11 @@ const updatePatientProfile = (req, res, patientID, updatedProfile) => {
 const schedulePatientAppointment = (req, res, patientID, appointmentDetails) => {
 
     const { officeID, staffID, dentistID, Date, Start_time, End_time, Appointment_Type } = appointmentDetails;
-    //console.log(appointmentDetails);
+
+    // Assuming `pool` is the database connection pool
     pool.query(
-        'INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, 'Scheduled'],
+        'INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_type, Appointment_status, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, 'Scheduled', true],
         (error, results) => {
             if (error) {
                 console.error('Error scheduling appointment:', error);
