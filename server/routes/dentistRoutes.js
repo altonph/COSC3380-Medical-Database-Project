@@ -2,29 +2,29 @@
 const { assignDentistSchedule, getDentistsByOfficeAndDay, getDentistID } = require('../controllers/dentistController');
 const { parse } = require('url');
 
-const handleGetDentistID = (req, res) => {
-    const { url, method } = req;
+// const handleGetDentistID = (req, res) => {
+//     const { url, method } = req;
 
-    if (method === 'GET' && url.startsWith('/api/dentist/dentistID')) {
+//     if (method === 'GET' && url.startsWith('/api/dentist/dentistID')) {
 
-        const params = new URLSearchParams(url.split('?')[1]);
-        const fName = params.get('FName');
-        const lName = params.get('LName');
+//         const params = new URLSearchParams(url.split('?')[1]);
+//         const fName = params.get('FName');
+//         const lName = params.get('LName');
 
-        if (!fName || !lName) {
-            res.writeHead(400, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'First and last name are required' }));
-            return;
-        }
+//         if (!fName || !lName) {
+//             res.writeHead(400, { 'Content-Type': 'application/json' });
+//             res.end(JSON.stringify({ error: 'First and last name are required' }));
+//             return;
+//         }
 
-        getDentistID(req, res, fName, lName);
+//         getDentistID(req, res, fName, lName);
 
-    } else {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'Route not found' }));
-    }
+//     } else {
+//         res.writeHead(404, { 'Content-Type': 'application/json' });
+//         res.end(JSON.stringify({ message: 'Route not found' }));
+//     }
 
-};
+// };
 
 
 // const handleGetDentistByOfficeID = (req, res) => {
@@ -95,7 +95,7 @@ const handleGetDentistsByOfficeAndDay = (req, res) => {
 };
 
 module.exports = { 
-    handleGetDentistID,
+    // handleGetDentistID,
     // handleGetDentistByOfficeID
     handleAssignDentistSchedule,
     handleGetDentistsByOfficeAndDay

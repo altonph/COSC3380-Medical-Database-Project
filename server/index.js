@@ -6,7 +6,7 @@ const { handleProtectedRoute } = require('./controllers/authController');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
 const { /* handleGetOfficeID, */ handleAssignDentistToOffice } = require('./routes/officeRoutes');
-const {  handleGetDentistID,/* handleGetDentistByOfficeID */ handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay } = require('./routes/dentistRoutes');
+const { /* handleGetDentistID, handleGetDentistByOfficeID */ handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay } = require('./routes/dentistRoutes');
 // const { handleGenerateSalaryReport } = require('./routes/adminRoutes');
 
 const server = http.createServer((req, res) => {
@@ -55,9 +55,9 @@ const server = http.createServer((req, res) => {
     else if (req.url.startsWith('/api/dentist/getDentist') && req.method === 'GET') {
         handleGetDentistsByOfficeAndDay(req, res);
     } 
-    else if (req.url.startsWith('/api/dentist/dentistID') && req.method === 'GET') {
-        handleGetDentistID(req, res);
-    } // else if (req.url.startsWith('/api/dentist/getDentistsByOfficeID') && req.method === 'GET') {
+    // else if (req.url.startsWith('/api/dentist/dentistID') && req.method === 'GET') {
+    //     handleGetDentistID(req, res);
+    // } // else if (req.url.startsWith('/api/dentist/getDentistsByOfficeID') && req.method === 'GET') {
     //     handleGetDentistByOfficeID(req, res);
     // } 
     // Handle admin routes

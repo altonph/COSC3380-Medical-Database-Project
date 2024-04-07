@@ -2,8 +2,8 @@
 
 -- @block Inserting offices
 INSERT INTO office (officeID, office_address, Phone_num, email) VALUES
-(1, '123 Main St', '1234567890', 'office1@example.com'),
-(2, '456 Elm St', '0987654321', 'office2@example.com');
+(1, '5432 Magnolia Drive', '1234567890', 'office1@shastadental.com'),
+(2, '9876 Sunflower Boulevard', '1234567890', 'office2@shastadental.com');
 
 -- @block Inserting a dentist
 INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary) VALUES
@@ -192,3 +192,16 @@ INSERT INTO schedule (officeID, dentistID, Monday, Wednesday) VALUES (1, 2, TRUE
 INSERT INTO schedule (officeID, dentistID, Tuesday, Thursday) VALUES (1, 3, TRUE, TRUE);
 -- Inserting schedule for dentist 4 at office 2 (assuming Monday and Friday)
 INSERT INTO schedule (officeID, dentistID, Monday, Friday) VALUES (2, 4, TRUE, TRUE);
+
+
+-- @block
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Salary) 
+VALUES ('John', 'Doe', 'General Dentistry', 'john.doe@example.com', '1234567891', '123 Main St', '1985-05-15', '2020-01-01', 80000);
+
+-- @block
+SELECT * FROM dentist;
+SELECT * FROM office_dentist;
+SELECT * FROM schedule;
+
+-- @block
+SELECT * FROM appointment;
