@@ -102,9 +102,6 @@ const updatePatientProfile = (req, res, patientID, updatedProfile) => {
     });
 };
 
-
-
-
 const schedulePatientAppointment = (req, res, patientID, appointmentDetails) => {
 
     const { officeID, staffID, dentistID, Date, Start_time, End_time, Appointment_Type } = appointmentDetails;
