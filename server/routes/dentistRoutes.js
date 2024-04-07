@@ -48,8 +48,24 @@ const { assignDentistSchedule } = require('../controllers/dentistController');
 
 // };
 
-const handleAssignDentistSchedule  = (req, res) => {
-    
+const handleAssignDentistSchedule = (req, res) => {
+
+    let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
+
+    req.on('end', () => {
+        try {
+            const { officeID, dentistID, schedule } = JSON.parse(data);
+            assignDentistSchedule(officeID, dentistID, schedule, res); // Pass 'res' to handle response
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Invalid JSON data' }));
+        }
+    });
+
 };
 
 module.exports = { 

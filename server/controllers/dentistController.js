@@ -54,7 +54,8 @@ const pool = require('../models/db');
 //     );
 // };
 
-const assignDentistSchedule = (officeID, dentistID, schedule) => {
+const assignDentistSchedule = (officeID, dentistID, schedule, res) => {
+
     const { Monday, Tuesday, Wednesday, Thursday, Friday } = schedule;
     pool.query(
         'INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -62,13 +63,16 @@ const assignDentistSchedule = (officeID, dentistID, schedule) => {
         (error, results) => {
             if (error) {
                 console.error('Error assigning schedule to dentist at office:', error);
-                // Handle error accordingly
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
             } else {
                 console.log('Schedule assigned to dentist at office successfully');
-                // Handle success accordingly
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Schedule assigned to dentist at office successfully' }));
             }
         }
     );
+
 };
 
 module.exports = { 

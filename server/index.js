@@ -6,7 +6,7 @@ const { handleProtectedRoute } = require('./controllers/authController');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
 const { /* handleGetOfficeID, */ handleAssignDentistToOffice } = require('./routes/officeRoutes');
-// const { handleGetDentistID, handleGetDentistByOfficeID } = require('./routes/dentistRoutes');
+const { /* handleGetDentistID, handleGetDentistByOfficeID */ handleAssignDentistSchedule } = require('./routes/dentistRoutes');
 // const { handleGenerateSalaryReport } = require('./routes/adminRoutes');
 
 const server = http.createServer((req, res) => {
@@ -49,6 +49,9 @@ const server = http.createServer((req, res) => {
         handleAssignDentistToOffice(req, res);
     } 
     // Handle dentist routes
+    else if (req.url === '/api/dentist/assignSchedule' && req.method === 'POST') {
+        handleAssignDentistSchedule(req, res);
+    } 
     // else if (req.url.startsWith('/api/dentist/dentistID') && req.method === 'GET') {
     //     handleGetDentistID(req, res);
     // } else if (req.url.startsWith('/api/dentist/getDentistsByOfficeID') && req.method === 'GET') {
