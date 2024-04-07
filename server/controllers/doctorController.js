@@ -176,6 +176,11 @@ const getAppointmentsByDoctorUsername = (req, res, username) => {
                 return;
             }
 
+            const formattedResults = results.map(appointment => {
+                const formattedDate = new Date(appointment.Date).toLocaleDateString();
+                return { ...appointment, Date: formattedDate };
+            });
+
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify(results));
         });

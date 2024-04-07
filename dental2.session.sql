@@ -24,6 +24,10 @@ INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday,
 VALUES (1, 1, TRUE, FALSE, TRUE, FALSE, TRUE);
 
 -- @block
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
+VALUES (1, 2, TRUE, FALSE, TRUE, FALSE, TRUE);
+
+-- @block
 SELECT * FROM schedule;
 
 -- @block
@@ -56,6 +60,13 @@ INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_ti
 VALUES (1, 2, 1, 1, '2024-04-03', '09:00:00', '10:00:00', 'Checkup', 'Scheduled');
 
 -- @block
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (1, 2, 1, 1, '2024-04-03', '12:00:00', '13:00:00', 'Checkup', 'Scheduled');
+
+-- @block
+SELECT * FROM APPOINTMENT;
+
+-- @block
 INSERT INTO visit_details (patientID, dentistID, Visit_Type, Diagnosis, Treatment, Notes)
 VALUES (1, 1, 'Checkup', 'No specific diagnosis', 'Routine checkup', 'Patient seems to be in good health overall.');
 
@@ -85,3 +96,31 @@ SELECT * FROM medical_records;
 
 -- @block
 DELETE FROM medical_records;
+
+-- @block
+DELETE FROM appointment;
+
+-- @block
+SELECT COUNT(*) AS count_schedule
+FROM schedule
+WHERE dentistID = 2
+AND officeID = 1
+AND (
+    DAYOFWEEK(CURDATE()) = 1 AND Monday = TRUE
+    OR DAYOFWEEK(CURDATE()) = 2 AND Tuesday = TRUE
+    OR DAYOFWEEK(CURDATE()) = 3 AND Wednesday = TRUE
+    OR DAYOFWEEK(CURDATE()) = 4 AND Thursday = TRUE
+    OR DAYOFWEEK(CURDATE()) = 5 AND Friday = TRUE
+);
+
+-- @block
+SELECT COUNT(*) AS count_appointments
+FROM appointment
+WHERE dentistID = 2
+AND officeID = 1
+AND Date = CURDATE()
+AND ((Start_time <= '09:00:00' AND End_time > '09:00:00')
+    OR (Start_time < '10:00:00' AND End_time >= '10:00:00')
+    OR (Start_time >= '09:00:00' AND End_time <= '10:00:00'));
+
+
