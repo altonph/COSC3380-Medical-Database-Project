@@ -1,5 +1,6 @@
 //dentistRoutes.js
-const { assignDentistSchedule } = require('../controllers/dentistController');
+const { assignDentistSchedule, getDentistsByOfficeAndDay } = require('../controllers/dentistController');
+const { parse } = require('url');
 
 // const handleGetDentistID = (req, res) => {
 //     const { url, method } = req;
@@ -68,8 +69,36 @@ const handleAssignDentistSchedule = (req, res) => {
 
 };
 
+const handleGetDentistsByOfficeAndDay = (req, res) => {
+
+    const { url, method } = req;
+
+    const { query } = parse(url, true);
+
+    if (url.startsWith('/api/dentist/getDentist') && method === 'GET') {
+        // Extract officeID and day from query parameters
+        const { officeID, dayOfWeek } = query;
+        
+        // Ensure officeID and day are provided
+        if (!officeID || !dayOfWeek) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'officeID and day are required query parameters' }));
+            return;
+        }
+
+        // Call the controller function to get dentists by office and day
+        getDentistsByOfficeAndDay(req, res, officeID, dayOfWeek);
+
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+    
+};
+
 module.exports = { 
     // handleGetDentistID,
     // handleGetDentistByOfficeID
-    handleAssignDentistSchedule
+    handleAssignDentistSchedule,
+    handleGetDentistsByOfficeAndDay
 };

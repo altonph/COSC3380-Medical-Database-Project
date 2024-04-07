@@ -29,6 +29,7 @@ const pool = require('../models/db');
 // };
 
 const assignDentistToOffice = (officeID, dentistID, res) => {
+
     pool.query(
         'INSERT INTO office_dentist (officeID, dentistID) VALUES (?, ?)',
         [officeID, dentistID],
@@ -44,8 +45,8 @@ const assignDentistToOffice = (officeID, dentistID, res) => {
             }
         }
     );
-};
 
+};
 
 module.exports = { 
     // getOfficeID,

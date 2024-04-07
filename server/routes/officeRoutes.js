@@ -44,7 +44,6 @@ const handleAssignDentistToOffice = (req, res) => {
     });
 };
 
-
 module.exports = {
     //handleGetOfficeID, 
     handleAssignDentistToOffice

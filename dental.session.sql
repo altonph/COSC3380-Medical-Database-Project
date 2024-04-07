@@ -143,6 +143,52 @@ UPDATE invoice SET Paid_Amount = Total_Amount WHERE Policy_number IS NOT NULL;
 
 -- @block
 SELECT * FROM patient;
-SELECT * FROM login;
+
+-- @block
 SELECT * FROM dentist;
+
+-- @block
+SELECT * FROM login;
+
+-- @block
+SELECT * FROM dentist;
+
+-- @block
 SELECT * FROM insurance;
+
+-- @block
+SELECT * FROM appointment;
+
+-- @block
+SELECT * FROM office_dentist;
+
+-- @block
+SELECT * FROM schedule;
+
+-- @block
+-- Inserting dentist 2 with General Dentistry specialty
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Salary) 
+VALUES ('John', 'Doe', 'General Dentistry', 'john.doe@example.com', '1234567890', '123 Main St, Anytown, USA', '1985-05-15', '2020-01-01', 80000);
+-- Inserting dentist 3 with General Dentistry specialty
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Salary) 
+VALUES ('Jane', 'Smith', 'General Dentistry', 'jane.smith@example.com', '9876543210', '456 Oak St, Othertown, USA', '1980-10-20', '2019-05-01', 75000);
+-- Inserting dentist 4 with Endodontist specialty
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Salary) 
+VALUES ('Michael', 'Johnson', 'Endodontist', 'michael.johnson@example.com', '5551234567', '789 Elm St, Anycity, USA', '1978-12-10', '2018-03-15', 90000);
+
+-- @block
+-- Inserting dentist 2 into office 1
+INSERT INTO office_dentist (officeID, dentistID) VALUES (1, 2);
+-- Inserting dentist 3 into office 1
+INSERT INTO office_dentist (officeID, dentistID) VALUES (1, 3);
+-- Inserting dentist 4 into office 2
+INSERT INTO office_dentist (officeID, dentistID) VALUES (2, 4);
+
+
+-- @block
+-- Inserting schedule for dentist 2 at office 1 (assuming Monday and Wednesday)
+INSERT INTO schedule (officeID, dentistID, Monday, Wednesday) VALUES (1, 2, TRUE, TRUE);
+-- Inserting schedule for dentist 3 at office 1 (assuming Tuesday and Thursday)
+INSERT INTO schedule (officeID, dentistID, Tuesday, Thursday) VALUES (1, 3, TRUE, TRUE);
+-- Inserting schedule for dentist 4 at office 2 (assuming Monday and Friday)
+INSERT INTO schedule (officeID, dentistID, Monday, Friday) VALUES (2, 4, TRUE, TRUE);
