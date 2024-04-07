@@ -5,9 +5,9 @@ const jwt = require('jsonwebtoken');
 const { handleProtectedRoute } = require('./controllers/authController');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
-const handleGetOfficeID = require('./routes/officeRoutes');
-const { handleGetDentistID, handleGetDentistByOfficeID } = require('./routes/dentistRoutes');
-const { handleGenerateSalaryReport } = require('./routes/adminRoutes');
+const { /* handleGetOfficeID, */ handleAssignDentistToOffice } = require('./routes/officeRoutes');
+// const { handleGetDentistID, handleGetDentistByOfficeID } = require('./routes/dentistRoutes');
+// const { handleGenerateSalaryReport } = require('./routes/adminRoutes');
 
 const server = http.createServer((req, res) => {
 
@@ -42,19 +42,22 @@ const server = http.createServer((req, res) => {
         handlePatientAppointment(req, res, jwt);
     } 
     // Handle office routes
-    else if (req.url.startsWith('/api/officeID') && req.method === 'GET') {
-        handleGetOfficeID(req, res);
+    // else if (req.url.startsWith('/api/officeID') && req.method === 'GET') {
+    //     handleGetOfficeID(req, res);
+    // } 
+    else if (req.url === '/api/office/assignDentist' && req.method === 'POST') {
+        handleAssignDentistToOffice(req, res);
     } 
     // Handle dentist routes
-    else if (req.url.startsWith('/api/dentist/dentistID') && req.method === 'GET') {
-        handleGetDentistID(req, res);
-    } else if (req.url.startsWith('/api/dentist/getDentistsByOfficeID') && req.method === 'GET') {
-        handleGetDentistByOfficeID(req, res);
-    } 
+    // else if (req.url.startsWith('/api/dentist/dentistID') && req.method === 'GET') {
+    //     handleGetDentistID(req, res);
+    // } else if (req.url.startsWith('/api/dentist/getDentistsByOfficeID') && req.method === 'GET') {
+    //     handleGetDentistByOfficeID(req, res);
+    // } 
     // Handle admin routes
-    else if (req.url.startsWith('/api/admin/salary-report') && req.method === 'GET') {
-        handleGenerateSalaryReport(req, res);
-    }  
+    // else if (req.url.startsWith('/api/admin/salary-report') && req.method === 'GET') {
+    //     handleGenerateSalaryReport(req, res);
+    // }  
     // No routes found
     else {
         res.writeHead(404);
