@@ -34,22 +34,21 @@ const server = http.createServer((req, res) => {
         handleLoginAdmin(req, res, jwt);
     } 
     // Handle patient routes
-    else if (req.url === '/api/patient/profile' && req.method === 'GET') { //todo: update frontend fetch
+    else if (req.url === '/api/patient/profile' && req.method === 'GET') { // TODO: update frontend fetch
         handleGetPatient(req, res, jwt);
-    } else if (req.url === '/api/patient/profile/update' && req.method === 'PATCH') { //todo: update frontend fetch
+    } else if (req.url === '/api/patient/profile/update' && req.method === 'PATCH') { // TODO: update frontend fetch
         handlePatientUpdate(req, res, jwt);
     } else if (req.url === '/api/patient/schedule' && req.method === 'POST') {
         handlePatientAppointment(req, res, jwt);
     } 
     // Handle office routes
-    else if (req.url === '/api/office/assignDentist' && req.method === 'POST') {
+    else if (req.url === '/api/office/assignDentist' && req.method === 'POST') { // TODO: implement frontend fetch
         handleAssignDentistToOffice(req, res);
     } 
     // Handle dentist routes
-    else if (req.url === '/api/dentist/assignSchedule' && req.method === 'POST') {
+    else if (req.url === '/api/dentist/assignSchedule' && req.method === 'POST') { // TODO: implement frontend fetch
         handleAssignDentistSchedule(req, res);
-    } 
-    else if (req.url.startsWith('/api/dentist/getDentist') && req.method === 'GET') {
+    } else if (req.url.startsWith('/api/dentist/getDentist') && req.method === 'GET') {
         handleGetDentistsByOfficeAndDay(req, res);
     } 
     // Handle admin routes

@@ -7,6 +7,8 @@ const PatientProfile = () => {
     patientID: null,
     insuranceID: null,
     dentistID: null,
+    Insurance_Company_Name: 'Insurance Name',
+    Policy_number: 'Policy Number',
     Gender: 'Gender',
     FName: 'First Name',
     LName: 'Last Name',
@@ -41,11 +43,19 @@ const PatientProfile = () => {
     }
   };
 
-  const renderInsurance = () => {
-    if (!patientData || !patientData.insuranceID) {
+  const renderInsuranceName = () => {
+    if (!patientData || !patientData.Insurance_Company_Name) {
       return "None";
     } else {
-      return patientData.insuranceID;
+      return patientData.Insurance_Company_Name;
+    }
+  };
+
+  const renderInsuranceNumber = () => {
+    if (!patientData || !patientData.Policy_number) {
+      return "None";
+    } else {
+      return patientData.Policy_number;
     }
   };
 
@@ -102,7 +112,12 @@ const PatientProfile = () => {
 
             <div>
               <label className="block mb-2">Insurance:</label>
-              <div className="border border-gray-300 rounded-md py-2 px-3">{renderInsurance()}</div>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{renderInsuranceName()}</div>
+            </div>
+
+            <div>
+              <label className="block mb-2">Policy Number:</label>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{renderInsuranceNumber()}</div>
             </div>
           </div>
         )}
