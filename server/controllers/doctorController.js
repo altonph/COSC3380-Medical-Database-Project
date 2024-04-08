@@ -219,6 +219,57 @@ const getAppointmentsByDoctorUsername = (req, res, username) => {
     });
 };
 
+const getInformationByPatientId = (req, res, patientId) => {
+    pool.query('SELECT * FROM patient WHERE patientID = ?', [patientId], (error, results) => {
+        if (error) {
+            console.error('Error retrieving patient information:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            return;
+        }
+
+        if (results.length === 0) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Patient not found' }));
+            return;
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(results[0]));
+    });
+};
+
+const updatePatientInformationByPatientId = (req, res, patientId) => {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        const patientData = JSON.parse(body);
+        const { Policy_number, Gender, FName, LName, DOB, Email, Phone_num, Address } = patientData;
+        const query = `
+            UPDATE patient 
+            SET Policy_number = ?, Gender = ?, FName = ?, LName = ?, DOB = ?, Email = ?, Phone_num = ?, Address = ? 
+            WHERE patientID = ?`;
+        pool.query(query, [Policy_number, Gender, FName, LName, DOB, Email, Phone_num, Address, patientId], (error, results) => {
+            if (error) {
+                console.error('Error updating patient information:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            }
+            if (results.affectedRows === 0) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Patient not found' }));
+                return;
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Patient information updated successfully' }));
+        });
+    });
+};
+
 module.exports = {
     getAllPatients,
     getPatientById,
@@ -229,5 +280,7 @@ module.exports = {
     updateMedicalHistoryByPatientId,
     updatePrescriptionsByPatientId,
     updateVisitDetailsByPatientId,
-    getAppointmentsByDoctorUsername
+    getAppointmentsByDoctorUsername,
+    getInformationByPatientId,
+    updatePatientInformationByPatientId
 };

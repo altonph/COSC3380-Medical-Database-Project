@@ -7,7 +7,7 @@ const { handleProtectedRoute } = require('./controllers/authController');
 const { patientRoutes, patientUpdate, appointmentRoutes } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
 const { adminRoutes } = require('./routes/adminRoutes'); 
-const { getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, getAppointmentsByDoctorUsername, updateVisitDetailsByPatientId } = require('./controllers/doctorController');
+const { getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, getAppointmentsByDoctorUsername, updateVisitDetailsByPatientId, getInformationByPatientId, updatePatientInformationByPatientId } = require('./controllers/doctorController');
 
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -48,6 +48,10 @@ const server = http.createServer((req, res) => {
         reportRoutes(req, res, jwt);
     } else if (req.url === '/api/doctor/patients' && req.method === 'GET') {
         doctorRoutes(req, res, jwt); 
+    } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/information') && req.method === 'GET') {
+        const parts = req.url.split('/');
+        const patientId = parts[parts.length - 2];
+        getInformationByPatientId(req, res, patientId);
     } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/medical-history') && req.method === 'GET') {
         const parts = req.url.split('/');
         const patientId = parts[parts.length - 2];
@@ -76,6 +80,10 @@ const server = http.createServer((req, res) => {
         const parts = req.url.split('/');
         const patientId = parts[parts.length - 2];
         updateVisitDetailsByPatientId(req, res, patientId); 
+    } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/information') && req.method === 'PUT') { 
+        const parts = req.url.split('/');
+        const patientId = parts[parts.length - 2];
+        updatePatientInformationByPatientId(req, res, patientId); 
     } else if (req.url.startsWith('/api/doctor/patients/') && req.method === 'GET') {
         const parts = req.url.split('/');
         const patientId = parts[parts.length - 1];

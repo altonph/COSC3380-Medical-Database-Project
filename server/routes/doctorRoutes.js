@@ -11,8 +11,7 @@ const doctorRoutes = (req, res) => {
             return unauthorizedResponse(res);
         }
         getAllPatients(req, res);
-    } 
-    else if (method === 'GET' && url.startsWith('/api/doctor/patients/') && url.endsWith('/prescriptions')) {
+    } else if (method === 'GET' && url.startsWith('/api/doctor/patients/') && url.endsWith('/prescriptions')) {
         const decodedToken = verifyToken(authHeader);
         if (!decodedToken) {
             return unauthorizedResponse(res);
@@ -20,8 +19,7 @@ const doctorRoutes = (req, res) => {
         const parts = url.split('/');
         const patientId = parts[parts.length - 2];
         getPrescriptionsByPatientId(req, res, patientId);
-    }
-    else if (method === 'GET' && url.startsWith('/api/doctor/patients/') && url.endsWith('/medical-history')) {
+    } else if (method === 'GET' && url.startsWith('/api/doctor/patients/') && url.endsWith('/medical-history')) {
         const decodedToken = verifyToken(authHeader);
         if (!decodedToken) {
             return unauthorizedResponse(res);
@@ -29,8 +27,7 @@ const doctorRoutes = (req, res) => {
         const parts = url.split('/');
         const patientId = parts[parts.length - 2];
         getMedicalHistoryByPatientId(req, res, patientId);
-    }
-    else if (method === 'GET' && url.startsWith('/api/doctor/patients/') && url.endsWith('/invoices')) {
+    } else if (method === 'GET' && url.startsWith('/api/doctor/patients/') && url.endsWith('/invoices')) {
         const decodedToken = verifyToken(authHeader);
         if (!decodedToken) {
             return unauthorizedResponse(res);
@@ -38,8 +35,7 @@ const doctorRoutes = (req, res) => {
         const parts = url.split('/');
         const patientId = parts[parts.length - 2];
         getInvoicesByPatientId(req, res, patientId);
-    }
-    else if (method === 'GET' && url.startsWith('/api/doctor/patients/') && url.endsWith('/visit-details')) {
+    } else if (method === 'GET' && url.startsWith('/api/doctor/patients/') && url.endsWith('/visit-details')) {
         const decodedToken = verifyToken(authHeader);
         if (!decodedToken) {
             return unauthorizedResponse(res);
@@ -47,8 +43,7 @@ const doctorRoutes = (req, res) => {
         const parts = url.split('/');
         const patientId = parts[parts.length - 2];
         getVisitDetailsByPatientId(req, res, patientId);
-    }
-    else if (method === 'GET' && url.startsWith('/api/doctor/patients/')) {
+    } else if (method === 'GET' && url.startsWith('/api/doctor/patients/')) {
         const decodedToken = verifyToken(authHeader);
         if (!decodedToken) {
             return unauthorizedResponse(res);
@@ -87,7 +82,23 @@ const doctorRoutes = (req, res) => {
         }
         const { username } = decodedToken; 
         getAppointmentsByDoctorUsername(req, res, username);
-    }
+    } else if (method === 'GET' && url.startsWith('/api/doctor/patients/') && url.endsWith('/information')) {
+        const decodedToken = verifyToken(authHeader);
+        if (!decodedToken) {
+            return unauthorizedResponse(res);
+        }
+        const parts = url.split('/');
+        const patientId = parts[parts.length - 2];
+        getInformationByPatientId(req, res, patientId);
+    } else if (method === 'PUT' && url.startsWith('/api/doctor/patients/') && url.endsWith('/information')) {
+        const decodedToken = verifyToken(authHeader);
+        if (!decodedToken) {
+            return unauthorizedResponse(res);
+        }
+        const parts = url.split('/');
+        const patientId = parts[parts.length - 2];
+        updatePatientInformationByPatientId(req, res, patientId);
+    }  
     else {
         return notFoundResponse(res);
     }
