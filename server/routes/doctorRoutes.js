@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { getAllPatients, getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, getAppointmentsByDoctorUsername } = require('../controllers/doctorController');
+const { getAllPatients, getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, updateVisitDetailsByPatientId, getAppointmentsByDoctorUsername } = require('../controllers/doctorController');
 
 const doctorRoutes = (req, res) => {
     const { url, method } = req;
@@ -72,6 +72,14 @@ const doctorRoutes = (req, res) => {
         const parts = url.split('/');
         const patientId = parts[parts.length - 2];
         updatePrescriptionsByPatientId(req, res, patientId);
+    } else if (method === 'PUT' && url.startsWith('/api/doctor/patients/') && url.endsWith('/visit-details')) {
+        const decodedToken = verifyToken(authHeader);
+        if (!decodedToken) {
+            return unauthorizedResponse(res);
+        }
+        const parts = url.split('/');
+        const patientId = parts[parts.length - 2];
+        updateVisitDetailsByPatientId(req, res, patientId); 
     } else if (method === 'GET' && url === '/api/doctor/appointments') {
         const decodedToken = verifyToken(authHeader);
         if (!decodedToken) {

@@ -7,7 +7,7 @@ const { handleProtectedRoute } = require('./controllers/authController');
 const { patientRoutes, patientUpdate, appointmentRoutes } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
 const { adminRoutes } = require('./routes/adminRoutes'); 
-const { getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, getAppointmentsByDoctorUsername } = require('./controllers/doctorController');
+const { getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, getAppointmentsByDoctorUsername, updateVisitDetailsByPatientId } = require('./controllers/doctorController');
 
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -73,6 +73,10 @@ const server = http.createServer((req, res) => {
         const parts = req.url.split('/');
         const patientId = parts[parts.length - 2];
         updatePrescriptionsByPatientId(req, res, patientId); 
+    } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/visit-details') && req.method === 'PUT') { 
+        const parts = req.url.split('/');
+        const patientId = parts[parts.length - 2];
+        updateVisitDetailsByPatientId(req, res, patientId); 
     } else if (req.url.startsWith('/api/doctor/patients/') && req.method === 'GET') {
         const parts = req.url.split('/');
         const patientId = parts[parts.length - 1];

@@ -28,6 +28,7 @@ import DoctorPortal from "./pages/doctor/DoctorPortal";
 import AdminProfile from "./pages/admin/AdminProfile";
 import DoctorProfile from "./pages/doctor/DoctorProfile";
 import ContactPage from "./pages/ContactPage";
+import DoctorEditVisitDetails from "./pages/doctor/DoctorEditVisitDetails";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -57,6 +58,7 @@ function App() {
             <Route path="/doctor/patients/:patientID" element={<PatientDetails />} />
             <Route path="/doctor/patients/:patientID/medical-history" element={<DoctorEditMedicalHistory />} />
             <Route path="/doctor/patients/:patientID/prescriptions" element={<DoctorEditPrescriptions />} />
+            <Route path="/doctor/patients/:patientID/visit-details" element={<DoctorEditVisitDetails />} />
             <Route path="/doctor/home" element= {<DoctorPortal/>} />
             <Route path="/doctor/profile" element= {<DoctorProfile/>} />
             <Route path="/admin/home" element= {<AdminPortal/>} />

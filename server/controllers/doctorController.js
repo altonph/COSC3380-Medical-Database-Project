@@ -152,6 +152,38 @@ const updatePrescriptionsByPatientId = (req, res, patientId) => {
     });
 };
 
+const updateVisitDetailsByPatientId = (req, res, patientId) => {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        const visitDetailsData = JSON.parse(body);
+        const { visitID, dentistID, Visit_Type, Diagnosis, Treatment, Notes } = visitDetailsData;
+        const query = `
+            UPDATE visit_details 
+            SET dentistID = ?, Visit_Type = ?, Diagnosis = ?, Treatment = ?, Notes = ? 
+            WHERE visitID = ? AND patientID = ?`; 
+        pool.query(query, [dentistID, Visit_Type, Diagnosis, Treatment, Notes, visitID, patientId], (error, results) => {
+            if (error) {
+                console.error('Error updating visit details:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            }
+            if (results.affectedRows === 0) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Visit details or Patient not found' }));
+                return;
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Visit details updated successfully' }));
+        });
+    });
+};
+
+
 const getAppointmentsByDoctorUsername = (req, res, username) => {
     pool.query('SELECT DentistID FROM login WHERE Username = ?', [username], (error, results) => {
         if (error) {
@@ -196,5 +228,6 @@ module.exports = {
     getVisitDetailsByPatientId,
     updateMedicalHistoryByPatientId,
     updatePrescriptionsByPatientId,
+    updateVisitDetailsByPatientId,
     getAppointmentsByDoctorUsername
 };

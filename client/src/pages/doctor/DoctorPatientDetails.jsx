@@ -22,145 +22,78 @@ const PatientDetails = () => {
       console.error('Token not found in local storage');
       return;
     }
-    console.log("Patient ID before fetching patient details ", patientID);
-    fetch(`http://localhost:5000/api/doctor/patients/${patientID}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` 
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => setPatient(data))
-    .catch(error => console.error('Error fetching patient details:', error));
-  }, [patientID]);
-  
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('Token not found in local storage');
-      return;
-    }
-    console.log("Patient ID before fetching medical history ", patientID);
-    fetch(`http://localhost:5000/api/doctor/patients/${patientID}/medical-history`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` 
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => setMedicalHistory(data))
-    .catch(error => console.error('Error fetching medical history:', error));
-  }, [patientID]);
-   
-  useEffect(() => {
-    const fetchPrescriptions = async () => {
+
+    const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          throw new Error("Token not found in local storage");
-        }
-
-        const response = await fetch(
-          `http://localhost:5000/api/doctor/patients/${patientID}/prescriptions`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
+        const patientPromise = fetch(`http://localhost:5000/api/doctor/patients/${patientID}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
           }
-        );
+        });
 
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+        const medicalHistoryPromise = fetch(`http://localhost:5000/api/doctor/patients/${patientID}/medical-history`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        const prescriptionsPromise = fetch(`http://localhost:5000/api/doctor/patients/${patientID}/prescriptions`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        const billingHistoryPromise = fetch(`http://localhost:5000/api/doctor/patients/${patientID}/invoices`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        const visitDetailsPromise = fetch(`http://localhost:5000/api/doctor/patients/${patientID}/visit-details`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        const [patientResponse, medicalHistoryResponse, prescriptionsResponse, billingHistoryResponse, visitDetailsResponse] = await Promise.all([
+          patientPromise,
+          medicalHistoryPromise,
+          prescriptionsPromise,
+          billingHistoryPromise,
+          visitDetailsPromise
+        ]);
+
+        if (!patientResponse.ok || !medicalHistoryResponse.ok || !prescriptionsResponse.ok || !billingHistoryResponse.ok || !visitDetailsResponse.ok) {
+          throw new Error('One or more network responses were not ok');
         }
 
-        const data = await response.json();
-        setPrescriptions(data);
+        const patientData = await patientResponse.json();
+        const medicalHistoryData = await medicalHistoryResponse.json();
+        const prescriptionsData = await prescriptionsResponse.json();
+        const billingHistoryData = await billingHistoryResponse.json();
+        const visitDetailsData = await visitDetailsResponse.json();
+
+        setPatient(patientData);
+        setMedicalHistory(medicalHistoryData);
+        setPrescriptions(prescriptionsData);
+        setBillingHistory(billingHistoryData);
+        setVisitDetails(visitDetailsData);
       } catch (error) {
-        console.error("Error fetching prescriptions:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchPrescriptions();
-  }, [patientID]);
-
-  useEffect(() => {
-    const fetchBillingHistory = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          throw new Error("Token not found in local storage");
-        }
-
-        const response = await fetch(
-          `http://localhost:5000/api/doctor/patients/${patientID}/invoices`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-        setBillingHistory(data);
-      } catch (error) {
-        console.error("Error fetching billing history:", error);
-      }
-    };
-
-    fetchBillingHistory();
-  }, [patientID]);
-
-  useEffect(() => {
-    const fetchVisitDetails = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          throw new Error("Token not found in local storage");
-        }
-
-        const response = await fetch(
-          `http://localhost:5000/api/doctor/patients/${patientID}/visit-details`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-        setVisitDetails(data);
-      } catch (error) {
-        console.error("Error fetching visit details:", error);
-      }
-    };
-
-    fetchVisitDetails();
+    fetchData();
   }, [patientID]);
 
   const formatDate = (dateString) => {
@@ -313,8 +246,8 @@ const PatientDetails = () => {
           <div>No visit details found</div>
           )}
           <div className="mt-4">
-            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit Visit Details</button>
-          </div>
+              <Link to={`/doctor/patients/${patientID}/visit-details`} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit Visit Details</Link>
+            </div>
         </div>          
           
         <div className="mt-8">
