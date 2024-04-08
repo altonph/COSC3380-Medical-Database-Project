@@ -9,6 +9,8 @@ const PatientProfileSetting = () => {
     patientID: null,
     insuranceID: null,
     dentistID: null,
+    Insurance_Company_Name: '',
+    Policy_number: '',
     FName: '',
     LName: '',
     Gender: '',
@@ -70,7 +72,7 @@ const PatientProfileSetting = () => {
   
     try {
       const response = await fetch("http://localhost:5000/api/patient/profile/update", {
-        method: "POST",
+        method: "PATCH",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`,
           "Content-Type": "application/json"
@@ -215,6 +217,39 @@ const PatientProfileSetting = () => {
               <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.Address}</div>
             )}
           </div>
+
+          {/* Insurance Name */}
+          <div>
+            <label className="block mb-2">Insurance Name:</label>
+            {isEditing ? (
+              <input
+                type="text"
+                name="Insurance_Company_Name"
+                value={editedProfile.Insurance_Company_Name}
+                onChange={handleInputChange}
+                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+              />
+            ) : (
+              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.Insurance_Company_Name}</div>
+            )}
+          </div>
+
+          {/* Policy Number */}
+          <div>
+            <label className="block mb-2">Policy Number:</label>
+            {isEditing ? (
+              <input
+                type="text"
+                name="Policy_number"
+                value={editedProfile.Policy_number}
+                onChange={handleInputChange}
+                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+              />
+            ) : (
+              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.Policy_number}</div>
+            )}
+          </div>
+          
         </div>
         
         {/* Edit Button */}
