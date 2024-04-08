@@ -14,6 +14,8 @@ import DoctorPatients from "./pages/doctor/DoctorPatients";
 import PatientDetails from "./pages/doctor/DoctorPatientDetails";
 import DoctorEditMedicalHistory from "./pages/doctor/DoctorEditMedicalHistory";
 import DoctorEditPrescriptions from "./pages/doctor/DoctorEditPrescriptions";
+import DoctorEditVisitDetails from "./pages/doctor/DoctorEditVisitDetails";
+import DoctorEditPatientInformation from "./pages/doctor/DoctorEditPatientInformation";
 import PatientPrescriptions from "./pages/patient/PatientPrescriptions"
 import HistoryPortal from "./pages/patient/HistoryPortal"; 
 import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
@@ -28,7 +30,6 @@ import DoctorPortal from "./pages/doctor/DoctorPortal";
 import AdminProfile from "./pages/admin/AdminProfile";
 import DoctorProfile from "./pages/doctor/DoctorProfile";
 import ContactPage from "./pages/ContactPage";
-import DoctorEditVisitDetails from "./pages/doctor/DoctorEditVisitDetails";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -59,6 +60,7 @@ function App() {
             <Route path="/doctor/patients/:patientID/medical-history" element={<DoctorEditMedicalHistory />} />
             <Route path="/doctor/patients/:patientID/prescriptions" element={<DoctorEditPrescriptions />} />
             <Route path="/doctor/patients/:patientID/visit-details" element={<DoctorEditVisitDetails />} />
+            <Route path="/doctor/patients/:patientID/patient-information" element={<DoctorEditPatientInformation />} />
             <Route path="/doctor/home" element= {<DoctorPortal/>} />
             <Route path="/doctor/profile" element= {<DoctorProfile/>} />
             <Route path="/admin/home" element= {<AdminPortal/>} />

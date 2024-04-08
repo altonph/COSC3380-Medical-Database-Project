@@ -2,19 +2,16 @@
 const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-
+const { handleRegisterPatient, handleLoginPatient, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
-const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
-const { getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, getAppointmentsByDoctorUsername, updateVisitDetailsByPatientId } = require('./controllers/doctorController');
-const { handleRegisterPatient, handleLoginPatient, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
+const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
+const { handleGenerateSalaryReport } = require('./routes/adminRoutes'); 
+const { getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, getAppointmentsByDoctorUsername, updateVisitDetailsByPatientId, getInformationByPatientId, updatePatientInformationByPatientId } = require('./controllers/doctorController');
 const { handleAssignDentistToOffice } = require('./routes/officeRoutes');
-const {  handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay } = require('./routes/dentistRoutes');
-const { handleGenerateSalaryReport } = require('./routes/adminRoutes');
-
+const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay } = require('./routes/dentistRoutes');
 
 const server = http.createServer((req, res) => {
-
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, UPDATE, PATCH, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -24,8 +21,7 @@ const server = http.createServer((req, res) => {
         res.end();
         return;
     }
-
-    // Handle authentication routes
+    
     if (req.url === '/api/patient/register' && req.method === 'POST') {
         handleRegisterPatient(req, res);
     } else if (req.url === '/api/patient/login' && req.method === 'POST') {
@@ -40,21 +36,29 @@ const server = http.createServer((req, res) => {
         handleRegisterAdmin(req, res, jwt);
     } else if (req.url === '/api/admin/login' && req.method === 'POST') {
         handleLoginAdmin(req, res, jwt);
-    // Handle patient routes
     } else if (req.url === '/api/patient/profile' && req.method === 'GET') {
-        patientRoutes(req, res, jwt);
-    } else if (req.url === '/api/patient/profile/update' && req.method === 'POST') {
-        patientUpdate(req, res, jwt);
-    } else if (req.url === '/api/appointment/schedule' && req.method === 'POST') { // schedule an appointment
-        appointmentRoutes(req, res, jwt);
-    } else if (req.url.startsWith('/api/admin/generate-report') && req.method === 'GET') {
-        adminRoutes(req, res, jwt);
-    } else if (req.url === '/api/admin/generate-report' && req.method === 'POST') {
-        adminRoutes(req, res, jwt);
-    } else if (req.url.startsWith('/api/report') && req.method === 'GET') {
-        reportRoutes(req, res, jwt);
-    } else if (req.url === '/api/doctor/patients' && req.method === 'GET') {
-        doctorRoutes(req, res, jwt); 
+        handleGetPatient(req, res, jwt);
+    } else if (req.url === '/api/patient/profile/update' && req.method === 'PATCH') {
+        handlePatientUpdate(req, res, jwt);
+    } else if (req.url === '/api/patient/schedule' && req.method === 'POST') { 
+        handlePatientAppointment(req, res, jwt);
+    } else if (req.url === '/api/office/assignDentist' && req.method === 'POST') {
+        handleAssignDentistToOffice(req, res);
+    } else if (req.url === '/api/dentist/assignSchedule' && req.method === 'POST') {
+        handleAssignDentistSchedule(req, res);
+    } else if (req.url.startsWith('/api/dentist/getDentist') && req.method === 'GET') {
+        handleGetDentistsByOfficeAndDay(req, res);
+    } else if (req.url.startsWith('/api/admin/salary-report') && req.method === 'GET') {
+        handleGenerateSalaryReport(req, res, jwt);
+    }
+    
+    // doctor pages
+    else if (req.url === '/api/doctor/patients' && req.method === 'GET') {
+        doctorRoutes(req, res, jwt);
+    } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/information') && req.method === 'GET') {
+        const parts = req.url.split('/');
+        const patientId = parts[parts.length - 2];
+        getInformationByPatientId(req, res, patientId);
     } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/medical-history') && req.method === 'GET') {
         const parts = req.url.split('/');
         const patientId = parts[parts.length - 2];
@@ -83,6 +87,10 @@ const server = http.createServer((req, res) => {
         const parts = req.url.split('/');
         const patientId = parts[parts.length - 2];
         updateVisitDetailsByPatientId(req, res, patientId); 
+    } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/information') && req.method === 'PUT') { 
+        const parts = req.url.split('/');
+        const patientId = parts[parts.length - 2];
+        updatePatientInformationByPatientId(req, res, patientId); 
     } else if (req.url.startsWith('/api/doctor/patients/') && req.method === 'GET') {
         const parts = req.url.split('/');
         const patientId = parts[parts.length - 1];
@@ -98,32 +106,8 @@ const server = http.createServer((req, res) => {
         }
         const { username } = decodedToken;
         getAppointmentsByDoctorUsername(req, res, username);
-    } else {
-
-    } 
-    // Handle patient routes
-    else if (req.url === '/api/patient/profile' && req.method === 'GET') { // TODO: update frontend fetch
-        handleGetPatient(req, res, jwt);
-    } else if (req.url === '/api/patient/profile/update' && req.method === 'PATCH') { // TODO: update frontend fetch
-        handlePatientUpdate(req, res, jwt);
-    } else if (req.url === '/api/patient/schedule' && req.method === 'POST') {
-        handlePatientAppointment(req, res, jwt);
-    } 
-    // Handle office routes
-    else if (req.url === '/api/office/assignDentist' && req.method === 'POST') { // TODO: implement frontend fetch
-        handleAssignDentistToOffice(req, res);
-    } 
-    // Handle dentist routes
-    else if (req.url === '/api/dentist/assignSchedule' && req.method === 'POST') { // TODO: implement frontend fetch
-        handleAssignDentistSchedule(req, res);
-    } else if (req.url.startsWith('/api/dentist/getDentist') && req.method === 'GET') {
-        handleGetDentistsByOfficeAndDay(req, res);
-    } 
-    // Handle admin routes
-    else if (req.url.startsWith('/api/admin/salary-report') && req.method === 'GET') { // TODO: adjust or remove
-        handleGenerateSalaryReport(req, res);
-    }  
-    // No routes found
+    }
+    
     else {
         res.writeHead(404);
         res.end('Not Found');

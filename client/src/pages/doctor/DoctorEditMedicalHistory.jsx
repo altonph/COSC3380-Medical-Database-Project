@@ -5,19 +5,17 @@ import Footer from "../../components/Footer";
 
 const DoctorEditMedicalHistory = () => {
   const { patientID } = useParams();
-  const [medicalHistory, setMedicalHistory] = useState(null);
-  const [editedMedicalHistory, setEditedMedicalHistory] = useState([]);
-  const [isEditingMedicalHistory, setIsEditingMedicalHistory] = useState(false);
+  const [medicalHistory, setMedicalHistory] = useState([]);
+  const [editableMedicalHistory, setEditableMedicalHistory] = useState([]);
 
   useEffect(() => {
     const fetchMedicalHistory = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          console.error("Token not found in local storage");
-          return;
+          throw new Error("Token not found in local storage");
         }
-        console.log("Fetching medical history for patient ", patientID);
+
         const response = await fetch(
           `http://localhost:5000/api/doctor/patients/${patientID}/medical-history`,
           {
@@ -28,12 +26,14 @@ const DoctorEditMedicalHistory = () => {
             },
           }
         );
+
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
+
         const data = await response.json();
         setMedicalHistory(data);
-        setEditedMedicalHistory(data); 
+        setEditableMedicalHistory(data.map(history => ({ ...history, editable: false })));
       } catch (error) {
         console.error("Error fetching medical history:", error);
       }
@@ -42,26 +42,27 @@ const DoctorEditMedicalHistory = () => {
     fetchMedicalHistory();
   }, [patientID]);
 
-  const handleChangeMedicalHistory = (index, field, value) => {
-    const updatedMedicalHistory = [...editedMedicalHistory];
-    updatedMedicalHistory[index][field] = value;
-    setEditedMedicalHistory(updatedMedicalHistory);
+  const handleEditClick = (index) => {
+    const updatedEditableMedicalHistory = [...editableMedicalHistory];
+    updatedEditableMedicalHistory[index].editable = true;
+    setEditableMedicalHistory(updatedEditableMedicalHistory);
   };
 
-  const handleEditMedicalHistory = () => {
-    setIsEditingMedicalHistory(true);
+  const handleInputChange = (e, index) => {
+    const { name, value } = e.target;
+    const updatedEditableMedicalHistory = [...editableMedicalHistory];
+    updatedEditableMedicalHistory[index][name] = value;
+    setEditableMedicalHistory(updatedEditableMedicalHistory);
   };
 
-  const handleSaveMedicalHistory = async () => {
+  const handleSaveClick = async (index) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        console.error("Token not found in local storage");
-        return;
+        throw new Error("Token not found in local storage");
       }
-  
-      console.log("Data to be sent to the backend:", editedMedicalHistory);
-  
+
+      const updatedHistory = editableMedicalHistory[index];
       const response = await fetch(
         `http://localhost:5000/api/doctor/patients/${patientID}/medical-history`,
         {
@@ -70,21 +71,30 @@ const DoctorEditMedicalHistory = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(editedMedicalHistory),
+          body: JSON.stringify(updatedHistory),
         }
       );
+
       if (!response.ok) {
-        throw new Error("Error updating medical history");
+        throw new Error("Network response was not ok");
       }
-      setIsEditingMedicalHistory(false);
+
+      const updatedMedicalHistory = [...medicalHistory];
+      updatedMedicalHistory[index] = updatedHistory;
+      setMedicalHistory(updatedMedicalHistory);
+
+      const updatedEditableMedicalHistory = [...editableMedicalHistory];
+      updatedEditableMedicalHistory[index].editable = false;
+      setEditableMedicalHistory(updatedEditableMedicalHistory);
     } catch (error) {
-      console.error("Error saving medical history:", error);
+      console.error("Error updating medical history:", error);
     }
   };
-  
 
-  const handleCancelMedicalHistory = () => {
-    setIsEditingMedicalHistory(false);
+  const handleCancelClick = (index) => {
+    const updatedEditableMedicalHistory = [...editableMedicalHistory];
+    updatedEditableMedicalHistory[index].editable = false;
+    setEditableMedicalHistory(updatedEditableMedicalHistory);
   };
 
   const formatDate = (dateString) => {
@@ -99,207 +109,85 @@ const DoctorEditMedicalHistory = () => {
 
   return (
     <>
-      <div className="flex flex-col h-screen">
-        <nav>
-          <HeaderPortalAdmin />
-        </nav>
+      <HeaderPortalAdmin />
 
-        <div className="flex flex-1">
+      <div className="flex flex-col min-h-screen">
+        <div className="flex-1 flex">
           <aside className="w-1/6 bg-gray-200 text-black">
             <nav className="p-4 text-xl">
               <ul>
-                <li>
-                  <a
-                    href="/doctor/home"
-                    className="block py-2 text-center text-gray-600 hover:text-black"
-                  >
-                    Home
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/doctor/appointments"
-                    className="block py-2 text-center text-gray-600 hover:text-black"
-                  >
-                    Appointments
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/doctor/patients"
-                    className="block py-2 text-center font-bold underline"
-                  >
-                    Patients
-                  </a>
-                </li>
+                <li><a href="/doctor/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
+                <li><a href="/doctor/appointments" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
+                <li><a href="/doctor/patients" className="block py-2 text-center font-bold underline">Patients</a></li>
               </ul>
             </nav>
           </aside>
 
-          <main className="flex-1 p-4">
-            <h1 className="text-3xl font-bold mb-4 p-8">
-              Edit Medical History
-            </h1>
+          <main className="flex-1 p-4 overflow-y-auto">
+            <h1 className="text-3xl font-bold mb-4 p-8">Medical History</h1>
             <div className="mt-8">
               <h2 className="text-lg font-semibold mb-2">Medical History:</h2>
-              {isEditingMedicalHistory || !medicalHistory || medicalHistory.length === 0 ? (
-                <div>
-                  {medicalHistory && medicalHistory.length === 0 ? (
-                    <p>No medical history found</p>
-                  ) : (
-                    <ul>
-                      {editedMedicalHistory.map((record, index) => (
-                        <li key={index}>
-                          <p>
-                            <span className="font-semibold">Allergies:</span>
-                            <input
-                              type="text"
-                              value={record.Allergies}
-                              onChange={(e) =>
-                                handleChangeMedicalHistory(
-                                  index,
-                                  "Allergies",
-                                  e.target.value
-                                )
-                              }
-                              className="border border-gray-400 p-1"
-                              placeholder="Allergies"
-                            />
-                          </p>
-                          <p>
-                            <span className="font-semibold">Height:</span>
-                            <input
-                              type="number"
-                              value={record.Feet}
-                              onChange={(e) =>
-                                handleChangeMedicalHistory(
-                                  index,
-                                  "Feet",
-                                  e.target.value
-                                )
-                              }
-                              className="border border-gray-400 p-1 mr-2"
-                              placeholder="Feet"
-                            />
-                            feet
-                            <input
-                              type="number"
-                              value={record.Inches}
-                              onChange={(e) =>
-                                handleChangeMedicalHistory(
-                                  index,
-                                  "Inches",
-                                  e.target.value
-                                )
-                              }
-                              className="border border-gray-400 p-1"
-                              placeholder="Inches"
-                            />
-                            inches
-                          </p>
-                          <p>
-                            <span className="font-semibold">Weight:</span>
-                            <input
-                              type="number"
-                              value={record.Weight}
-                              onChange={(e) =>
-                                handleChangeMedicalHistory(
-                                  index,
-                                  "Weight",
-                                  e.target.value
-                                )
-                              }
-                              className="border border-gray-400 p-1"
-                            />
-                            lbs
-                          </p>
-                          <p>
-                            <span className="font-semibold">Notes:</span>
-                            <input
-                              type="text"
-                              value={record.Notes}
-                              onChange={(e) =>
-                                handleChangeMedicalHistory(
-                                  index,
-                                  "Notes",
-                                  e.target.value
-                                )
-                              }
-                              className="border border-gray-400 p-1"
-                            />
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  <div className="mt-4">
-                    {isEditingMedicalHistory ? (
-                      <>
-                        <button
-                          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                          onClick={handleSaveMedicalHistory}
-                        >
-                          Save
-                        </button>
-                        <button
-                          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                          onClick={handleCancelMedicalHistory}
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : null}
-                  </div>
-                </div>
+              {medicalHistory.length > 0 ? (
+                <ul>
+                  {editableMedicalHistory.map((history, index) => (
+                    <li key={history.recordsID} className="mb-4">
+                      {history.editable ? (
+                        <>
+                          <div>
+                            <p><span className="font-semibold">Date Created:</span>{" "}{formatDate(history.Date_Created)}</p>
+                          </div>
+                          <div>
+                            <label htmlFor={`allergies${index}`} className="font-semibold">Allergies:{" "}</label>
+                            <input type="text" id={`allergies${index}`} name="Allergies" value={history.Allergies} onChange={(e) => handleInputChange(e, index)} />
+                          </div>
+                          <div>
+                            <p><span className="font-semibold">Height:</span></p>
+                            <label htmlFor={`feet${index}`} className="font-semibold">Feet:{" "}</label>
+                            <input type="number" id={`feet${index}`} name="Feet" value={history.Feet} onChange={(e) => handleInputChange(e, index)} />
+                            <label htmlFor={`inches${index}`} className="font-semibold">Inches:{" "}</label>
+                            <input type="number" id={`inches${index}`} name="Inches" value={history.Inches} onChange={(e) => handleInputChange(e, index)} />
+                          </div>
+                          <div>
+                            <label htmlFor={`weight${index}`} className="font-semibold">Weight:{" "}</label>
+                            <input type="number" id={`weight${index}`} name="Weight" value={history.Weight} onChange={(e) => handleInputChange(e, index)} />
+                          </div>
+                          <div>
+                            <label htmlFor={`notes${index}`} className="font-semibold">Notes:{" "}</label>
+                            <input type="text" id={`notes${index}`} name="Notes" value={history.Notes} onChange={(e) => handleInputChange(e, index)} />
+                          </div>
+                          <div className="mt-2">
+                            <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" onClick={() => handleSaveClick(index)}>Save</button>
+                            <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-2" onClick={() => handleCancelClick(index)}>Cancel</button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <p><span className="font-semibold">Date Created:</span>{" "}{formatDate(history.Date_Created)}</p>
+                          <p><span className="font-semibold">Allergies:</span>{" "}{history.Allergies}</p>
+                          <p><span className="font-semibold">Height:</span></p>
+                          <p><span className="font-semibold">Feet:</span>{" "}{history.Feet}{" "}<span className="font-semibold">Inches:</span>{" "}{history.Inches}</p>
+                          <p><span className="font-semibold">Weight:</span>{" "}{history.Weight}</p>
+                          <p><span className="font-semibold">Notes:</span>{" "}{history.Notes}</p>
+                          <div className="mt-2">
+                            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onClick={() => handleEditClick(index)}>Edit Medical History</button>
+                          </div>
+                        </>
+                      )}
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <div>
-                  <ul>
-                    {medicalHistory.map((record, index) => (
-                      <li key={index}>
-                        <p>
-                          <span className="font-semibold">Allergies:</span>{" "}
-                          {record.Allergies}
-                        </p>
-                        <p>
-                          <span className="font-semibold">Height:</span>{" "}
-                          {record.Feet} feet {record.Inches} inches
-                        </p>
-                        <p>
-                          <span className="font-semibold">Weight:</span>{" "}
-                          {record.Weight} lbs
-                        </p>
-                        <p>
-                          <span className="font-semibold">Notes:</span>{" "}
-                          {record.Notes}
-                        </p>
-                        <p>
-                          <span className="font-semibold">
-                            Date created:
-                          </span>{" "}
-                          {formatDate(record.Date_Created)}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-4">
-                    {!isEditingMedicalHistory && (
-                      <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                        onClick={handleEditMedicalHistory}
-                      >
-                        Edit Medical History
-                      </button>
-                    )}
-                  </div>
-                </div>
+                <div>No medical history found</div>
               )}
+            </div>
+
+            <div className="mt-8">
+              <Link to={`/doctor/patients/${patientID}`} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Back to Patient {patientID}</Link>
             </div>
           </main>
         </div>
-      </div>
-      <nav>
         <Footer />
-      </nav>
+      </div>
     </>
   );
 };

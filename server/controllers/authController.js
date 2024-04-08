@@ -227,8 +227,6 @@ function loginDoctor(username, password, res, jwt) {
     );
 }
 
-}
-
 function loginAdmin(username, password, res, jwt) {
 
     pool.query('SELECT * FROM login WHERE Username = ?', [username], async (error, results) => {

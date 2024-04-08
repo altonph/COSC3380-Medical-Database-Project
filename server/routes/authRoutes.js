@@ -1,7 +1,6 @@
-const { registerUser, loginUser, registerAdmin, loginAdmin, registerDoctor, loginDoctor } = require('../controllers/authController');
+const { registerPatient, loginPatient, registerAdmin, loginAdmin, registerDoctor, loginDoctor } = require('../controllers/authController');
 
 function handleRegisterPatient(req, res) {
-
 
     let data = '';
     req.on('data', chunk => {

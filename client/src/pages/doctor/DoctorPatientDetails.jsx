@@ -141,90 +141,18 @@ const PatientDetails = () => {
           <h1 className="text-3xl font-bold mb-4 p-8">Patient Details</h1>
           <div className="mt-8">
             <h2 className="text-lg font-semibold mb-2">Patient Information:</h2>
-            {editedPatient ? (
-              <>
-                <p><span className="font-semibold">ID:</span> {patient.patientID}</p>
-                <p>
-                  <span className="font-semibold">Name:</span> 
-                  <input 
-                    type="text" 
-                    value={editedPatient.FName} 
-                    onChange={(e) => setEditedPatient({ ...editedPatient, FName: e.target.value })} 
-                    className="border border-gray-400 p-1 mr-2"
-                  /> 
-                  <input 
-                    type="text" 
-                    value={editedPatient.LName} 
-                    onChange={(e) => setEditedPatient({ ...editedPatient, LName: e.target.value })} 
-                    className="border border-gray-400 p-1"
-                  />
-                </p>
-                <p><span className="font-semibold">Gender:</span>
-                <input 
-                    type="gender" 
-                    value={editedPatient.Gender} 
-                    onChange={(e) => setEditedPatient({ ...editedPatient, Gender: e.target.value })} 
-                    className="border border-gray-400 p-1"
-                  />
-                </p>
-                <p>
-                  <span className="font-semibold">Date of Birth:</span> 
-                  <input 
-                    type="date" 
-                    value={editedPatient.DOB} 
-                    onChange={(e) => setEditedPatient({ ...editedPatient, DOB: e.target.value })} 
-                    className="border border-gray-400 p-1"
-                  /> 
-                </p>
-                <p>
-                  <span className="font-semibold">Email:</span> 
-                  <input 
-                    type="email" 
-                    value={editedPatient.Email} 
-                    onChange={(e) => setEditedPatient({ ...editedPatient, Email: e.target.value })} 
-                    className="border border-gray-400 p-1"
-                  /> 
-                </p>
-                <p>
-                  <span className="font-semibold">Phone Number:</span> 
-                  <input 
-                    type="tel" 
-                    value={editedPatient.Phone_num} 
-                    onChange={(e) => setEditedPatient({ ...editedPatient, Phone_num: e.target.value })} 
-                    className="border border-gray-400 p-1"
-                  /> 
-                </p>
-                <p>
-                  <span className="font-semibold">Address:</span> 
-                  <input 
-                    type="text" 
-                    value={editedPatient.Address} 
-                    onChange={(e) => setEditedPatient({ ...editedPatient, Address: e.target.value })} 
-                    className="border border-gray-400 p-1"
-                  /> 
-                </p>
-              </>
-            ) : (
-              <>
-                <p><span className="font-semibold">ID:</span> {patient.patientID}</p>
-                <p><span className="font-semibold">Name:</span> {patient.FName} {patient.LName}</p>
-                <p><span className="font-semibold">Gender:</span> {patient.Gender}</p>
-                <p><span className="font-semibold">Date of Birth:</span> {formatDate(patient.DOB)}</p>
-                <p><span className="font-semibold">Email:</span> {patient.Email}</p>
-                <p><span className="font-semibold">Phone Number:</span> {patient.Phone_num}</p>
-                <p><span className="font-semibold">Address:</span> {patient.Address}</p>
-              </>
-            )}
-            <div className="mt-4">
-              {editedPatient ? (
-                <>
-                  <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onClick={handleSavePatientInformation}>Save</button>
-                  <button className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" onClick={handleCancelPatientInformation}>Cancel</button>
-                </>
-              ) : (
-                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onClick={handleEditPatientInformation}>Edit Patient Information</button>
-              )}
-            </div>
+            <>
+              <p><span className="font-semibold">ID:</span> {patient.patientID}</p>
+              <p><span className="font-semibold">Name:</span> {patient.FName} {patient.LName}</p>
+              <p><span className="font-semibold">Gender:</span> {patient.Gender}</p>
+              <p><span className="font-semibold">Date of Birth:</span> {formatDate(patient.DOB)}</p>
+              <p><span className="font-semibold">Email:</span> {patient.Email}</p>
+              <p><span className="font-semibold">Phone Number:</span> {patient.Phone_num}</p>
+              <p><span className="font-semibold">Address:</span> {patient.Address}</p>
+            </>
+          </div>
+          <div className="mt-4">
+            <Link to={`/doctor/patients/${patientID}/patient-information`} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit Patient Information</Link>
           </div>
 
           <div className="mt-8">

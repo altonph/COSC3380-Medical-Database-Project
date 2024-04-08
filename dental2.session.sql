@@ -75,7 +75,7 @@ SELECT * FROM visit_details;
 
 -- @block
 INSERT INTO prescription (dentistID, patientID, visitID, National_Drug_Code, Medication_Name, Medication_Dosage, Refills, notes, Date_prescribed)
-VALUES (1, 1, 1, '1234567890123', 'Medicine X', '10mg', 3, 'Take with food', '2024-04-03');
+VALUES (1, 1, 3, '1234567890123', 'Medicine X', '10mg', 3, 'Take with food', '2024-04-03');
 
 -- @block
 SELECT * FROM prescription;
