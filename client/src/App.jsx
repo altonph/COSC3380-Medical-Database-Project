@@ -12,6 +12,8 @@ import DoctorLoginPage from "./pages/doctor/doctorLoginPage";
 import DoctorAppointment from "./pages/doctor/DoctorAppointments";
 import DoctorPatients from "./pages/doctor/DoctorPatients";
 import PatientDetails from "./pages/doctor/DoctorPatientDetails";
+import DoctorEditMedicalHistory from "./pages/doctor/DoctorEditMedicalHistory";
+import DoctorEditPrescriptions from "./pages/doctor/DoctorEditPrescriptions";
 import PatientPrescriptions from "./pages/patient/PatientPrescriptions"
 import HistoryPortal from "./pages/patient/HistoryPortal"; 
 import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
@@ -26,6 +28,7 @@ import DoctorPortal from "./pages/doctor/DoctorPortal";
 import AdminProfile from "./pages/admin/AdminProfile";
 import DoctorProfile from "./pages/doctor/DoctorProfile";
 import ContactPage from "./pages/ContactPage";
+import DoctorEditVisitDetails from "./pages/doctor/DoctorEditVisitDetails";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -34,7 +37,6 @@ function App() {
   return (
         <Router>
           <Routes>
-            <Route index element= {<LandingPage />} />
             <Route path="/" element={<LandingPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/home" element={<LandingPage />} />
@@ -54,6 +56,9 @@ function App() {
             <Route path="/doctor/appointments" element={<DoctorAppointment/>}/>
             <Route path="/doctor/patients" element={<DoctorPatients/>}/>
             <Route path="/doctor/patients/:patientID" element={<PatientDetails />} />
+            <Route path="/doctor/patients/:patientID/medical-history" element={<DoctorEditMedicalHistory />} />
+            <Route path="/doctor/patients/:patientID/prescriptions" element={<DoctorEditPrescriptions />} />
+            <Route path="/doctor/patients/:patientID/visit-details" element={<DoctorEditVisitDetails />} />
             <Route path="/doctor/home" element= {<DoctorPortal/>} />
             <Route path="/doctor/profile" element= {<DoctorProfile/>} />
             <Route path="/admin/home" element= {<AdminPortal/>} />

@@ -1,6 +1,7 @@
-const { registerPatient, loginPatient, registerAdmin, loginAdmin } = require('../controllers/authController');
+const { registerUser, loginUser, registerAdmin, loginAdmin, registerDoctor, loginDoctor } = require('../controllers/authController');
 
 function handleRegisterPatient(req, res) {
+
 
     let data = '';
     req.on('data', chunk => {
@@ -80,9 +81,45 @@ function handleLoginAdmin(req, res, jwt) {
 
 }
 
+function handleRegisterDoctor(req, res) {
+    let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
+    req.on('end', () => {
+        try {
+            const userData = JSON.parse(data);
+            registerDoctor(userData, res);
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
+            res.writeHead(400);
+            res.end('Invalid JSON data');
+        }
+    });
+}
+
+function handleLoginDoctor(req, res, jwt) {
+    let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
+    req.on('end', () => {
+        try {
+            const { Username: username, Password: password } = JSON.parse(data);
+            loginDoctor(username, password, res, jwt);
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
+            res.writeHead(400);
+            res.end('Invalid JSON data');
+        }
+    });
+}
+
 module.exports = {
     handleRegisterPatient,
     handleLoginPatient,
     handleRegisterAdmin,
-    handleLoginAdmin
+    handleLoginAdmin,
+    handleRegisterDoctor,
+    handleLoginDoctor
 };

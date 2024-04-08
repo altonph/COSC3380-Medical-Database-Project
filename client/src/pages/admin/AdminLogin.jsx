@@ -17,6 +17,7 @@ const AdminLogin = () => {
         Password: Password,
       };
 
+
       const response = await fetch('http://localhost:5000/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -25,6 +25,7 @@ const MakeAppointment = () => {
   const fetchDentistsByOfficeAndDay = async (officeID, dayOfWeek) => {
     try {
       const response = await fetch(`http://localhost:5000/api/dentist/getDentist?officeID=${officeID}&dayOfWeek=${dayOfWeek}`);
+
       if (response.ok) {
         const data = await response.json();
         setDentists(data);
@@ -63,7 +64,7 @@ const MakeAppointment = () => {
     // console.log('Appointment Type:', reasonForAppointment);
 
     try {
-
+      
       const response = await fetch('http://localhost:5000/api/patient/schedule', {
         method: 'POST',
         headers: {

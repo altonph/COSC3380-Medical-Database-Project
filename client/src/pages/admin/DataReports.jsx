@@ -9,7 +9,7 @@ function DataReports() {
 
   const handleGenerateReport = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/salary-report?specialty=${speciality}`);
+      const response = await fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/admin/salary-report?specialty=${speciality}`);
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
