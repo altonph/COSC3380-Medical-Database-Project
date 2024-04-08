@@ -2,12 +2,14 @@
 const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const { handleRegister, handleLogin, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
+const { handleRegisterPatient, handleLoginPatient, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
-const { patientRoutes, patientUpdate, appointmentRoutes } = require('./routes/patientRoutes');
+const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
-const { adminRoutes } = require('./routes/adminRoutes'); 
+const { handleGenerateSalaryReport } = require('./routes/adminRoutes'); 
 const { getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, getAppointmentsByDoctorUsername, updateVisitDetailsByPatientId, getInformationByPatientId, updatePatientInformationByPatientId } = require('./controllers/doctorController');
+const { handleAssignDentistToOffice } = require('./routes/officeRoutes');
+const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay } = require('./routes/dentistRoutes');
 
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,34 +22,39 @@ const server = http.createServer((req, res) => {
         return;
     }
     
-    if (req.url === '/patient/register' && req.method === 'POST') {
-        handleRegister(req, res);
-    } else if (req.url === '/patient/login' && req.method === 'POST') {
-        handleLogin(req, res, jwt);
-    } else if (req.url === '/protected-patient' && req.method === 'GET') {
+    if (req.url === '/api/patient/register' && req.method === 'POST') {
+        handleRegisterPatient(req, res);
+    } else if (req.url === '/api/patient/login' && req.method === 'POST') {
+        handleLoginPatient(req, res, jwt);
+    } else if (req.url === '/api/patient/protected' && req.method === 'GET') {
         handleProtectedRoute(req, res, jwt);
     } else if (req.url === '/doctor/register' && req.method === 'POST') {
         handleRegisterDoctor(req, res, jwt);
     } else if (req.url === '/doctor/login' && req.method === 'POST') {
         handleLoginDoctor(req, res, jwt);
-    } else if (req.url === '/register/admin' && req.method === 'POST') {
+    } else if (req.url === '/api/admin/register' && req.method === 'POST') {
         handleRegisterAdmin(req, res, jwt);
-    } else if (req.url === '/login/admin' && req.method === 'POST') {
+    } else if (req.url === '/api/admin/login' && req.method === 'POST') {
         handleLoginAdmin(req, res, jwt);
     } else if (req.url === '/api/patient/profile' && req.method === 'GET') {
-        patientRoutes(req, res, jwt);
-    } else if (req.url === '/api/patient/profile/update' && req.method === 'POST') {
-        patientUpdate(req, res, jwt);
-    } else if (req.url === '/api/appointment/schedule' && req.method === 'POST') { 
-        appointmentRoutes(req, res, jwt);
-    } else if (req.url.startsWith('/api/admin/generate-report') && req.method === 'GET') {
-        adminRoutes(req, res, jwt);
-    } else if (req.url === '/api/admin/generate-report' && req.method === 'POST') {
-        adminRoutes(req, res, jwt);
-    } else if (req.url.startsWith('/api/report') && req.method === 'GET') {
-        reportRoutes(req, res, jwt);
-    } else if (req.url === '/api/doctor/patients' && req.method === 'GET') {
-        doctorRoutes(req, res, jwt); 
+        handleGetPatient(req, res, jwt);
+    } else if (req.url === '/api/patient/profile/update' && req.method === 'PATCH') {
+        handlePatientUpdate(req, res, jwt);
+    } else if (req.url === '/api/patient/schedule' && req.method === 'POST') { 
+        handlePatientAppointment(req, res, jwt);
+    } else if (req.url === '/api/office/assignDentist' && req.method === 'POST') {
+        handleAssignDentistToOffice(req, res);
+    } else if (req.url === '/api/dentist/assignSchedule' && req.method === 'POST') {
+        handleAssignDentistSchedule(req, res);
+    } else if (req.url.startsWith('/api/dentist/getDentist') && req.method === 'GET') {
+        handleGetDentistsByOfficeAndDay(req, res);
+    } else if (req.url.startsWith('/api/admin/salary-report') && req.method === 'GET') {
+        handleGenerateSalaryReport(req, res, jwt);
+    }
+    
+    // doctor pages
+    else if (req.url === '/api/doctor/patients' && req.method === 'GET') {
+        doctorRoutes(req, res, jwt);
     } else if (req.url.startsWith('/api/doctor/patients/') && req.url.endsWith('/information') && req.method === 'GET') {
         const parts = req.url.split('/');
         const patientId = parts[parts.length - 2];
@@ -99,24 +106,13 @@ const server = http.createServer((req, res) => {
         }
         const { username } = decodedToken;
         getAppointmentsByDoctorUsername(req, res, username);
-    } else if (req.url === '/api/patient/profile' && req.method === 'GET') { 
-        handleGetPatient(req, res, jwt);
-    } else if (req.url === '/api/patient/profile/update' && req.method === 'PATCH') { 
-        handlePatientUpdate(req, res, jwt);
-    } else if (req.url === '/api/patient/schedule' && req.method === 'POST') {
-        handlePatientAppointment(req, res, jwt);
-    } else if (req.url === '/api/office/assignDentist' && req.method === 'POST') { 
-        handleAssignDentistToOffice(req, res);
-    } else if (req.url === '/api/dentist/assignSchedule' && req.method === 'POST') { 
-        handleAssignDentistSchedule(req, res);
-    } else if (req.url.startsWith('/api/dentist/getDentist') && req.method === 'GET') {
-        handleGetDentistsByOfficeAndDay(req, res);
-    } else if (req.url.startsWith('/api/admin/salary-report') && req.method === 'GET') { 
-        handleGenerateSalaryReport(req, res);
-    } else {
+    }
+    
+    else {
         res.writeHead(404);
         res.end('Not Found');
     }
+
 });
 
 const PORT = 5000;
