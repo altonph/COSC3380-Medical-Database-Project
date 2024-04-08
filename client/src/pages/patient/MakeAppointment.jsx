@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import HeaderPortalPatient from "../../components/HeaderPortalPatient";
 import Footer from "../../components/Footer";
 import { useNavigate } from 'react-router-dom';
 
 const MakeAppointment = () => {
+
   const navigateTo = useNavigate();
-  const [preferredDate, setPreferredDate] = useState('');
+  const [preferredDate, setPreferredDate] = useState(null);
   const [preferredTime, setPreferredTime] = useState('');
   const [practitioner, setPractitioner] = useState('');
   const [location, setLocation] = useState('');
@@ -14,18 +17,18 @@ const MakeAppointment = () => {
   const [notification, setNotification] = useState('');
 
   useEffect(() => {
-    if (location) {
-      fetchDentistsByOffice(location);
+    if (location && preferredDate) {
+      fetchDentistsByOfficeAndDay(location, getDayOfWeek(preferredDate));
     }
-  }, [location]);
+  }, [location, preferredDate]);
 
-  const fetchDentistsByOffice = async (officeID) => {
+  const fetchDentistsByOfficeAndDay = async (officeID, dayOfWeek) => {
     try {
-      const response = await fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/getDentistByOffice?officeID=${officeID}`);
+      const response = await fetch(`http://localhost:5000/api/dentist/getDentist?officeID=${officeID}&dayOfWeek=${dayOfWeek}`);
+
       if (response.ok) {
         const data = await response.json();
-        //console.log(data);
-        setDentists(data.results);
+        setDentists(data);
       } else {
         console.error('Failed to fetch dentists:', response.statusText);
       }
@@ -46,19 +49,23 @@ const MakeAppointment = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Convert preferredTime to SQL acceptable format
+
     const timeParts = preferredTime.split(' ');
     const time = timeParts[1] === 'PM' ? parseInt(timeParts[0]) + 12 : parseInt(timeParts[0]);
     const formattedTime = `${time}:00:00`;
-    console.log('Appointment submitted');
-    console.log('Selected Office ID:', location);
-    console.log('Selected Dentist:', dentists.find(dentist => `${dentist.FName} ${dentist.LName}` === practitioner)?.dentistID);
-    console.log('Preferred Date:', preferredDate);
-    console.log('Preferred Time (SQL format):', formattedTime);
-    console.log('Appointment Type:', reasonForAppointment);
-  
+
+    const sqlFormattedDate = preferredDate.toISOString().split('T')[0];
+
+    // console.log('Appointment submitted');
+    // console.log('Selected Office ID:', location);
+    // console.log('Preferred Date:', sqlFormattedDate);
+    // console.log('Selected Dentist:', practitioner);
+    // console.log('Preferred Time:', formattedTime);
+    // console.log('Appointment Type:', reasonForAppointment);
+
     try {
-      const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/appointment/schedule', {
+      
+      const response = await fetch('http://localhost:5000/api/patient/schedule', {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`,
@@ -66,12 +73,13 @@ const MakeAppointment = () => {
         },
         body: JSON.stringify({
           officeID: location,
-          dentistID: dentists.find(dentist => `${dentist.FName} ${dentist.LName}` === practitioner)?.dentistID,
-          Date: preferredDate,
+          dentistID: practitioner,
+          Date: sqlFormattedDate,
           Start_time: formattedTime,
           Appointment_Type: reasonForAppointment
         }),
       });
+
       if (response.ok) {
         console.log('Appointment successfully scheduled!');
         setNotification('Appointment scheduled successfully!');
@@ -79,22 +87,34 @@ const MakeAppointment = () => {
           setNotification('');
           navigateTo('/patient/home');
         }, 1000);
+
       } else {
         console.error('Failed to make appointment:', response.statusText);
       }
+
     } catch (error) {
       console.error('Error making appointment:', error);
     }
+
   };
-  
+
   const handleLocationChange = (e) => {
+
     setLocation(e.target.value);
-    console.log('Selected Office ID:', e.target.value);
     setPractitioner('');
-    fetchDentistsByOffice(e.target.value);
+
+  };
+
+  const getDayOfWeek = (date) => {
+
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayIndex = new Date(date).getDay();
+
+    return daysOfWeek[dayIndex];
   };
 
   return (
+
     <div className="flex h-screen flex-col">
       {/* header */}
       <nav>
@@ -129,48 +149,41 @@ const MakeAppointment = () => {
                   onChange={handleLocationChange}
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                 >
-                  <option value="" disabled selected>Select Location</option>
-                  <option value="1">123 Main St, Houston, TX</option>
-                  <option value="2">321 2nd St, Katy, TX</option>
+                  <option value="" disabled>Select Location</option>
+                  <option value="1">5432 Magnolia Drive Austin, TX</option>
+                  <option value="2">9876 Sunflower Boulevard Phoenix, AZ</option>
                 </select>
               </div>
-               {/* Practitioner */}
-               <div className="mb-4">
-              <label className="block text-sm font-bold mb-2">Practitioner:</label>
-              <select
-                value={practitioner}
-                onChange={(e) => {
-                  const selectedPractitionerName = e.target.value;
-                  const selectedDentist = dentists.find(dentist => `${dentist.FName} ${dentist.LName}` === selectedPractitionerName);
-                  if (selectedDentist) {
-                    setPractitioner(selectedPractitionerName);
-                    console.log('Selected Dentist ID:', selectedDentist.dentistID); //debug statement
-                  }
-                }}
-                className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              >
-                <option value="" disabled selected>Select Practitioner</option>
-                {dentists.length > 0 ? (
-                  dentists.map(dentist => (
-                    <option key={dentist.dentistID} value={`${dentist.FName} ${dentist.LName}`}>
-                      {`Dr. ${dentist.FName} ${dentist.LName}`}
-                    </option>
-                  ))
-                ) : (
-                  <option value="" disabled>No Practitioners available</option>
-                )}
-              </select>
-            </div>
+
               {/* Preferred Date */}
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Date:</label>
-                <input
-                  type="date"
-                  value={preferredDate}
-                  onChange={(e) => setPreferredDate(e.target.value)}
+                <DatePicker
+                  selected={preferredDate}
+                  onChange={date => setPreferredDate(date)}
+                  minDate={new Date()}
+                  filterDate={date => date.getDay() !== 0 && date.getDay() !== 6}
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                 />
               </div>
+
+              {/* Practitioner */}
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Primary Practitioner:</label>
+                <select
+                  value={practitioner}
+                  onChange={(e) => setPractitioner(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                >
+                  <option value="" disabled>Select Practitioner</option>
+                  {dentists.map(dentist => (
+                    <option key={dentist.dentistID} value={dentist.dentistID}>
+                      {`Dr. ${dentist.FName} ${dentist.LName}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* Preferred Time */}
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Time:</label>
@@ -179,7 +192,7 @@ const MakeAppointment = () => {
                   onChange={(e) => setPreferredTime(e.target.value)}
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                 >
-                  <option value="" disabled selected>Select Time</option>
+                  <option value="" disabled>Select Time</option>
                   {generateTimeOptions().map((time) => (
                     <option key={time} value={time}>
                       {time}
@@ -188,6 +201,7 @@ const MakeAppointment = () => {
                 </select>
               </div>
 
+              {/* Reason for Appointment */}
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Reason for Appointment:</label>
                 <select
@@ -195,10 +209,10 @@ const MakeAppointment = () => {
                   onChange={(e) => setReasonForAppointment(e.target.value)}
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                 >
-                  <option value="" disabled selected>Select Reason</option>
+                  <option value="" disabled>Select Reason</option>
                   <option value="Checkup">Checkup</option>
                   <option value="Cleaning">Cleaning</option>
-                  <option value="Filling">Filling</option>
+                  <option value="Whitening">Whitening</option>
                   <option value="Extraction">Extraction</option>
                   <option value="Root Canal">Root Canal</option>
                 </select>

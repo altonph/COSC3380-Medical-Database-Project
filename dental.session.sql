@@ -1,146 +1,207 @@
--- @block Dummy data for office table
-INSERT INTO office (officeID, office_address, Phone_num, email) 
-VALUES (1, '123 Main St, Houston, TX', '1234567890', 'office1@example.com');
-INSERT INTO office (officeID, office_address, Phone_num, email) 
-VALUES (2, '321 2nd St, Katy, TX', '1234567890', 'office2@example.com');
+-- Simulating non specialist appointment
+
+-- @block Inserting offices
+INSERT INTO office (officeID, office_address, Phone_num, email) VALUES
+(1, '5432 Magnolia Drive', '1234567890', 'office1@shastadental.com'),
+(2, '9876 Sunflower Boulevard', '1234567890', 'office2@shastadental.com');
+
+-- @block Inserting a dentist
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary) VALUES
+('John', 'Doe', 'General Dentistry', 'john.doe@example.com', '1112223333', '123 Dentist St', '1980-01-01', '2022-01-01', NULL, TRUE, 80000);
+
+-- @block Linking dentist to only one office
+INSERT INTO office_dentist (officeID, dentistID) VALUES (1, 1);
+
+-- @block Creating a schedule for the dentist at office 1
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday) VALUES
+(1, 1, TRUE, TRUE, TRUE, TRUE, TRUE);
+
+-- @block Inserting a staff member
+INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, End_date, Is_active, Salary) VALUES
+(1, 'Jane', 'Smith', 'jane.smith@example.com', '9998887777', '1990-01-01', '456 Staff St', 'Receptionist', '2022-01-01', NULL, TRUE, 50000);
+
+-- @block Inserting a patient
+INSERT INTO patient (Gender, FName, LName, DOB, Email, Phone_num, Address) VALUES
+('Male', 'Alex', 'Johnson', '1995-01-01', 'alex.johnson@example.com', '7776665555', '789 Patient St');
 
 -- @block
-SELECT * FROM login;
+SELECT * FROM patient;
+
+-- @block Inserting insurance
+INSERT INTO insurance (Policy_number, Insurance_Company_Name) VALUES ('ABCDE123456789', 'Dental Insurance Inc.');
+
+-- @block Updating patient's insurance
+UPDATE patient SET Policy_number = 'ABCDE123456789' WHERE patientID = 1;
+
+-- @block Scheduling an appointment
+INSERT INTO appointment (dentistID, patientID, Date, Start_time, officeID, staffID, Appointment_type, Appointment_status, is_active) VALUES
+(1, 1, '2024-04-10', '09:00:00', 1, NULL, 'Checkup', 'Scheduled', TRUE);
 
 -- @block
-SELECT * FROM office;
-SELECT * FROM dentist;
 SELECT * FROM appointment;
 
--- @block
-INSERT INTO dentist (officeID, FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary) 
-VALUES (2, 'Emily', 'Johnson', 'General Dentistry', 'emily.johnson@example.com', '5551234567', '456 Oak St, Katy, TX', '1985-05-15', '2022-01-01', NULL, TRUE, 90000);
+-- @block Dentist adding a staff member to an appointment
+UPDATE appointment SET staffID = 1 WHERE dentistID = 1 AND patientID = 1 AND Date = '2024-04-10' AND Start_time = '09:00:00';
+
+-- @block Inserting medical record if it's the patient's first appointment
+INSERT INTO medical_records (patientID, Date_Created, Allergies, Feet, Inches, Weight, Notes) VALUES
+(1, '2024-04-10', 'None', 5, 9, 160, 'First visit');
+
+-- @block Inserting visit details
+INSERT INTO visit_details (patientID, dentistID, Visit_Type, Diagnosis, Treatment, Notes) VALUES
+(1, 1, 'Checkup', 'No significant issues found', 'Routine cleaning', 'Patient scheduled for next visit in 6 months');
+
+
+-- @block Generating an invoice with 20% off co-pay if insurance policy exists
+INSERT INTO invoice (Policy_number, patientID, visitID, Date, Description, Total_Amount, Paid_Amount) 
+VALUES ('ABCDE123456789', 1, 1, '2024-04-10', 'Routine cleaning', 100.00, 0.00);
 
 -- @block
-INSERT INTO insurance (Insurance_Company_Name, Policy_number) 
-VALUES ('XYZ Insurance', '1234567890');
-
--- @block
-INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, End_date, Is_active, Salary) 
-VALUES (1, 'Jessica', 'Brown', 'jessica@example.com', '5551234567', '1990-08-20', '789 Oak St, Houston, TX', 'Receptionist', '2023-02-01', NULL, TRUE, 50000);
-
-
--- @block
-INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status, Cancellation_Reason, Specialist_Approval, Is_active) 
-VALUES 
-(1, 1, 1, 1, '2024-04-01', '09:00:00', '09:30:00', 'Checkup', 'Confirmed', NULL, FALSE, TRUE);
-
--- @block
-INSERT INTO medical_records (patientID, dentistID, visitID, Date_Created, Allergies, Height, Weight, Notes) 
-VALUES (1, 1, NULL, '2023-05-10', 'None', 170, 70, 'No significant issues.');
--- @block
-INSERT INTO visit_details (recordsID, dentistID, Visit_Type, Diagnosis, Treatment, Notes) 
-VALUES 
-(1, 1, 'Checkup', 'Healthy', 'None', 'No issues detected');
-
--- @block
-INSERT INTO prescription (dentistID, patientID, visitID, National_Drug_Code, Medication_Name, Medication_Dosage, Refills, notes, Date_prescribed) 
-VALUES (1, 1, NULL, '1234567890123', 'Fluoxetine', '20mg', 1, 'Take once daily with food.', '2023-05-10');
-
--- @block
-INSERT INTO invoice (insuranceID, patientID, visitID, Date, Description, Total_Amount, Paid_Amount) 
-VALUES (NULL, 1, NULL, '2023-05-10', 'Regular checkup and prescription', 150.00, 0.00);
-
--- @block
-UPDATE medical_records
-SET visitID = 1
-WHERE patientID = 1;
-
--- Update prescription
-UPDATE prescription
-SET visitID = 1
-WHERE patientID = 1;
-
--- Update invoice
-UPDATE invoice
-SET visitID = 1
-WHERE patientID = 1;
-
--- @block
-UPDATE patient
-SET dentistID = 1
-WHERE patientID = 1;
-
-
--- @block
-SELECT * FROM office;
-
--- @block
-DELETE FROM office;
-
--- @block
-SELECT * FROM dentist;
-SELECT * FROM patient;
-SELECT * FROM login;
-
-
--- @block
-DELETE FROM office;
-DELETE FROM dentist;
-DELETE FROM login;
-
--- @block
-SELECT * FROM dentist;
-SELECT * FROM patient;
-SELECT * FROM staff;
-SELECT * FROM login;
-SELECT * FROM appointment;
-SELECT * FROM medical_records;
-SELECT * FROM visit_details;
-SELECT * FROM prescription;
 SELECT * FROM invoice;
 
+-- @block Updating the Total_Amount to reflect the discount
+UPDATE invoice SET Total_Amount = Total_Amount * 0.8 WHERE Policy_number IS NOT NULL;
+
+-- @block Updating the Paid_Amount to reflect Total_Amount
+UPDATE invoice SET Paid_Amount = Total_Amount WHERE Policy_number IS NOT NULL;
 
 
+-- Simulating primary approval for appointment
+
+-- @block
+-- Create the trigger
+CREATE TRIGGER root_canal_approval_trigger BEFORE UPDATE ON appointment
+FOR EACH ROW
+BEGIN
+    -- Check if the Appointment_type is 'Root Canal' and Primary_approval is 'Approved'
+    IF NEW.Appointment_type = 'Root Canal' AND NEW.Primary_approval = 'Approved' THEN
+        -- Update the dentistID to the ID of the endodontist (specialist)
+        SET NEW.dentistID = (SELECT dentistID FROM dentist WHERE Specialty = 'Endodontist');
+    END IF;
+END;
+
+-- @block Inserting offices
+INSERT INTO office (officeID, office_address, Phone_num, email) VALUES
+(1, '123 Main St', '1234567890', 'office1@example.com'),
+(2, '456 Elm St', '0987654321', 'office2@example.com');
+
+-- @block Inserting a general dentist
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary) VALUES
+('John', 'Doe', 'General Dentistry', 'john.doe@example.com', '1112223333', '123 Dentist St', '1980-01-01', '2022-01-01', NULL, TRUE, 80000);
+
+-- @block Inserting an endodontist
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary) VALUES
+('Emily', 'Smith', 'Endodontist', 'emily.smith@example.com', '4445556666', '456 Root Canal St', '1985-01-01', '2022-01-01', NULL, TRUE, 90000);
+
+-- @block Linking general dentist to office 1
+INSERT INTO office_dentist (officeID, dentistID) VALUES (1, 1);
+
+-- @block Linking endodontist to office 2
+INSERT INTO office_dentist (officeID, dentistID) VALUES (2, 2);
+
+-- @block Creating a schedule for the general dentist at office 1
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday) VALUES
+(1, 1, TRUE, TRUE, TRUE, TRUE, TRUE);
+
+-- @block Creating a schedule for the endodontist at office 2
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday) VALUES
+(2, 2, TRUE, TRUE, TRUE, TRUE, TRUE);
+
+-- @block Inserting a staff member
+INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, End_date, Is_active, Salary) VALUES
+(1, 'Jane', 'Smith', 'jane.smith@example.com', '9998887777', '1990-01-01', '456 Staff St', 'Receptionist', '2022-01-01', NULL, TRUE, 50000);
+
+-- @block Inserting a patient
+INSERT INTO patient (Gender, FName, LName, DOB, Email, Phone_num, Address) VALUES
+('Male', 'Alex', 'Johnson', '1995-01-01', 'alex.johnson@example.com', '7776665555', '789 Patient St');
+
+-- @block Inserting insurance
+INSERT INTO insurance (Policy_number, Insurance_Company_Name) VALUES ('ABCDE123456789', 'Dental Insurance Inc.');
+
+-- @block Updating patient's insurance
+UPDATE patient SET Policy_number = 'ABCDE123456789' WHERE patientID = 1;
+
+-- @block Scheduling an appointment for a root canal
+INSERT INTO appointment (dentistID, patientID, Date, Start_time, officeID, staffID, Appointment_type, Appointment_status, Primary_approval, is_active) VALUES
+(1, 1, '2024-04-10', '09:00:00', 1, NULL, 'Root Canal', 'Scheduled', 'Pending', TRUE);
+
+-- @block
+SELECT * FROM appointment;
+
+-- @block Dentist approves the appointment and selects the endodontist
+UPDATE appointment SET Primary_approval = 'Approved' WHERE dentistID = 1 AND patientID = 1 AND Date = '2024-04-10' AND Start_time = '09:00:00';
+
+-- @block Generating an invoice for the root canal procedure
+INSERT INTO invoice (Policy_number, patientID, visitID, Date, Description, Total_Amount, Paid_Amount) 
+VALUES ('ABCDE123456789', 1, 1, '2024-04-10', 'Root Canal Procedure', 1000.00, 0.00);
+
+-- @block Updating the Total_Amount to reflect the discount if insurance exists
+UPDATE invoice SET Total_Amount = Total_Amount * 0.8 WHERE Policy_number IS NOT NULL;
+
+-- @block Updating the Paid_Amount to reflect Total_Amount
+UPDATE invoice SET Paid_Amount = Total_Amount WHERE Policy_number IS NOT NULL;
 
 -- @block
 SELECT * FROM patient;
+
+-- @block
 SELECT * FROM dentist;
+
+-- @block
+SELECT * FROM login;
+
+-- @block
+SELECT * FROM dentist;
+
+-- @block
+SELECT * FROM insurance;
 
 -- @block
 SELECT * FROM appointment;
 
 -- @block
-DELETE FROM appointment;
+SELECT * FROM office_dentist;
 
 -- @block
-INSERT INTO schedule (dentistID, Day) 
-VALUES (1, 'Monday');
-
--- @block might change schema to this
-CREATE TABLE `schedule` (
-  `scheduleID` int PRIMARY KEY AUTO_INCREMENT,
-  `dentistID` int,
-  `officeID` int,
-  `Day` varchar(10)
-);
+SELECT * FROM schedule;
 
 -- @block
--- Inserting dummy data for dentists
-INSERT INTO dentist (officeID, FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Is_active, Salary)
-VALUES
-(1, 'John', 'Doe', 'General Dentistry', 'john.doe@example.com', '1234567890', '123 Main St', '1980-05-15', '2020-03-10', TRUE, 80000),
-(1, 'Jane', 'Smith', 'Orthodontist', 'jane.smith@example.com', '9876543210', '456 Elm St', '1975-10-20', '2021-06-25', TRUE, 100000),
-(1, 'Michael', 'Johnson', 'General Dentistry', 'michael.johnson@example.com', '1112223333', '789 Oak St', '1982-08-30', '2021-01-15', TRUE, 75000),
-(1, 'Emily', 'Williams', 'Orthodontist', 'emily.williams@example.com', '4445556666', '101 Pine St', '1987-03-12', '2020-09-05', TRUE, 110000),
-(1, 'David', 'Brown', 'General Dentistry', 'david.brown@example.com', '7778889999', '202 Maple St', '1978-11-25', '2019-12-01', TRUE, 82000),
-(1, 'Jennifer', 'Wilson', 'Orthodontist', 'jennifer.wilson@example.com', '3332221111', '303 Cherry St', '1985-06-18', '2022-02-20', TRUE, 105000),
-(2, 'Matthew', 'Miller', 'General Dentistry', 'matthew.miller@example.com', '5556667777', '404 Walnut St', '1976-09-05', '2018-05-10', TRUE, 78000),
-(2, 'Sarah', 'Brown', 'Orthodontist', 'sarah.brown@example.com', '2223334444', '505 Cedar St', '1983-12-08', '2020-11-30', TRUE, 115000),
-(2, 'Daniel', 'Martinez', 'General Dentistry', 'daniel.martinez@example.com', '9998887777', '606 Pine St', '1979-04-28', '2017-07-15', TRUE, 76000),
-(2, 'Lauren', 'Garcia', 'Orthodontist', 'lauren.garcia@example.com', '1119998888', '707 Oak St', '1988-07-10', '2021-04-10', TRUE, 108000),
-(2, 'Christopher', 'Lopez', 'General Dentistry', 'christopher.lopez@example.com', '3334445555', '808 Elm St', '1984-02-14', '2019-10-05', TRUE, 79000),
-(2, 'Amanda', 'Rodriguez', 'Orthodontist', 'amanda.rodriguez@example.com', '4445556666', '909 Maple St', '1981-05-27', '2022-08-15', TRUE, 112000);
+-- Inserting dentist 2 with General Dentistry specialty
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Salary) 
+VALUES ('John', 'Doe', 'General Dentistry', 'john.doe@example.com', '1234567890', '123 Main St, Anytown, USA', '1985-05-15', '2020-01-01', 80000);
+-- Inserting dentist 3 with General Dentistry specialty
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Salary) 
+VALUES ('Jane', 'Smith', 'General Dentistry', 'jane.smith@example.com', '9876543210', '456 Oak St, Othertown, USA', '1980-10-20', '2019-05-01', 75000);
+-- Inserting dentist 4 with Endodontist specialty
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Salary) 
+VALUES ('Michael', 'Johnson', 'Endodontist', 'michael.johnson@example.com', '5551234567', '789 Elm St, Anycity, USA', '1978-12-10', '2018-03-15', 90000);
 
 -- @block
-SELECT FName, LName, Email, Salary
-FROM dentist
-WHERE Specialty = 'General Dentistry';
+-- Inserting dentist 2 into office 1
+INSERT INTO office_dentist (officeID, dentistID) VALUES (1, 2);
+-- Inserting dentist 3 into office 1
+INSERT INTO office_dentist (officeID, dentistID) VALUES (1, 3);
+-- Inserting dentist 4 into office 2
+INSERT INTO office_dentist (officeID, dentistID) VALUES (2, 4);
+
 
 -- @block
-DELETE FROM dentist;
+-- Inserting schedule for dentist 2 at office 1 (assuming Monday and Wednesday)
+INSERT INTO schedule (officeID, dentistID, Monday, Wednesday) VALUES (1, 2, TRUE, TRUE);
+-- Inserting schedule for dentist 3 at office 1 (assuming Tuesday and Thursday)
+INSERT INTO schedule (officeID, dentistID, Tuesday, Thursday) VALUES (1, 3, TRUE, TRUE);
+-- Inserting schedule for dentist 4 at office 2 (assuming Monday and Friday)
+INSERT INTO schedule (officeID, dentistID, Monday, Friday) VALUES (2, 4, TRUE, TRUE);
+
+
+-- @block
+INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, Salary) 
+VALUES ('John', 'Doe', 'General Dentistry', 'john.doe@example.com', '1234567891', '123 Main St', '1985-05-15', '2020-01-01', 80000);
+
+-- @block
+SELECT * FROM dentist;
+SELECT * FROM office_dentist;
+SELECT * FROM schedule;
+
+-- @block
+SELECT * FROM appointment;
