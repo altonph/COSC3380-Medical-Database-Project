@@ -1,26 +1,27 @@
 // Import necessary modules
-const { getOfficeID } = require('../controllers/officeController');
+const { assignDentistToOffice } = require('../controllers/officeController');
 
-const handleGetOfficeID = (req, res) => {
+// Define the route handler for assigning a dentist to an office
+const handleAssignDentistToOffice = (req, res) => {
 
-    const { url, method } = req;
+    let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
 
-    if (method === 'GET' && url.startsWith('/api/officeID')) {
-        const params = new URLSearchParams(url.split('?')[1]);
-        const officeAddress = params.get('officeAddress');
+    req.on('end', () => {
+        try {
+            const { officeID, dentistID } = JSON.parse(data);
+            assignDentistToOffice(officeID, dentistID, res);
 
-        if (!officeAddress) {
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
             res.writeHead(400, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Office address is required' }));
-            return;
+            res.end(JSON.stringify({ error: 'Invalid JSON data' }));
         }
-
-        getOfficeID(req, res, officeAddress);
-    } else {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'Route not found' }));
-    }
-
+    });
 };
 
-module.exports = handleGetOfficeID ;
+module.exports = {
+    handleAssignDentistToOffice
+};

@@ -13,9 +13,9 @@ function registerPatient(userData, res) {
             return;
         }
 
-        pool.query('INSERT INTO patient (insuranceID, dentistID, Gender, FName, LName, DOB, Email, Phone_num, Address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [userData.insuranceID, userData.dentistID, userData.Gender, userData.FName, userData.LName, userData.DOB, userData.Email, userData.Phone_num, userData.Address],
-            (error, results) => {
+        pool.query('INSERT INTO patient (Gender, FName, LName, DOB, Email, Phone_num, Address) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [userData.Gender, userData.FName, userData.LName, userData.DOB, userData.Email, userData.Phone_num, userData.Address],
+            (error, patientResults) => {
                 if (error) {
                     console.error('Error creating patient:', error);
                     res.writeHead(500);
@@ -23,11 +23,11 @@ function registerPatient(userData, res) {
                     return;
                 }
                 
-                const patientID = results.insertId;
+                const patientID = patientResults.insertId;
 
-                pool.query('INSERT INTO login (Username, Password, User_role, Email, patientID, dentistID, staffID) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [userData.Username, hashedPassword, userData.User_role, userData.Email, patientID, userData.dentistID, userData.staffID],
-                    (error, results) => {
+                pool.query('INSERT INTO login (Username, Password, User_role, Email, PatientID) VALUES (?, ?, ?, ?, ?)',
+                    [userData.Username, hashedPassword, userData.User_role, userData.Email, patientID],
+                    (error, loginResults) => {
                         if (error) {
                             console.error('Error registering user:', error);
                             res.writeHead(500);
@@ -42,6 +42,7 @@ function registerPatient(userData, res) {
 
 }
 
+
 function registerAdmin(userData, res) {
 
     bcrypt.hash(userData.Password, 10, (err, hashedPassword) => {
@@ -52,8 +53,8 @@ function registerAdmin(userData, res) {
             return;
         }
 
-        pool.query('INSERT INTO dentist (officeID, FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [userData.officeID, userData.FName, userData.LName, userData.Specialty, userData.Email, userData.Phone_num, userData.Address, userData.DOB, userData.Start_date, userData.End_Date, userData.Is_active, userData.Salary],
+        pool.query('INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [userData.FName, userData.LName, userData.Specialty, userData.Email, userData.Phone_num, userData.Address, userData.DOB, userData.Start_date, userData.End_date, userData.Is_active, userData.Salary],
             (error, results) => {
                 if (error) {
                     console.error('Error creating admin:', error);
@@ -64,8 +65,8 @@ function registerAdmin(userData, res) {
                 
                 const dentistID = results.insertId;
 
-                pool.query('INSERT INTO login (Username, Password, User_role, Email, patientID, dentistID, staffID) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [userData.Username, hashedPassword, userData.User_role, userData.Email, userData.patientID, dentistID, userData.staffID],
+                pool.query('INSERT INTO login (Username, Password, User_role, Email, dentistID) VALUES (?, ?, ?, ?, ?)',
+                    [userData.Username, hashedPassword, userData.User_role, userData.Email, dentistID],
                     (error, results) => {
                         if (error) {
                             console.error('Error registering admin:', error);
@@ -80,6 +81,7 @@ function registerAdmin(userData, res) {
     });
 
 }
+
 
 function loginPatient(username, password, res, jwt) {
 

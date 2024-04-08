@@ -1,54 +1,53 @@
 //dentistRoutes.js
-const { getDentistID, getDentistsByOfficeID  } = require('../controllers/dentistController');
+const { assignDentistSchedule, getDentistsByOfficeAndDay, getDentistID } = require('../controllers/dentistController');
+const { parse } = require('url');
 
-const handleGetDentistID = (req, res) => {
-    const { url, method } = req;
+const handleAssignDentistSchedule = (req, res) => {
 
-    if (method === 'GET' && url.startsWith('/api/dentist/dentistID')) {
+    let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
 
-        const params = new URLSearchParams(url.split('?')[1]);
-        const fName = params.get('FName');
-        const lName = params.get('LName');
-
-        if (!fName || !lName) {
+    req.on('end', () => {
+        try {
+            const { officeID, dentistID, schedule } = JSON.parse(data);
+            assignDentistSchedule(officeID, dentistID, schedule, res); // Pass 'res' to handle response
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
             res.writeHead(400, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'First and last name are required' }));
-            return;
+            res.end(JSON.stringify({ error: 'Invalid JSON data' }));
         }
-
-        getDentistID(req, res, fName, lName);
-
-    } else {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'Route not found' }));
-    }
+    });
 
 };
 
+const handleGetDentistsByOfficeAndDay = (req, res) => {
 
-const handleGetDentistByOfficeID = (req, res) => {
     const { url, method } = req;
 
-    if (method === 'GET' && url.startsWith('/api/dentist/getDentistsByOfficeID')) {
-        const params = new URLSearchParams(url.split('?')[1]);
-        const officeID = params.get('officeID');
+    const { query } = parse(url, true);
 
-        if (!officeID) {
+    if (url.startsWith('/api/dentist/getDentist') && method === 'GET') {
+
+        const { officeID, dayOfWeek } = query;
+        
+        if (!officeID || !dayOfWeek) {
             res.writeHead(400, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Office ID is required' }));
+            res.end(JSON.stringify({ error: 'officeID and day are required query parameters' }));
             return;
         }
 
-        getDentistsByOfficeID(req, res, officeID);
+        getDentistsByOfficeAndDay(req, res, officeID, dayOfWeek);
 
     } else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Route not found' }));
     }
-
+    
 };
 
 module.exports = { 
-    handleGetDentistID,
-    handleGetDentistByOfficeID
+    handleAssignDentistSchedule,
+    handleGetDentistsByOfficeAndDay
 };
