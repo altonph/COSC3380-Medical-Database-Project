@@ -10,6 +10,7 @@ import PatientProfile from "./pages/patient/PatientProfile";
 import PatientProfileSettings from "./pages/patient/PatientProfileSettings";
 import DoctorLoginPage from "./pages/doctor/doctorLoginPage";
 import DoctorAppointment from "./pages/doctor/DoctorAppointments";
+import DoctorMakeAppointment from "./pages/doctor/DoctorMakeAppointment";
 import DoctorPatients from "./pages/doctor/DoctorPatients";
 import PatientDetails from "./pages/doctor/DoctorPatientDetails";
 import DoctorEditMedicalHistory from "./pages/doctor/DoctorEditMedicalHistory";
@@ -55,6 +56,7 @@ function App() {
             <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
             <Route path="/doctor/appointments" element={<DoctorAppointment/>}/>
+            <Route path="/doctor/appointments/make-appointment" element={<DoctorMakeAppointment />} />
             <Route path="/doctor/patients" element={<DoctorPatients/>}/>
             <Route path="/doctor/patients/:patientID" element={<PatientDetails />} />
             <Route path="/doctor/patients/:patientID/medical-history" element={<DoctorEditMedicalHistory />} />
