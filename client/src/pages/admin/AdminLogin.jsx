@@ -7,16 +7,33 @@ import Footer from '../../components/Footer';
 const AdminLogin = () => {
   const [Username, setUsername] = useState('');
   const [Password, setPassword] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const navigateTo = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Reset error messages
+    setUsernameError('');
+    setPasswordError('');
+
+    // Input validation
+    if (!Username.trim()) {
+      setUsernameError('Username is required.');
+      return;
+    }
+
+    if (!Password.trim()) {
+      setPasswordError('Password is required.');
+      return;
+    }
+
     try {
       const body = {
         Username: Username,
         Password: Password,
       };
-
 
       const response = await fetch('http://localhost:5000/api/admin/login', {
         method: 'POST',
@@ -53,12 +70,15 @@ const AdminLogin = () => {
               <input
                 value={Username}
                 onChange={(e) => setUsername(e.target.value)}
-                type="Username"
+                type="text"
                 placeholder="Username"
                 id="Username"
                 name="Username"
-                className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
+                className={`w-full border py-2 px-3 rounded focus:outline-none ${
+                  usernameError ? 'border-red-500' : 'focus:ring focus:border-blue-300'
+                }`}
               />
+              {usernameError && <p className="text-red-500 text-xs mt-1">{usernameError}</p>}
             </div>
             <div className="mb-4">
               <label htmlFor="Password" className="block">
@@ -67,12 +87,15 @@ const AdminLogin = () => {
               <input
                 value={Password}
                 onChange={(e) => setPassword(e.target.value)}
-                type="Password"
+                type="password"
                 placeholder="********"
                 id="Password"
                 name="Password"
-                className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
+                className={`w-full border py-2 px-3 rounded focus:outline-none ${
+                  passwordError ? 'border-red-500' : 'focus:ring focus:border-blue-300'
+                }`}
               />
+              {passwordError && <p className="text-red-500 text-xs mt-1">{passwordError}</p>}
             </div>
             <button
               type="submit"
@@ -81,7 +104,9 @@ const AdminLogin = () => {
               Log In
             </button>
           </form>
-          <p className="text-center mt-4">Not an administrator? <Link to="/doctor/login" className="text-blue-500">Login here</Link>.</p>
+          <p className="text-center mt-4">
+            Not an administrator? <Link to="/doctor/login" className="text-blue-500">Login here</Link>.
+          </p>
         </div>
       </div>
       <Footer />
