@@ -2,7 +2,8 @@
 const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const { handleRegisterPatient, handleLoginPatient, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin } = require('./routes/authRoutes');
+const { handleRegisterPatient, handleLoginPatient, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin, handleRegisterStaff,
+    handleLoginStaff } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
@@ -27,6 +28,10 @@ const server = http.createServer((req, res) => {
         handleLoginPatient(req, res, jwt);
     } else if (req.url === '/api/patient/protected' && req.method === 'GET') {
         handleProtectedRoute(req, res, jwt);
+    } else if (req.url === '/api/staff/register' && req.method === 'POST') {
+        handleRegisterStaff(req, res, jwt);
+    } else if (req.url === '/api/staff/login' && req.method === 'POST') {
+        handleLoginStaff(req, res, jwt);
     } else if (req.url === '/doctor/register' && req.method === 'POST') {
         handleRegisterDoctor(req, res, jwt);
     } else if (req.url === '/doctor/login' && req.method === 'POST') {

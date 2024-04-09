@@ -274,6 +274,95 @@ function loginAdmin(username, password, res, jwt) {
 
 }
 
+function registerStaff(userData, res) {
+    bcrypt.hash(userData.Password, 10, (err, hashedPassword) => {
+        if (err) {
+            console.error('Error hashing password:', err);
+            res.writeHead(500);
+            res.end('Error hashing password');
+            return;
+        }
+
+        pool.query('INSERT INTO staff (officeID, FName, LName, Email, Phone_num, DOB, Address, Position, Start_date, End_date, Is_active, Salary) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [userData.officeID, userData.Fname, userData.Lname, userData.Email, userData.Phone_num, userData.DOB, userData.Address, userData.Position, userData.Start_date, userData.End_date, userData.Is_active, userData.Salary],
+            (error, results) => {
+                if (error) {
+                    console.error('Error creating staff member:', error);
+                    res.writeHead(500);
+                    res.end('Error creating staff member');
+                    return;
+                }
+
+                const staffID = results.insertId;
+
+                pool.query('INSERT INTO login (Username, Password, User_role, Email, staffID) VALUES (?, ?, ?, ?, ?)',
+                    [userData.Username, hashedPassword, 'Staff', userData.Email, staffID],
+                    (error, results) => {
+                        if (error) {
+                            console.error('Error registering staff member:', error);
+                            res.writeHead(500);
+                            res.end('Error registering staff member');
+                        } else {
+                            res.writeHead(200);
+                            res.end('Staff member registered successfully');
+                        }
+                    });
+            });
+    });
+}
+
+function loginStaff(username, password, res, jwt) {
+    pool.query(
+        'SELECT * FROM login WHERE Username = ? AND User_role = "Staff"',
+        [username],
+        async (error, results) => {
+            if (error) {
+                console.error('Error retrieving staff member:', error);
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end('Internal Server Error');
+                return;
+            }
+
+            if (results.length === 0) {
+                res.writeHead(400, { 'Content-Type': 'text/plain' });
+                res.end('Staff member not found');
+                return;
+            }
+
+            const staff = results[0];
+
+            bcrypt.compare(password, staff.Password, (err, result) => {
+                if (err) {
+                    console.error('Error comparing passwords:', err);
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.end('Internal Server Error');
+                    return;
+                }
+
+                if (result) {
+                    if (staff.User_role !== 'Staff') {
+                        res.writeHead(403, { 'Content-Type': 'text/plain' });
+                        res.end('Forbidden');
+                        return;
+                    }
+
+                    const token = jwt.sign({ 
+                        username: staff.Username, 
+                        role: staff.User_role,
+                        staffID: staff.staffID
+                    }, process.env.JWT_SECRET, { expiresIn: '2h' });
+
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ token, role: staff.User_role, staffID: staff.staffID }));
+                } else {
+                    res.writeHead(401, { 'Content-Type': 'text/plain' });
+                    res.end('Incorrect password');
+                }
+            });
+        }
+    );
+}
+
 function verifyToken(req, jwt) {
 
     const authHeader = req.headers['authorization'];
@@ -317,5 +406,7 @@ module.exports = {
     registerDoctor,
     loginDoctor,
     registerAdmin,
-    loginAdmin
+    loginAdmin,
+    registerStaff,
+    loginStaff
 };

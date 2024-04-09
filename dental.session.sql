@@ -199,9 +199,8 @@ INSERT INTO dentist (FName, LName, Specialty, Email, Phone_num, Address, DOB, St
 VALUES ('John', 'Doe', 'General Dentistry', 'john.doe@example.com', '1234567891', '123 Main St', '1985-05-15', '2020-01-01', 80000);
 
 -- @block
-SELECT * FROM dentist;
-SELECT * FROM office_dentist;
-SELECT * FROM schedule;
+SELECT * FROM appointment;
 
 -- @block
-SELECT * FROM appointment;
+SELECT * FROM staff;
+SELECT * FROM login;
