@@ -178,7 +178,10 @@ const DoctorEditVisitDetails = () => {
                 <div>No visit details found</div>
               )}
             </div>
-
+            
+            <div className="mt-8">
+              <button className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add New Visit Details for Patient {patientID}</button>
+            </div>
             <div className="mt-8">
               <Link to={`/doctor/patients/${patientID}`} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Back to Patient {patientID}</Link>
             </div>

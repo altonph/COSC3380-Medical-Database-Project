@@ -237,7 +237,6 @@ const PatientDetails = () => {
                     <th className="border border-gray-400 px-20 py-2">Description</th>
                     <th className="border border-gray-400 px-20 py-2">Paid Amount</th>
                     <th className="border border-gray-400 px-32 py-2">Total Amount</th>
-                    <th className="border border-gray-400 px-20 py-2">Actions</th> 
                   </tr>
                 </thead>
                 <tbody>
@@ -247,9 +246,6 @@ const PatientDetails = () => {
                       <td className="border border-gray-400 px-20 py-4">{entry.Description}</td>
                       <td className="border border-gray-400 px-20 py-4">{entry.Paid_Amount}</td>
                       <td className="border border-gray-400 px-32 py-4">{entry.Total_Amount}</td>
-                      <td className="border border-gray-400 px-20 py-4"> 
-                        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit</button> 
-                      </td>
                     </tr>
                   ))}
                 </tbody>

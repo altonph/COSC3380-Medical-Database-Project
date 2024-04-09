@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import 'react-calendar/dist/Calendar.css';
 import Footer from "../../components/Footer";
 import HeaderPortalAdmin from '../../components/HeaderPortalDoctor';
+import { Link } from "react-router-dom";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -124,7 +125,7 @@ const DoctorAppointment = () => {
               </div>
 
               <div className="flex justify-center items-center mb-4">
-                <button className="bg-blue-500 text-white px-4 py-2 mr-2">Add New Appointment</button>
+                <Link to="/doctor/appointments/make-appointment" className="bg-blue-500 text-white px-4 py-2 mr-2">Add New Appointment</Link>
                 <button className="bg-gray-500 text-white px-4 py-2">Delete Existing Appointment</button>
               </div>
 
