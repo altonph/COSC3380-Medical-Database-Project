@@ -1,5 +1,5 @@
 //dentistRoutes.js
-const { assignDentistSchedule, getDentistsByOfficeAndDay, getDentistID } = require('../controllers/dentistController');
+const { assignDentistSchedule, getDentistsByOfficeAndDay, updateAppointmentWithStaff } = require('../controllers/dentistController');
 const { parse } = require('url');
 
 const handleAssignDentistSchedule = (req, res) => {
@@ -47,7 +47,35 @@ const handleGetDentistsByOfficeAndDay = (req, res) => {
     
 };
 
+
+const handleUpdateAppointmentWithStaff = (req, res) => {
+    const parsedUrl = parse(req.url, true);
+    const { query } = parsedUrl;
+
+    if (req.method === 'PATCH' && parsedUrl.pathname === '/api/dentist/updateAppointmentWithStaff') {
+        let data = '';
+        req.on('data', chunk => {
+            data += chunk;
+        });
+
+        req.on('end', () => {
+            try {
+                const { dentistID, patientID, Date, Start_time, staffID } = JSON.parse(data);
+                updateAppointmentWithStaff(dentistID, patientID, Date, Start_time, staffID, res);
+            } catch (error) {
+                console.error('Error parsing JSON data:', error);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid JSON data' }));
+            }
+        });
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
 module.exports = { 
     handleAssignDentistSchedule,
-    handleGetDentistsByOfficeAndDay
+    handleGetDentistsByOfficeAndDay,
+    handleUpdateAppointmentWithStaff
 };
