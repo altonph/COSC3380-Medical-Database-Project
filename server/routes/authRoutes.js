@@ -1,4 +1,4 @@
-const { registerPatient, loginPatient, registerAdmin, loginAdmin, registerDoctor, loginDoctor } = require('../controllers/authController');
+const { registerPatient, loginPatient, registerAdmin, loginAdmin, registerDoctor, loginDoctor, loginStaff, registerStaff, getUserRole } = require('../controllers/authController');
 
 function handleRegisterPatient(req, res) {
 
@@ -114,11 +114,65 @@ function handleLoginDoctor(req, res, jwt) {
     });
 }
 
+function handleRegisterStaff(req, res) {
+    let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
+    req.on('end', () => {
+        try {
+            const staffData = JSON.parse(data);
+            registerStaff(staffData, res);
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
+            res.writeHead(400);
+            res.end('Invalid JSON data');
+        }
+    });
+}
+
+function handleLoginStaff(req, res, jwt) {
+    let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
+    req.on('end', () => {
+        try {
+            const { Username: username, Password: password } = JSON.parse(data);
+            loginStaff(username, password, res, jwt);
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
+            res.writeHead(400);
+            res.end('Invalid JSON data');
+        }
+    });
+}
+
+function handleGetUserRole(req, res) {
+    let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
+    req.on('end', () => {
+        try {
+            const { Username: username, Password: password } = JSON.parse(data);
+            getUserRole(username, password, res);
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
+            res.writeHead(400);
+            res.end('Invalid JSON data');
+        }
+    });
+}
+
 module.exports = {
     handleRegisterPatient,
     handleLoginPatient,
     handleRegisterAdmin,
     handleLoginAdmin,
     handleRegisterDoctor,
-    handleLoginDoctor
+    handleLoginDoctor,
+    handleRegisterStaff,
+    handleLoginStaff,
+    handleGetUserRole
 };

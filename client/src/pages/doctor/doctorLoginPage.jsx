@@ -17,7 +17,7 @@ const DoctorLoginPage = (props) => {
                 Password: password,
             }
 
-            const response = await fetch("http://localhost:5000/doctor/login", { 
+            const response = await fetch("http://localhost:5000/doctor/check-role", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)
@@ -26,13 +26,44 @@ const DoctorLoginPage = (props) => {
             if (response.ok) {
                 const data = await response.json();
                 console.log(data);
-                localStorage.setItem('token', data.token); 
-                localStorage.setItem('role', data.role); 
-                navigateTo('/doctor/home'); 
-                console.log("Login Successful");
+
+                // Check user role and redirect accordingly
+                if (data.role === 'Staff') {
+                    const staffResponse = await fetch("http://localhost:5000/staff/login", { 
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(body)
+                    });
+                    if (staffResponse.ok) {
+                        const staffData = await staffResponse.json();
+                        console.log(staffData);
+                        localStorage.setItem('token', staffData.token); 
+                        localStorage.setItem('role', staffData.role);
+                        navigateTo('/staff/home');
+                    } else {
+                        const staffError = await staffResponse.json();
+                        console.error('Staff login failed:', staffError.message);
+                    }
+                } else if (data.role === 'Dentist') {
+                    const dentistResponse = await fetch("http://localhost:5000/doctor/login", { 
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(body)
+                    });
+                    if (dentistResponse.ok) {
+                        const dentistData = await dentistResponse.json();
+                        console.log(dentistData);
+                        localStorage.setItem('token', dentistData.token); 
+                        localStorage.setItem('role', dentistData.role);
+                        navigateTo('/doctor/home');
+                    } else {
+                        const dentistError = await dentistResponse.json();
+                        console.error('Dentist login failed:', dentistError.message);
+                    }
+                }
             } else {
-                const data = await response.json();
-                console.error('Login failed:', data.message);
+                const roleError = await response.json();
+                console.error('Role check failed:', roleError.message);
             }
         } catch (err) {
             console.log(err.message);

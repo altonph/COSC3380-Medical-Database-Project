@@ -124,3 +124,8 @@ AND ((Start_time <= '09:00:00' AND End_time > '09:00:00')
     OR (Start_time >= '09:00:00' AND End_time <= '10:00:00'));
 
 
+-- @block
+SELECT * FROM login;
+
+-- @block
+SELECT * FROM staff;
