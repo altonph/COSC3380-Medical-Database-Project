@@ -7,10 +7,36 @@ import Footer from "../../components/Footer";
 const LoginPage = (props) => {
     const [Username, setUsername] = useState('');
     const [Password, setPassword] = useState('');
+    const [usernameError, setUsernameError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const MAX_USERNAME_LENGTH = 50;
+    const MAX_PASSWORD_LENGTH = 100;
     const navigateTo = useNavigate(); // Get the history object
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Reset error messages
+        setUsernameError('');
+        setPasswordError('');
+    
+        // Input validation
+        if (!Username.trim()) {
+          setUsernameError('Username is required.');
+          return;
+        } else if (Username.length > MAX_USERNAME_LENGTH) {
+          setUsernameError('Username cannot exceed 50 characters.')
+          return;
+        }
+    
+        if (!Password.trim()) {
+          setPasswordError('Password is required.');
+          return;
+        } else if (Password.length > MAX_PASSWORD_LENGTH) {
+          setPasswordError('Password cannot exceed 100 characters.')
+          return;
+        }
+    
         try {
             const body = {
                 Username: Username,
@@ -26,7 +52,6 @@ const LoginPage = (props) => {
             if (response.ok) {
                 const data = await response.json();
                 console.log(data);
-                //console.log(data);
                 localStorage.setItem('token', data.token); // Store token in local storage
                 localStorage.setItem('role', data.role); // Store role in local storage
                 localStorage.setItem('firstName', data.firstName);
@@ -59,8 +84,11 @@ const LoginPage = (props) => {
                                 placeholder="Username" 
                                 id="Username" 
                                 name="Username"
-                                className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
-                            />
+                                className={`w-full border py-2 px-3 rounded focus:outline-none ${
+                                    usernameError ? 'border-red-500' : 'focus:ring focus:border-blue-300'
+                                  }`}
+                                  />
+                                {usernameError && <p className="text-red-500 text-xs mt-1">{usernameError}</p>}
                         </div>
                         <div className="mb-4">
                             <label htmlFor="Password" className="block">Password</label>
@@ -71,8 +99,11 @@ const LoginPage = (props) => {
                                 placeholder="********" 
                                 id="Password" 
                                 name="Password"
-                                className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
+                                className={`w-full border py-2 px-3 rounded focus:outline-none ${
+                                    passwordError ? 'border-red-500' : 'focus:ring focus:border-blue-300'
+                                }`}
                             />
+                            {passwordError && <p className="text-red-500 text-xs mt-1">{passwordError}</p>}
                         </div>
                         <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300">Log In</button>
                     </form>
