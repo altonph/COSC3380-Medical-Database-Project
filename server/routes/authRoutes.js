@@ -1,4 +1,8 @@
-const { registerPatient, loginPatient, registerAdmin, loginAdmin, registerDoctor, loginDoctor, registerStaff, loginStaff, editDentist } = require('../controllers/authController');
+const { 
+        registerPatient, loginPatient, registerAdmin, loginAdmin, 
+        registerDoctor, loginDoctor, registerStaff, loginStaff, 
+        editDentist, editStaff 
+} = require('../controllers/authController');
 const url = require('url');
 
 function handleRegisterPatient(req, res) {
@@ -171,6 +175,26 @@ function handleEditDentist(req, res) {
     });
 }
 
+function handleEditStaff(req, res) {
+    let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
+
+    req.on('end', () => {
+        try {
+            const parsedUrl = url.parse(req.url, true);
+            const staffID = parsedUrl.pathname.split('/').pop(); // Extract staffID from the URL
+            const userData = JSON.parse(data);
+            editStaff(staffID, userData, res);
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
+            res.writeHead(400);
+            res.end('Invalid JSON data');
+        }
+    });
+}
+
 module.exports = {
     handleRegisterPatient,
     handleLoginPatient,
@@ -180,5 +204,6 @@ module.exports = {
     handleLoginDoctor,
     handleRegisterStaff,
     handleLoginStaff,
-    handleEditDentist
+    handleEditDentist,
+    handleEditStaff
 };

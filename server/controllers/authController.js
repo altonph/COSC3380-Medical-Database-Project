@@ -364,7 +364,6 @@ function loginStaff(username, password, res, jwt) {
 }
 
 function editDentist(dentistID, userData, res) {
-    // Update dentist table
     pool.query(
         'UPDATE dentist SET FName = ?, LName = ?, Specialty = ?, Email = ?, Phone_num = ?, Address = ?, DOB = ?, Salary = ? WHERE dentistID = ?',
         [userData.FName, userData.LName, userData.Specialty, userData.Email, userData.Phone_num, userData.Address, userData.DOB, userData.Salary, dentistID],
@@ -376,7 +375,6 @@ function editDentist(dentistID, userData, res) {
                 return;
             }
 
-            // Update email in the login table as it is connected to the dentist
             pool.query(
                 'UPDATE login SET Email = ? WHERE dentistID = ?',
                 [userData.Email, dentistID],
@@ -426,6 +424,65 @@ function editDentist(dentistID, userData, res) {
     );
 }
 
+function editStaff(staffID, userData, res) {
+    // Update staff table
+    pool.query(
+        'UPDATE staff SET officeID = ?, Fname = ?, Lname = ?, Email = ?, Phone_num = ?, Address = ?, DOB = ?, Position = ?, Start_date = ?, Salary = ? WHERE staffID = ?',
+        [userData.officeID, userData.Fname, userData.Lname, userData.Email, userData.Phone_num, userData.Address, userData.DOB, userData.Position, userData.Start_date, userData.Salary, staffID],
+        (error, results) => {
+            if (error) {
+                console.error('Error updating staff information:', error);
+                res.writeHead(500);
+                res.end('Error updating staff information');
+                return;
+            }
+
+            pool.query(
+                'UPDATE login SET Email = ? WHERE staffID = ?',
+                [userData.Email, staffID],
+                (error, results) => {
+                    if (error) {
+                        console.error('Error updating email in login table:', error);
+                        res.writeHead(500);
+                        res.end('Error updating email in login table');
+                        return;
+                    }
+
+                    if (userData.Username && userData.Password) {
+
+                        bcrypt.hash(userData.Password, 10, (err, hashedPassword) => {
+                            if (err) {
+                                console.error('Error hashing password:', err);
+                                res.writeHead(500);
+                                res.end('Error hashing password');
+                                return;
+                            }
+                            
+                            pool.query(
+                                'UPDATE login SET Username = ?, Password = ? WHERE staffID = ?',
+                                [userData.Username, hashedPassword, staffID],
+                                (error, results) => {
+                                    if (error) {
+                                        console.error('Error updating username and password in login table:', error);
+                                        res.writeHead(500);
+                                        res.end('Error updating username and password in login table');
+                                        return;
+                                    }
+
+                                    res.writeHead(200);
+                                    res.end('Staff information updated successfully');
+                                }
+                            );
+                        });
+                    } else {
+                        res.writeHead(200);
+                        res.end('Staff information updated successfully');
+                    }
+                }
+            );
+        }
+    );
+}
 
 function verifyToken(req, jwt) {
 
@@ -473,5 +530,6 @@ module.exports = {
     loginAdmin,
     registerStaff,
     loginStaff,
-    editDentist
+    editDentist,
+    editStaff
 };
