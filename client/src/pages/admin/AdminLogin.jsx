@@ -9,6 +9,8 @@ const AdminLogin = () => {
   const [Password, setPassword] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const MAX_USERNAME_LENGTH = 50;
+  const MAX_PASSWORD_LENGTH = 100;
   const navigateTo = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -22,10 +24,16 @@ const AdminLogin = () => {
     if (!Username.trim()) {
       setUsernameError('Username is required.');
       return;
+    } else if (Username.length > MAX_USERNAME_LENGTH) {
+      setUsernameError('Username cannot exceed 50 characters.')
+      return;
     }
 
     if (!Password.trim()) {
       setPasswordError('Password is required.');
+      return;
+    } else if (Password.length > MAX_PASSWORD_LENGTH) {
+      setPasswordError('Password cannot exceed 100 characters.')
       return;
     }
 
@@ -48,9 +56,9 @@ const AdminLogin = () => {
         navigateTo('/admin/home');
         console.log('Login Successful');
       } else {
-        const data = await response.json();
-        console.error('Login failed:', data.message);
-      }
+          const data = await response.json();
+          console.error('Login failed:', data.message);
+          }
     } catch (err) {
       console.log(err.message);
     }

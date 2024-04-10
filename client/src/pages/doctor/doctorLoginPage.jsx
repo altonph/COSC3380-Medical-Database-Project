@@ -4,13 +4,39 @@ import { useNavigate } from 'react-router-dom';
 import Header from "../../components/Header"; 
 import Footer from "../../components/Footer";
 
-const DoctorLoginPage = (props) => {
+const DoctorLoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [usernameError, setUsernameError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const MAX_USERNAME_LENGTH = 50;
+    const MAX_PASSWORD_LENGTH = 100;
     const navigateTo = useNavigate();
 
     const handleSubmit = async (e) => { 
         e.preventDefault();
+
+        // Reset error messages
+        setUsernameError('');
+        setPasswordError('');
+
+        // Input validation
+        if (!username.trim()) {
+            setUsernameError('Username is required.');
+            return;
+        } else if (username.length > MAX_USERNAME_LENGTH) {
+            setUsernameError('Username cannot exceed 50 characters.')
+            return;
+        }
+    
+        if (!password.trim()) {
+            setPasswordError('Password is required.');
+            return;
+        } else if (password.length > MAX_PASSWORD_LENGTH) {
+            setPasswordError('Password cannot exceed 100 characters.')
+            return;
+        }
+
         try {
             const body = {
                 Username: username,
@@ -25,7 +51,6 @@ const DoctorLoginPage = (props) => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log(data);
                 localStorage.setItem('token', data.token); 
                 localStorage.setItem('role', data.role); 
                 navigateTo('/doctor/home'); 
@@ -37,7 +62,7 @@ const DoctorLoginPage = (props) => {
         } catch (err) {
             console.log(err.message);
         }
-    }
+    };
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -47,37 +72,51 @@ const DoctorLoginPage = (props) => {
                     <h2 className="text-2xl font-bold mb-4 text-center">Provider Login</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
-                            <label htmlFor="username" className="block">Username</label>
+                            <label htmlFor="Username" className="block">
+                                Username
+                                </label>
                             <input 
                                 value={username} 
                                 onChange={(e) => setUsername(e.target.value)} 
                                 type="text" 
                                 placeholder="Username" 
-                                id="username" 
-                                name="username"
-                                className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
-                            />
+                                id="Username" 
+                                name="Username"
+                                className={`w-full border py-2 px-3 rounded focus:outline-none ${
+                                    usernameError ? 'border-red-500' : 'focus:ring focus:border-blue-300'
+                                  }`}                            
+                                />
+                                {usernameError && <p className="text-red-500 text-xs mt-1">{usernameError}</p>}
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="password" className="block">Password</label>
+                            <label htmlFor="Password" className="block">
+                                Password
+                            </label>
                             <input 
                                 value={password} 
                                 onChange={(e) => setPassword(e.target.value)} 
                                 type="password" 
                                 placeholder="********" 
-                                id="password" 
-                                name="password"
-                                className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
-                            />
+                                id="Password" 
+                                name="Password"
+                                className={`w-full border py-2 px-3 rounded focus:outline-none ${
+                                    passwordError ? 'border-red-500' : 'focus:ring focus:border-blue-300'
+                                  }`}
+                                />
+                                {passwordError && <p className="text-red-500 text-xs mt-1">{passwordError}</p>}
                         </div>
-                        <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300">Log In</button>
+                        <button type="submit" 
+                        className="w-full bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300">
+                            Log In
+                            </button>
                     </form>
-                    <p className="text-center mt-4">Are you an administrator? Login <Link to="/admin/login" className="text-blue-500">here</Link>.</p>
+                    <p className="text-center mt-4">Are you an administrator?  <Link to="/admin/login" className="text-blue-500">Login here</Link>.
+                    </p>
                 </div>
             </div>
             <Footer />
         </div>
     );
-}
+};
 
 export default DoctorLoginPage;
