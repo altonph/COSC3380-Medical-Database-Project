@@ -736,6 +736,134 @@ function handleProtectedRoute(req, res, jwt) {
     res.end('Protected route accessed successfully for Patient role');
 }
 
+function registerStaff(userData, res) {
+    bcrypt.hash(userData.Password, 10, (err, hashedPassword) => {
+        if (err) {
+            console.error('Error hashing password:', err);
+            res.writeHead(500);
+            res.end('Error hashing password');
+            return;
+        }
+
+        pool.query('INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, End_date, Is_active, Salary) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [userData.officeID, userData.Fname, userData.Lname, userData.Email, userData.Phone_num, userData.DOB, userData.Address, userData.Position, userData.Start_date, userData.End_date, userData.Is_active, userData.Salary],
+            (error, results) => {
+                if (error) {
+                    console.error('Error creating staff:', error);
+                    res.writeHead(500);
+                    res.end('Error creating staff');
+                    return;
+                }
+                
+                const staffID = results.insertId;
+
+                pool.query('INSERT INTO login (Username, Password, User_role, Email, StaffID) VALUES (?, ?, ?, ?, ?)',
+                    [userData.Username, hashedPassword, 'Staff', userData.Email, staffID],
+                    (error, loginResults) => {
+                        if (error) {
+                            console.error('Error registering staff:', error);
+                            res.writeHead(500);
+                            res.end('Error registering staff');
+                        } else {
+                            res.writeHead(200);
+                            res.end('Staff registered successfully');
+                        }
+                    });
+            });
+    });
+}
+
+function loginStaff(username, password, res, jwt) {
+    pool.query(
+        'SELECT * FROM login WHERE Username = ? AND User_role = "Staff"',
+        [username],
+        async (error, results) => {
+            if (error) {
+                console.error('Error retrieving staff:', error);
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end('Internal Server Error');
+                return;
+            }
+
+            if (results.length === 0) {
+                res.writeHead(400, { 'Content-Type': 'text/plain' });
+                res.end('Staff not found');
+                return;
+            }
+
+            const staff = results[0];
+
+            bcrypt.compare(password, staff.Password, (err, result) => {
+                if (err) {
+                    console.error('Error comparing passwords:', err);
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.end('Internal Server Error');
+                    return;
+                }
+
+                if (result) {
+                    if (staff.User_role !== 'Staff') {
+                        res.writeHead(403, { 'Content-Type': 'text/plain' });
+                        res.end('Forbidden');
+                        return;
+                    }
+                    
+                    const token = jwt.sign({ 
+                        username: staff.Username, 
+                        role: staff.User_role, 
+                        staffID: staff.StaffID
+                    }, process.env.JWT_SECRET, { expiresIn: '2h' });
+
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ token, role: staff.User_role, staffID: staff.StaffID }));
+                } else {
+                    res.writeHead(401, { 'Content-Type': 'text/plain' });
+                    res.end('Incorrect password');
+                }
+            });
+        }
+    );
+}
+
+function getUserRole(username, password, res) {
+    pool.query(
+        'SELECT * FROM login WHERE Username = ?',
+        [username],
+        (error, results) => {
+            if (error) {
+                console.error('Error retrieving user:', error);
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end('Internal Server Error');
+                return;
+            }
+
+            if (results.length === 0) {
+                res.writeHead(400, { 'Content-Type': 'text/plain' });
+                res.end('Invalid username or password');
+                return;
+            }
+
+            const user = results[0];
+            bcrypt.compare(password, user.Password, (err, result) => {
+                if (err) {
+                    console.error('Error comparing passwords:', err);
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.end('Internal Server Error');
+                    return;
+                }
+
+                if (result) {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ role: user.User_role }));
+                } else {
+                    res.writeHead(400, { 'Content-Type': 'text/plain' });
+                    res.end('Invalid username or password');
+                }
+            });
+        }
+    );
+}
+
 module.exports = {
     registerPatient,
     loginPatient,
@@ -751,5 +879,6 @@ module.exports = {
     editPatient,
     archiveDentist,
     archivePatient,
-    archiveStaff
+    archiveStaff,
+    getUserRole
 };

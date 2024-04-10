@@ -11,12 +11,14 @@ import PatientProfileSettings from "./pages/patient/PatientProfileSettings";
 import DoctorLoginPage from "./pages/doctor/doctorLoginPage";
 import DoctorAppointment from "./pages/doctor/DoctorAppointments";
 import DoctorMakeAppointment from "./pages/doctor/DoctorMakeAppointment";
+import DoctorAddVisitDetails from "./pages/doctor/DoctorAddVisitDetails";
 import DoctorPatients from "./pages/doctor/DoctorPatients";
 import PatientDetails from "./pages/doctor/DoctorPatientDetails";
 import DoctorEditMedicalHistory from "./pages/doctor/DoctorEditMedicalHistory";
 import DoctorEditPrescriptions from "./pages/doctor/DoctorEditPrescriptions";
 import DoctorEditVisitDetails from "./pages/doctor/DoctorEditVisitDetails";
 import DoctorEditPatientInformation from "./pages/doctor/DoctorEditPatientInformation";
+import StaffPortal from "./pages/staff/StaffPortal";
 import PatientPrescriptions from "./pages/patient/PatientPrescriptions"
 import HistoryPortal from "./pages/patient/HistoryPortal"; 
 import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
@@ -57,6 +59,7 @@ function App() {
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
             <Route path="/doctor/appointments" element={<DoctorAppointment/>}/>
             <Route path="/doctor/appointments/make-appointment" element={<DoctorMakeAppointment />} />
+            <Route path="doctor/appointments/add-visit-details" element={<DoctorAddVisitDetails />} />
             <Route path="/doctor/patients" element={<DoctorPatients/>}/>
             <Route path="/doctor/patients/:patientID" element={<PatientDetails />} />
             <Route path="/doctor/patients/:patientID/medical-history" element={<DoctorEditMedicalHistory />} />
@@ -65,6 +68,7 @@ function App() {
             <Route path="/doctor/patients/:patientID/patient-information" element={<DoctorEditPatientInformation />} />
             <Route path="/doctor/home" element= {<DoctorPortal/>} />
             <Route path="/doctor/profile" element= {<DoctorProfile/>} />
+            <Route path="/staff/home" element={<StaffPortal />} />
             <Route path="/admin/home" element= {<AdminPortal/>} />
             <Route path="/admin/appointments" element={<AdminAppointment/>}/>
             <Route path="/admin/patients" element={<AdminPatients/>}/>

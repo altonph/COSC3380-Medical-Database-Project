@@ -2,7 +2,7 @@ const {
         registerPatient, loginPatient, registerAdmin, loginAdmin, 
         registerDoctor, loginDoctor, registerStaff, loginStaff, 
         editDentist, editStaff,  editPatient, archiveDentist,
-        archivePatient, archiveStaff
+        archivePatient, archiveStaff, getUserRole
 } = require('../controllers/authController');
 const url = require('url');
 
@@ -128,8 +128,9 @@ function handleRegisterStaff(req, res) {
 
     req.on('end', () => {
         try {
-            const userData = JSON.parse(data);
-            registerStaff(userData, res);
+            const staffData = JSON.parse(data);
+            registerStaff(staffData, res);
+
         } catch (error) {
             console.error('Error parsing JSON data:', error);
             res.writeHead(400);
@@ -240,14 +241,31 @@ function handleArchiveStaff(req, res) {
     let data = '';
     req.on('data', chunk => {
         data += chunk;
-    });
-
-    req.on('end', () => {
+      });
+  
+      req.on('end', () => {
         try {
             const parsedUrl = url.parse(req.url, true);
             const staffID = parsedUrl.pathname.split('/').pop(); // Extract staffID from the URL
             const { End_date } = JSON.parse(data);
             archiveStaff(staffID, End_date, res);
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
+            res.writeHead(400);
+            res.end('Invalid JSON data');
+        }
+    });
+}
+  
+function handleGetUserRole(req, res) {
+  let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
+    req.on('end', () => {
+        try {
+            const { Username: username, Password: password } = JSON.parse(data);
+            getUserRole(username, password, res);
         } catch (error) {
             console.error('Error parsing JSON data:', error);
             res.writeHead(400);
@@ -289,5 +307,6 @@ module.exports = {
     handleEditPatient,
     handleArchiveDentist,
     handleArchiveStaff,
-    handleArchivePatient
+    handleArchivePatient,
+    handleGetUserRole
 };

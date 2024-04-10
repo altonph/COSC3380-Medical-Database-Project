@@ -8,6 +8,7 @@ const HeaderPortalStaff = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Retrieve first and last name from local storage
     const storedFirstName = localStorage.getItem('firstName');
     const storedLastName = localStorage.getItem('lastName');
     if (storedFirstName && storedLastName) {
