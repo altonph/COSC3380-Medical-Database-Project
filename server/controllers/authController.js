@@ -604,8 +604,101 @@ const editPatient = (patientID, userData, res) => {
     });
 };
 
+function archiveStaff(staffID, End_date, res) {
+    pool.query(
+        'UPDATE staff SET Is_active = ?, End_date = ? WHERE staffID = ?',
+        [false, End_date, staffID],
+        (error, results) => {
+            if (error) {
+                console.error('Error archiving staff member:', error);
+                res.writeHead(500);
+                res.end('Error archiving staff member');
+                return;
+            }
 
+            // Invalidate login credentials
+            pool.query(
+                'UPDATE login SET Password = NULL, User_role = NULL WHERE staffID = ?',
+                [staffID],
+                (error, results) => {
+                    if (error) {
+                        console.error('Error invalidating login credentials for staff member:', error);
+                        res.writeHead(500);
+                        res.end('Error invalidating login credentials for staff member');
+                        return;
+                    }
 
+                    res.writeHead(200);
+                    res.end('Staff member archived successfully');
+                }
+            );
+        }
+    );
+}
+
+function archiveDentist(dentistID, End_date, res) {
+    pool.query(
+        'UPDATE dentist SET Is_active = ?, End_date = ? WHERE dentistID = ?',
+        [false, End_date, dentistID],
+        (error, results) => {
+            if (error) {
+                console.error('Error archiving dentist:', error);
+                res.writeHead(500);
+                res.end('Error archiving dentist');
+                return;
+            }
+
+            // Invalidate login credentials
+            pool.query(
+                'UPDATE login SET Password = NULL, User_role = NULL WHERE dentistID = ?',
+                [dentistID],
+                (error, results) => {
+                    if (error) {
+                        console.error('Error invalidating login credentials for dentist:', error);
+                        res.writeHead(500);
+                        res.end('Error invalidating login credentials for dentist');
+                        return;
+                    }
+
+                    res.writeHead(200);
+                    res.end('Dentist archived successfully');
+                }
+            );
+        }
+    );
+}
+
+function archivePatient(patientID, res) {
+    pool.query(
+        'UPDATE patient SET is_active = ? WHERE patientID = ?',
+        [false, patientID],
+        (error, results) => {
+            if (error) {
+                console.error('Error archiving patient:', error);
+                res.writeHead(500);
+                res.end('Error archiving patient');
+                return;
+            }
+
+            // Invalidate login credentials
+            pool.query(
+                'UPDATE login SET Password = NULL, User_role = NULL WHERE patientID = ?',
+                [patientID],
+                (error, results) => {
+                    if (error) {
+                        console.error('Error invalidating login credentials for patient:', error);
+                        res.writeHead(500);
+                        res.end('Error invalidating login credentials for patient');
+                        return;
+                    }
+
+                    res.writeHead(200);
+                    res.end('Patient archived successfully');
+                }
+            );
+        }
+    );
+}
 
 function verifyToken(req, jwt) {
 
@@ -655,5 +748,8 @@ module.exports = {
     loginStaff,
     editDentist,
     editStaff,
-    editPatient
+    editPatient,
+    archiveDentist,
+    archivePatient,
+    archiveStaff
 };

@@ -3,7 +3,7 @@ const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin, handleRegisterStaff,
-    handleLoginStaff, handleEditDentist, handleEditStaff, handleEditPatient } = require('./routes/authRoutes');
+    handleLoginStaff, handleEditDentist, handleEditStaff, handleEditPatient, handleArchiveDentist, handleArchiveStaff, handleArchivePatient } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
@@ -60,6 +60,12 @@ const server = http.createServer((req, res) => {
         handleEditStaff(req, res);
     } else if (req.url.startsWith('/api/patient/editPatient') && req.method === 'PATCH') {
         handleEditPatient(req, res);
+    } else if (req.url.startsWith('/api/dentist/archive') && req.method === 'PATCH') {
+        handleArchiveDentist(req, res);
+    } else if (req.url.startsWith('/api/staff/archive') && req.method === 'PATCH') {
+        handleArchiveStaff(req, res);
+    } else if (req.url.startsWith('/api/patient/archive') && req.method === 'PATCH') {
+        handleArchivePatient(req, res);
     }
     
     

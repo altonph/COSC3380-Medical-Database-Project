@@ -1,7 +1,8 @@
 const { 
         registerPatient, loginPatient, registerAdmin, loginAdmin, 
         registerDoctor, loginDoctor, registerStaff, loginStaff, 
-        editDentist, editStaff,  editPatient
+        editDentist, editStaff,  editPatient, archiveDentist,
+        archivePatient, archiveStaff
 } = require('../controllers/authController');
 const url = require('url');
 
@@ -215,6 +216,65 @@ const handleEditPatient = (req, res) => {
     });
 };
 
+function handleArchiveDentist(req, res) {
+    let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
+
+    req.on('end', () => {
+        try {
+            const parsedUrl = url.parse(req.url, true);
+            const dentistID = parsedUrl.pathname.split('/').pop(); // Extract dentistID from the URL
+            const { End_date } = JSON.parse(data);
+            archiveDentist(dentistID, End_date, res);
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
+            res.writeHead(400);
+            res.end('Invalid JSON data');
+        }
+    });
+}
+
+function handleArchiveStaff(req, res) {
+    let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
+
+    req.on('end', () => {
+        try {
+            const parsedUrl = url.parse(req.url, true);
+            const staffID = parsedUrl.pathname.split('/').pop(); // Extract staffID from the URL
+            const { End_date } = JSON.parse(data);
+            archiveStaff(staffID, End_date, res);
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
+            res.writeHead(400);
+            res.end('Invalid JSON data');
+        }
+    });
+}
+
+function handleArchivePatient(req, res) {
+    let data = '';
+    req.on('data', chunk => {
+        data += chunk;
+    });
+
+    req.on('end', () => {
+        try {
+            const parsedUrl = url.parse(req.url, true);
+            const patientID = parsedUrl.pathname.split('/').pop(); // Extract patientID from the URL
+            archivePatient(patientID, res);
+        } catch (error) {
+            console.error('Error parsing JSON data:', error);
+            res.writeHead(400);
+            res.end('Invalid JSON data');
+        }
+    });
+}
+
 module.exports = {
     handleRegisterPatient,
     handleLoginPatient,
@@ -226,5 +286,8 @@ module.exports = {
     handleLoginStaff,
     handleEditDentist,
     handleEditStaff,
-    handleEditPatient
+    handleEditPatient,
+    handleArchiveDentist,
+    handleArchiveStaff,
+    handleArchivePatient
 };
