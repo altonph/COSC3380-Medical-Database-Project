@@ -3,7 +3,7 @@ const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin, handleRegisterStaff,
-    handleLoginStaff } = require('./routes/authRoutes');
+    handleLoginStaff, handleEditDentist } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
@@ -56,7 +56,10 @@ const server = http.createServer((req, res) => {
         handleGenerateSalaryReport(req, res, jwt);
     } else if (req.url.startsWith('/api/dentist/updateAppointmentWithStaff') && req.method === 'PATCH') {
         handleUpdateAppointmentWithStaff(req, res);
+    } else if (req.url.startsWith('/api/dentist/editDentist') && req.method === 'PATCH') {
+        handleEditDentist(req, res);
     }
+    
     
     //handleUpdateAppointmentWithStaff
     // doctor pages
