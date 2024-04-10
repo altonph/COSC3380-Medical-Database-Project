@@ -13,6 +13,7 @@ const DoctorAppointment = () => {
     const [selectedEvent, setSelectedEvent] = useState(null);
     const fullCalendarRef = useRef(null);
     const [showModal, setShowModal] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState(selectedEvent?.extendedProps.appointment.Appointment_Status || '');
     const [modalPosition, setModalPosition] = useState({ top: '50%', left: '50%' });
   
     const getAppointmentsForDate = (formattedDate) => {
@@ -69,6 +70,17 @@ const DoctorAppointment = () => {
       return `${year}-${month}-${day}`;
     };
 
+    const handleAddVisitDetails = () => {
+      localStorage.setItem('appointmentDetails', JSON.stringify(selectedEvent.extendedProps.appointment));
+    };
+    
+    const handleStatusChange = (event) => {
+      const newStatus = event.target.value;
+      // Implement the logic to handle status change
+      // This function will be responsible for updating the appointment status when a new option is selected from the dropdown
+    };
+    
+
     useEffect(() => {
       const fetchAppointments = async () => {
         try {
@@ -103,7 +115,7 @@ const DoctorAppointment = () => {
           <nav>
             <HeaderPortalAdmin/>
           </nav>
-  
+    
           <div className="flex flex-1">
             <aside className="w-1/6 bg-gray-200 text-black">
               <nav className="p-4 text-xl">
@@ -114,21 +126,21 @@ const DoctorAppointment = () => {
                 </ul>
               </nav>
             </aside>
-            
+    
             <main className="flex-1 p-4">
               <h1 className="text-3xl font-bold mt-14 mb-4 p-8">Edit Appointments</h1>
-              
+    
               <div className="flex justify-center items-center mb-4">
                 <button onClick={() => fullCalendarRef.current.getApi().changeView('dayGridMonth')} className="bg-blue-500 text-white px-4 py-2 mr-2">Month View</button>
                 <button onClick={() => fullCalendarRef.current.getApi().changeView('timeGridWeek')} className="bg-blue-500 text-white px-4 py-2 mr-2">Week View</button>
                 <button onClick={() => fullCalendarRef.current.getApi().changeView('timeGridDay')} className="bg-blue-500 text-white px-4 py-2">Day View</button>
               </div>
-
+    
               <div className="flex justify-center items-center mb-4">
                 <Link to="/doctor/appointments/make-appointment" className="bg-blue-500 text-white px-4 py-2 mr-2">Add New Appointment</Link>
                 <button className="bg-gray-500 text-white px-4 py-2">Delete Existing Appointment</button>
               </div>
-
+    
               <div className="flex justify-center items-center">
                 <div className="mr-8">
                   <h2 className="text-lg font-semibold mb-2">Select Date:</h2>
@@ -157,30 +169,56 @@ const DoctorAppointment = () => {
                   />
                 </div>
               </div>
-
-              {showModal && (
-                <div className="fixed inset-0 bg-black opacity-50 z-50"></div>
-              )}
-
+    
               {selectedEvent && showModal && (
-                <div
-                id="appointment-modal"
-                className="fixed bg-white border rounded p-4 shadow-lg z-50"
-                style={{ top: modalPosition.top, left: modalPosition.left, transform: 'translate(-50%, -50%)' }}
-                >
-                  <h3 className="font-bold mb-2">Appointment Details</h3>
-                  <div>
-                    <p><span className="font-semibold">Start Time:</span> {convertTo12HourFormat(selectedEvent.extendedProps.appointment.Start_time)}</p>
-                    <p><span className="font-semibold">End Time:</span> {convertTo12HourFormat(selectedEvent.extendedProps.appointment.End_time)}</p>
-                    <p><span className="font-semibold">Patient:</span> {selectedEvent.extendedProps.appointment.patientID}</p>
-                    <p><span className="font-semibold">Appointment Type:</span> {selectedEvent.extendedProps.appointment.Appointment_Type}</p>
-                    <p><span className="font-semibold">Appointment Status:</span> {selectedEvent.extendedProps.appointment.Appointment_Status}</p>
-                    <p><span className="font-semibold">Cancellation Reason:</span> {selectedEvent.extendedProps.appointment.Cancellation_Reason}</p>
-                    <p><span className="font-semibold">Specialist Approval:</span> {selectedEvent.extendedProps.appointment.Specialist_Approval}</p>
-                    <p><span className="font-semibold">Is Active:</span> {selectedEvent.extendedProps.appointment.Is_active}</p>
+                <>
+                  <div className="fixed inset-0 bg-black opacity-50 z-50"></div> 
+                  <div
+                    id="appointment-modal"
+                    className="fixed bg-white border rounded p-4 shadow-lg z-50"
+                    style={{ top: modalPosition.top, left: modalPosition.left, transform: 'translate(-50%, -50%)' }}
+                  >
+                    <h3 className="font-bold mb-2">Appointment Details</h3>
+                    <div>
+                      <p><span className="font-semibold">Start Time:</span> {convertTo12HourFormat(selectedEvent.extendedProps.appointment.Start_time)}</p>
+                      <p><span className="font-semibold">End Time:</span> {convertTo12HourFormat(selectedEvent.extendedProps.appointment.End_time)}</p>
+                      <p><span className="font-semibold">Patient:</span> {selectedEvent.extendedProps.appointment.patientID}</p>
+                      <p><span className="font-semibold">Appointment Type:</span> {selectedEvent.extendedProps.appointment.Appointment_Type}</p>
+                      <p><span className="font-semibold">Appointment Status:</span> {selectedEvent.extendedProps.appointment.Appointment_Status}</p>
+                      <p><span className="font-semibold">Specialist Approval:</span> {selectedEvent.extendedProps.appointment.Specialist_Approval}</p>
+                      <p><span className="font-semibold">Is Active:</span> {selectedEvent.extendedProps.appointment.Is_active}</p>
+                      {selectedStatus === 'Cancelled' && (
+                        <div>
+                          <label htmlFor="cancellationReason" className="font-semibold">Cancellation Reason:</label>
+                          <input 
+                            type="text" 
+                            id="cancellationReason" 
+                            name="cancellationReason" 
+                            style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} 
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-4">
+                    <Link 
+  to="/doctor/appointments/add-visit-details"
+  onClick={() => handleAddVisitDetails(selectedEvent.extendedProps.appointment)}
+  className="bg-gray-500 text-white px-4 py-2 mr-2"
+>
+  Add Visit Details
+</Link>
+                      <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </div>
+                    <div className="mt-4">
+                    <button className="bg-blue-500 text-white px-4 py-2 mr-2">Submit</button>
+                    </div>
                   </div>
-                </div>
+                </>
               )}
+
             </main>
           </div>
           <nav>
@@ -188,7 +226,7 @@ const DoctorAppointment = () => {
           </nav>
         </div>
       </>
-    );
-};
+    );       
+  };    
 
 export default DoctorAppointment;

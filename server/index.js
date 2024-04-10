@@ -55,7 +55,7 @@ const server = http.createServer((req, res) => {
     
     //handleUpdateAppointmentWithStaff
     // doctor pages
-    else if (req.url === '/api/doctor/patients' || req.url.startsWith('/api/doctor/patients/') || req.url === '/api/doctor/appointments') {
+    else if (req.url === '/api/doctor/patients' || req.url.startsWith('/api/doctor/patients/') || req.url.startsWith('/api/doctor/appointments/') || req.url === ('/api/doctor/appointments')) {
         doctorRoutes(req, res); 
     }
     
