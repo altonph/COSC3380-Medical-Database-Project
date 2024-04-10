@@ -484,6 +484,129 @@ function editStaff(staffID, userData, res) {
     );
 }
 
+const editPatient = (patientID, userData, res) => {
+    const { Policy_number, Insurance_Company_Name, Gender, FName, LName, DOB, Email, Phone_num, Address, Username, Password } = userData;
+
+    // Assuming `pool` is the database connection pool
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting database connection:', err);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            return;
+        }
+
+        connection.beginTransaction(err => {
+            if (err) {
+                console.error('Error starting transaction:', err);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                connection.release();
+                return;
+            }
+
+            // Update patient information
+            connection.query(
+                'UPDATE patient SET Policy_number = ?, Insurance_Company_Name = ?, Gender = ?, FName = ?, LName = ?, DOB = ?, Phone_num = ?, Address = ? WHERE patientID = ?',
+                [Policy_number, Insurance_Company_Name, Gender, FName, LName, DOB, Phone_num, Address, patientID],
+                (error, patientResults) => {
+                    if (error) {
+                        console.error('Error updating patient profile:', error);
+                        connection.rollback(() => {
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                            connection.release();
+                        });
+                        return;
+                    }
+
+                    // Update login information
+                    connection.query(
+                        'UPDATE login SET Email = ? WHERE patientID = ?',
+                        [Email, patientID],
+                        (loginError, loginResults) => {
+                            if (loginError) {
+                                console.error('Error updating email in login table:', loginError);
+                                connection.rollback(() => {
+                                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                    connection.release();
+                                });
+                                return;
+                            }
+
+                            if (Username && Password) {
+                                bcrypt.hash(Password, 10, (hashErr, hashedPassword) => {
+                                    if (hashErr) {
+                                        console.error('Error hashing password:', hashErr);
+                                        connection.rollback(() => {
+                                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                                            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                            connection.release();
+                                        });
+                                        return;
+                                    }
+
+                                    connection.query(
+                                        'UPDATE login SET Username = ?, Password = ? WHERE patientID = ?',
+                                        [Username, hashedPassword, patientID],
+                                        (loginError, loginResults) => {
+                                            if (loginError) {
+                                                console.error('Error updating username and password in login table:', loginError);
+                                                connection.rollback(() => {
+                                                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                                                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                                    connection.release();
+                                                });
+                                                return;
+                                            }
+
+                                            connection.commit(err => {
+                                                if (err) {
+                                                    console.error('Error committing transaction:', err);
+                                                    connection.rollback(() => {
+                                                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                                                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                                        connection.release();
+                                                    });
+                                                    return;
+                                                }
+
+                                                res.writeHead(200, { 'Content-Type': 'application/json' });
+                                                res.end(JSON.stringify({ message: 'Patient profile updated successfully' }));
+                                                connection.release();
+                                            });
+                                        }
+                                    );
+                                });
+                            } else {
+                                connection.commit(err => {
+                                    if (err) {
+                                        console.error('Error committing transaction:', err);
+                                        connection.rollback(() => {
+                                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                                            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                            connection.release();
+                                        });
+                                        return;
+                                    }
+
+                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ message: 'Patient profile updated successfully' }));
+                                    connection.release();
+                                });
+                            }
+                        }
+                    );
+                }
+            );
+        });
+    });
+};
+
+
+
+
 function verifyToken(req, jwt) {
 
     const authHeader = req.headers['authorization'];
@@ -531,5 +654,6 @@ module.exports = {
     registerStaff,
     loginStaff,
     editDentist,
-    editStaff
+    editStaff,
+    editPatient
 };

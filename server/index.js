@@ -3,7 +3,7 @@ const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin, handleRegisterStaff,
-    handleLoginStaff, handleEditDentist, handleEditStaff } = require('./routes/authRoutes');
+    handleLoginStaff, handleEditDentist, handleEditStaff, handleEditPatient } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
@@ -52,14 +52,14 @@ const server = http.createServer((req, res) => {
         handleAssignDentistSchedule(req, res);
     } else if (req.url.startsWith('/api/dentist/getDentist') && req.method === 'GET') {
         handleGetDentistsByOfficeAndDay(req, res);
-    } else if (req.url.startsWith('/api/admin/salary-report') && req.method === 'GET') {
-        handleGenerateSalaryReport(req, res, jwt);
     } else if (req.url.startsWith('/api/dentist/updateAppointmentWithStaff') && req.method === 'PATCH') {
         handleUpdateAppointmentWithStaff(req, res);
     } else if (req.url.startsWith('/api/dentist/editDentist') && req.method === 'PATCH') {
         handleEditDentist(req, res);
     } else if (req.url.startsWith('/api/staff/editStaff') && req.method === 'PATCH') {
         handleEditStaff(req, res);
+    } else if (req.url.startsWith('/api/patient/editPatient') && req.method === 'PATCH') {
+        handleEditPatient(req, res);
     }
     
     
