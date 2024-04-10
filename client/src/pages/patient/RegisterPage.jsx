@@ -14,10 +14,30 @@ const RegisterPage = () => {
     const [Phone_num, setPhone_num] = useState('');
     const [Address, setAddress] = useState('');
     const [Username, setUsername] = useState('');
+    const [inputErrors, setInputErrors] = useState({
+        FName: '',
+        LName: '',
+        Gender: '',
+        DOB: '',
+        Email: '',
+        Password: '',
+        Phone_num: '',
+        Address: '',
+        Username: ''
+    });
+    const MAX_NAME_LENGTH = 20;
+    const MAX_EMAIL_LENGTH = 50;
+    const MAX_USERNAME_LENGTH = 50;
+    const MAX_PASSWORD_LENGTH = 100;
+    const MAX_PHONE_LENGTH = 10;
+    const MAX_ADDRESS_LENGTH = 100;
     const navigateTo = useNavigate(); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // reset error messages
+        
         try {
             const body = {
                 PatientID: null,
