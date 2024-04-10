@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import HeaderPortalDoctor from "../../components/HeaderPortalDoctor";
 import Footer from "../../components/Footer";
 
@@ -12,6 +13,7 @@ const DoctorAddVisitDetails = () => {
   const [showPrescriptionDropdown, setShowPrescriptionDropdown] = useState(false);
   const [numberOfPrescriptions, setNumberOfPrescriptions] = useState(1);
   const [isInsertSuccess, setIsInsertSuccess] = useState(false);
+  const [scheduleFollowUp, setScheduleFollowUp] = useState(false);
 
   useEffect(() => {
     const storedAppointment = localStorage.getItem('appointmentDetails');
@@ -65,6 +67,46 @@ const DoctorAddVisitDetails = () => {
         console.error('Error:', error);
     });
   };
+
+  const handleConfirmPrescriptions = () => {
+    const { visitID } = appointmentDetails;
+
+    prescriptions.forEach(prescription => {
+        const prescriptionData = {
+            dentistID: appointmentDetails.dentistID,
+            patientID: appointmentDetails.patientID,
+            visitID: visitID,
+            National_Drug_Code: prescription.National_Drug_Code,
+            Medication_Name: prescription.Medication_Name,
+            Medication_Dosage: prescription.Medication_Dosage,
+            Refills: prescription.Refills,
+            notes: prescription.notes,
+            Date_prescribed: new Date().toISOString().split('T')[0]
+        };
+
+        fetch('http://localhost:5000/api/doctor/appointments/prescriptions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(prescriptionData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Prescription inserted successfully:', data);
+        })
+        .catch(error => {
+            console.error('Error inserting prescription:', error);
+        });
+    });
+  };
+
 
   const handleCheckboxChange = (e) => {
     setShowPrescriptionDropdown(e.target.checked);
@@ -243,25 +285,37 @@ const DoctorAddVisitDetails = () => {
               </div>
   
               <div className="col-span-2">
-                <button onClick={handleConfirm} className="bg-blue-500 text-white px-4 py-2 mr-2 mt-4">Confirm</button>
-                {isInsertSuccess && (
+              <button onClick={handleConfirm} className="bg-blue-500 text-white px-4 py-2 mr-2 mt-4 mb-4">Confirm</button>
+              {isInsertSuccess && (
+                <label className="block mt-2 text-lg"> 
+                  <input type="checkbox" className="mr-2 h-6 w-6 mt-4" onChange={handleCheckboxChange} /> 
+                  Add Prescriptions
+                </label>
+              )}
+              {showPrescriptionDropdown && (
+                <>
+                  <label className="block mt-2 text-lg">Number of Prescriptions:</label>
+                  <select value={numberOfPrescriptions} onChange={handleDropdownChange} className="mt-2 p-2 rounded-md">
+                    {[1, 2, 3, 4, 5].map(num => (
+                      <option key={num} value={num}>{num}</option>
+                    ))}
+                  </select>
+                </>
+              )}
+              {showPrescriptionDropdown && renderPrescriptionInputs()}
+              {showPrescriptionDropdown && (
+                <button onClick={handleConfirmPrescriptions} className="bg-blue-500 text-white px-4 py-2 mt-4">Confirm Prescriptions</button>
+              )}
+              {isInsertSuccess && (
+                <div>
                   <label className="block mt-2 text-lg"> 
-                    <input type="checkbox" className="mr-2 h-6 w-6 mt-4" onChange={handleCheckboxChange} /> 
-                    Add Prescriptions
+                    <input type="checkbox" className="mr-2 h-6 w-6 mt-4" onChange={(e) => setScheduleFollowUp(e.target.checked)} /> 
+                    Schedule Follow Up Appointment
                   </label>
-                )}
-                {showPrescriptionDropdown && (
-                  <>
-                    <label className="block mt-2 text-lg">Number of Prescriptions:</label>
-                    <select value={numberOfPrescriptions} onChange={handleDropdownChange} className="mt-2 p-2 rounded-md">
-                      {[1, 2, 3, 4, 5].map(num => (
-                        <option key={num} value={num}>{num}</option>
-                      ))}
-                    </select>
-                  </>
-                )}
-                {showPrescriptionDropdown && renderPrescriptionInputs()}
-              </div>
+                </div>
+              )}
+            </div>
+            <Link to="/doctor/appointments" className="bg-blue-500 text-white px-4 py-2 mt-4">Return to Appointments Page</Link>
             </div>
           </main>
         </div>

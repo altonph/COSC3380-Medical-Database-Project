@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { getAllPatients, getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, updateVisitDetailsByPatientId, getAppointmentsByDoctorUsername, insertVisitDetails } = require('../controllers/doctorController');
+const { getAllPatients, getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, updateVisitDetailsByPatientId, getAppointmentsByDoctorUsername, insertVisitDetails, insertPrescription } = require('../controllers/doctorController');
 
 const doctorRoutes = (req, res) => {
     const { url, method } = req;
@@ -104,6 +104,12 @@ const doctorRoutes = (req, res) => {
             return unauthorizedResponse(res);
         }
         insertVisitDetails(req, res); 
+    } else if (method === 'POST' && url === '/api/doctor/appointments/prescriptions') {
+        const decodedToken = verifyToken(authHeader);
+        if (!decodedToken) {
+            return unauthorizedResponse(res);
+        }
+        insertPrescription(req, res);
     }
     else {
         return notFoundResponse(res);

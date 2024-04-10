@@ -295,6 +295,32 @@ const insertVisitDetails = (req, res) => {
     });
 };
 
+const insertPrescription = (req, res) => {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        const prescriptionData = JSON.parse(body);
+        const { dentistID, patientID, visitID, National_Drug_Code, Medication_Name, Medication_Dosage, Refills, notes, Date_prescribed } = prescriptionData;
+        const query = `
+            INSERT INTO prescription 
+            (dentistID, patientID, visitID, National_Drug_Code, Medication_Name, Medication_Dosage, Refills, notes, Date_prescribed) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        pool.query(query, [dentistID, patientID, visitID, National_Drug_Code, Medication_Name, Medication_Dosage, Refills, notes, Date_prescribed], (error, results) => {
+            if (error) {
+                console.error('Error inserting prescription:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            }
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Prescription inserted successfully', prescriptionID: results.insertId }));
+        });
+    });
+};
+
 module.exports = {
     getAllPatients,
     getPatientById,
@@ -308,5 +334,6 @@ module.exports = {
     getAppointmentsByDoctorUsername,
     getInformationByPatientId,
     updatePatientInformationByPatientId,
-    insertVisitDetails
+    insertVisitDetails,
+    insertPrescription
 };
