@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 
-const HeaderPortalStaff = () => {
+const HeaderPortal = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [firstName, setFirstName] = useState('Staff');
-  const [lastName, setLastName] = useState('Member');
+  const [firstName, setFirstName] = useState('Patient');
+  const [lastName, setLastName] = useState('Name');
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Retrieve first and last name from local storage
     const storedFirstName = localStorage.getItem('firstName');
     const storedLastName = localStorage.getItem('lastName');
     if (storedFirstName && storedLastName) {
@@ -31,7 +32,7 @@ const HeaderPortalStaff = () => {
 
   return (
     <header className="flex max-w-screen justify-between items-center bg-blue-900 text-white p-4">
-      <div className="font-bold text-xl"><a href="/staff/home">ShastaDental Staff Portal</a></div>
+      <div className="font-bold text-xl"><a href="/patient/home">ShastaDental Patient Portal</a></div>
       <nav>
         <ul className="flex space-x-4">
           <li>
@@ -45,10 +46,10 @@ const HeaderPortalStaff = () => {
               {isDropdownOpen && (
                 <ul className="absolute top-10 right-0 bg-white text-black shadow-md rounded-md py-1">
                   <li className="px-4 py-2 hover:bg-gray-200">
-                    <a href="/staff/profile">Profile</a>
+                    <a href="/patient/profile">Profile</a>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-200">
-                    <a href="/staff/settings">Settings</a>
+                    <a href="/patient/settings">Settings</a>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-200">
                     <button onClick={handleLogout}>Log Out</button>
@@ -63,4 +64,4 @@ const HeaderPortalStaff = () => {
   );
 };
 
-export default HeaderPortalStaff;
+export default HeaderPortal;
