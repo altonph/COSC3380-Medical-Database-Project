@@ -7,6 +7,7 @@ const { handleRegisterPatient, handleLoginPatient, handleRegisterDoctor, handleL
 const { handleProtectedRoute } = require('./controllers/authController');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
+const { staffRoutes, staffverifyToken } = require('./routes/staffRoutes');
 const { handleGenerateSalaryReport } = require('./routes/adminRoutes'); 
 const { handleAssignDentistToOffice } = require('./routes/officeRoutes');
 const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff } = require('./routes/dentistRoutes');
@@ -79,6 +80,9 @@ const server = http.createServer((req, res) => {
     // doctor pages
     else if (req.url === '/api/doctor/patients' || req.url.startsWith('/api/doctor/patients/') || req.url.startsWith('/api/doctor/appointments/') || req.url === ('/api/doctor/appointments')) {
         doctorRoutes(req, res); 
+    }
+    else if (req.url === '/api/staff/patients' || req.url.startsWith('/api/staff/patients/') || req.url.startsWith('/api/staff/appointments/') || req.url === ('/api/staff/appointments')) {
+        staffRoutes(req, res); 
     }
     
     else {

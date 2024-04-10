@@ -219,6 +219,41 @@ const getAppointmentsByDoctorUsername = (req, res, username) => {
     });
 };
 
+const getAppointmentsByStaffUsername = (req, res, username) => {
+    pool.query('SELECT StaffID FROM login WHERE Username = ?', [username], (error, results) => {
+        if (error) {
+            console.error('Error retrieving staff ID:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            return;
+        }
+
+        if (results.length === 0) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Staff not found' }));
+            return;
+        }
+
+        const staffId = results[0].StaffID;
+        pool.query('SELECT * FROM appointment WHERE staffID = ?', [staffId], (error, results) => {
+            if (error) {
+                console.error('Error retrieving appointments:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            }
+
+            const formattedResults = results.map(appointment => {
+                const formattedDate = new Date(appointment.Date).toLocaleDateString();
+                return { ...appointment, Date: formattedDate };
+            });
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(formattedResults));
+        });
+    });
+};
+
 const getInformationByPatientId = (req, res, patientId) => {
     pool.query('SELECT * FROM patient WHERE patientID = ?', [patientId], (error, results) => {
         if (error) {
@@ -332,6 +367,7 @@ module.exports = {
     updatePrescriptionsByPatientId,
     updateVisitDetailsByPatientId,
     getAppointmentsByDoctorUsername,
+    getAppointmentsByStaffUsername,
     getInformationByPatientId,
     updatePatientInformationByPatientId,
     insertVisitDetails,

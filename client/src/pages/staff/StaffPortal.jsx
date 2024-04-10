@@ -18,8 +18,6 @@ const StaffPortal = () => {
                                 <li><a href="#" className="block py-2 text-center font-bold underline">Home</a></li>
                                 <li><a href="/staff/appointments" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
                                 <li><a href="/staff/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
-                                <li><a href="/staff/medical-records" className="block py-2 text-center text-gray-600 hover:text-black">Medical Records</a></li>
-                                <li><a href="/staff/data-reports" className="block py-2 text-center text-gray-600 hover:text-black">Data Reports</a></li>
                             </ul>
                         </nav>
                     </aside>

@@ -19,6 +19,15 @@ import DoctorEditPrescriptions from "./pages/doctor/DoctorEditPrescriptions";
 import DoctorEditVisitDetails from "./pages/doctor/DoctorEditVisitDetails";
 import DoctorEditPatientInformation from "./pages/doctor/DoctorEditPatientInformation";
 import StaffPortal from "./pages/staff/StaffPortal";
+import StaffPatients from "./pages/staff/StaffPatients";
+import StaffPatientDetails from "./pages/staff/StaffPatientDetails";
+import StaffEditPatientInformation from "./pages/staff/StaffEditPatientInformation";
+import StaffEditVisitDetails from "./pages/staff/StaffEditVisitDetails";
+import StaffEditMedicalHistory from "./pages/staff/StaffEditMedicalHistory";
+import StaffEditPrescriptions from "./pages/staff/StaffEditPrescriptions";
+import StaffAppointment from "./pages/staff/StaffAppointments";
+import StaffMakeAppointment from "./pages/staff/StaffMakeAppointment";
+import StaffAddVisitDetails from "./pages/staff/StaffAddVisitDetails";
 import PatientPrescriptions from "./pages/patient/PatientPrescriptions"
 import HistoryPortal from "./pages/patient/HistoryPortal"; 
 import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
@@ -69,6 +78,15 @@ function App() {
             <Route path="/doctor/home" element= {<DoctorPortal/>} />
             <Route path="/doctor/profile" element= {<DoctorProfile/>} />
             <Route path="/staff/home" element={<StaffPortal />} />
+            <Route path="/staff/patients" element={<StaffPatients />} />
+            <Route path="/staff/patients/:patientID" element={<StaffPatientDetails />} />
+            <Route path="/staff/patients/:patientID/patient-information" element={<StaffEditPatientInformation/>} />
+            <Route path="/staff/patients/:patientID/visit-details" element={<StaffEditVisitDetails/>} />
+            <Route path="/staff/patients/:patientID/medical-history" element={<StaffEditMedicalHistory />} />
+            <Route path="/staff/patients/:patientID/prescriptions" element={<StaffEditPrescriptions />} />
+            <Route path="/staff/appointments" element={<StaffAppointment />} />
+            <Route path="/staff/appointments/make-appointment" element={<StaffMakeAppointment/>} />
+            <Route path="/staff/appointments/add-visit-details" element={<StaffAddVisitDetails />} />
             <Route path="/admin/home" element= {<AdminPortal/>} />
             <Route path="/admin/appointments" element={<AdminAppointment/>}/>
             <Route path="/admin/patients" element={<AdminPatients/>}/>

@@ -18,8 +18,6 @@ const DoctorPortal = () => {
                                 <li><a href="#" className="block py-2 text-center font-bold underline">Home</a></li>
                                 <li><a href="/doctor/appointments" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
                                 <li><a href="/doctor/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
-                                <li><a href="/doctor/medical-records" className="block py-2 text-center text-gray-600 hover:text-black">Medical Records</a></li>
-                                <li><a href="/doctor/data-reports" className="block py-2 text-center text-gray-600 hover:text-black">Data Reports</a></li>
                             </ul>
                         </nav>
                     </aside>

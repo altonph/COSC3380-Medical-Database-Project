@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import 'react-calendar/dist/Calendar.css';
 import Footer from "../../components/Footer";
-import HeaderPortalAdmin from '../../components/HeaderPortalDoctor';
+import HeaderPortalStaff from '../../components/HeaderPortalStaff';
 import { Link } from "react-router-dom";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 
-const DoctorAppointment = () => {
+const StaffAppointment = () => {
     const [date, setDate] = useState(new Date());
     const [appointments, setAppointments] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
@@ -15,7 +15,7 @@ const DoctorAppointment = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState(selectedEvent?.extendedProps.appointment.Appointment_Status || '');
     const [modalPosition, setModalPosition] = useState({ top: '50%', left: '50%' });
-  
+
     const getAppointmentsForDate = (formattedDate) => {
       return appointments.filter((appointment) => {
         const appointmentDate = new Date(appointment.Date);
@@ -29,7 +29,7 @@ const DoctorAppointment = () => {
       const twelveHourFormatHours = parseInt(hours) % 12 || 12;
       return `${twelveHourFormatHours}:${minutes} ${amOrPm}`;
     };
-    
+
     const eventContent = (eventInfo) => {
       const appointment = eventInfo.event.extendedProps.appointment;
       return (
@@ -56,7 +56,7 @@ const DoctorAppointment = () => {
           handleCloseModal();
         }
       };
-      
+
       document.addEventListener('mousedown', handleClickOutsideModal);
       return () => {
         document.removeEventListener('mousedown', handleClickOutsideModal);
@@ -73,17 +73,17 @@ const DoctorAppointment = () => {
     const handleAddVisitDetails = () => {
       localStorage.setItem('appointmentDetails', JSON.stringify(selectedEvent.extendedProps.appointment));
     };
-    
+
     const handleStatusChange = (event) => {
       const newStatus = event.target.value;
     };
-    
+
 
     useEffect(() => {
       const fetchAppointments = async () => {
         try {
           const token = localStorage.getItem('token'); 
-          const response = await fetch('http://localhost:5000/api/doctor/appointments', {
+          const response = await fetch('http://localhost:5000/api/staff/appointments', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ const DoctorAppointment = () => {
 
       fetchAppointments();
     }, []); 
-  
+
     const formattedDate = formatDate(date);
     const appointmentsForDate = getAppointmentsForDate(formattedDate);
 
@@ -111,34 +111,34 @@ const DoctorAppointment = () => {
       <>
         <div className="flex h-screen flex-col">
           <nav>
-            <HeaderPortalAdmin/>
+            <HeaderPortalStaff/>
           </nav>
-    
+
           <div className="flex flex-1">
             <aside className="w-1/6 bg-gray-200 text-black">
               <nav className="p-4 text-xl">
                 <ul>
-                  <li><a href="/doctor/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
-                  <li><a href="/doctor/appointments" className="block py-2 text-center font-bold underline">Appointments</a></li>
-                  <li><a href="/doctor/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
+                  <li><a href="/staff/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
+                  <li><a href="/staff/appointments" className="block py-2 text-center font-bold underline">Appointments</a></li>
+                  <li><a href="/staff/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
                 </ul>
               </nav>
             </aside>
-    
+
             <main className="flex-1 p-4">
               <h1 className="text-3xl font-bold mt-14 mb-4 p-8">Edit Appointments</h1>
-    
+
               <div className="flex justify-center items-center mb-4">
                 <button onClick={() => fullCalendarRef.current.getApi().changeView('dayGridMonth')} className="bg-blue-500 text-white px-4 py-2 mr-2">Month View</button>
                 <button onClick={() => fullCalendarRef.current.getApi().changeView('timeGridWeek')} className="bg-blue-500 text-white px-4 py-2 mr-2">Week View</button>
                 <button onClick={() => fullCalendarRef.current.getApi().changeView('timeGridDay')} className="bg-blue-500 text-white px-4 py-2">Day View</button>
               </div>
-    
+
               <div className="flex justify-center items-center mb-4">
-                <Link to="/doctor/appointments/make-appointment" className="bg-blue-500 text-white px-4 py-2 mr-2">Add New Appointment</Link>
+                <Link to="/staff/appointments/make-appointment" className="bg-blue-500 text-white px-4 py-2 mr-2">Add New Appointment</Link>
                 <button className="bg-gray-500 text-white px-4 py-2">Delete Existing Appointment</button>
               </div>
-    
+
               <div className="flex justify-center items-center">
                 <div className="mr-8">
                   <h2 className="text-lg font-semibold mb-2">Select Date:</h2>
@@ -167,7 +167,7 @@ const DoctorAppointment = () => {
                   />
                 </div>
               </div>
-    
+
               {selectedEvent && showModal && (
                 <>
                   <div className="fixed inset-0 bg-black opacity-50 z-50"></div> 
@@ -198,7 +198,7 @@ const DoctorAppointment = () => {
                       )}
                     </div>
                     <div className="mt-4">
-                    <Link to="/doctor/appointments/add-visit-details" onClick={() => handleAddVisitDetails(selectedEvent.extendedProps.appointment)} className="bg-gray-500 text-white px-4 py-2 mr-2">
+                    <Link to="/staff/appointments/add-visit-details" onClick={() => handleAddVisitDetails(selectedEvent.extendedProps.appointment)} className="bg-gray-500 text-white px-4 py-2 mr-2">
                       Add Visit Details
                     </Link>
                       <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
@@ -223,4 +223,4 @@ const DoctorAppointment = () => {
     );       
   };    
 
-export default DoctorAppointment;
+export default StaffAppointment;
