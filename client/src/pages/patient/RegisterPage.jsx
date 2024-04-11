@@ -44,7 +44,7 @@ const RegisterPage = () => {
         if (!LName.trim()) {
             validationErrors.LName = 'Last Name is required.';
         }
-        else if (!LName.length > MAX_NAME_LENGTH) {
+        else if (LName.length > MAX_NAME_LENGTH) {
             validationErrors.LName = 'Cannot exceed 20 characters.';
         }
 
