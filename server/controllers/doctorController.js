@@ -418,6 +418,58 @@ const checkVisitDetailsCount = (req, res) => {
     });
 };
 
+const updateAppointmentStatus = (req, res) => {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', async () => {
+        try {
+            const appointmentData = JSON.parse(body);
+            const { Appointment_Status, Cancellation_Reason } = appointmentData;
+  
+            let query = '';
+            let queryParams = [];
+  
+            if (Appointment_Status === 'Completed') {
+                query = `
+                    UPDATE appointment 
+                    SET Appointment_Status = ? 
+                    WHERE dentistID = ? AND patientID = ? AND Date = ? AND Start_time = ?`;
+                queryParams = [Appointment_Status, appointmentData.dentistID, appointmentData.patientID, appointmentData.Date, appointmentData.Start_time];
+            } else if (Appointment_Status === 'Cancelled') {
+                query = `
+                    UPDATE appointment 
+                    SET Appointment_Status = ?, Cancellation_Reason = ? 
+                    WHERE dentistID = ? AND patientID = ? AND Date = ? AND Start_time = ?`;
+                queryParams = [Appointment_Status, Cancellation_Reason, appointmentData.dentistID, appointmentData.patientID, appointmentData.Date, appointmentData.Start_time];
+            } else {
+                query = `
+                    UPDATE appointment 
+                    SET Appointment_Status = ? 
+                    WHERE dentistID = ? AND patientID = ? AND Date = ? AND Start_time = ?`;
+                queryParams = [Appointment_Status, appointmentData.dentistID, appointmentData.patientID, appointmentData.Date, appointmentData.Start_time];
+            }
+  
+            pool.query(query, queryParams, (error, results) => {
+                if (error) {
+                    console.error('Error updating appointment status:', error);
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                    return;
+                }
+  
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Appointment status updated successfully' }));
+            });
+        } catch (error) {
+            console.error('Error parsing request body:', error);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Bad Request' }));
+        }
+    });
+};  
+
 module.exports = {
     getAllPatients,
     getPatientById,
@@ -435,5 +487,6 @@ module.exports = {
     insertVisitDetails,
     insertPrescription,
     insertAppointment,
-    checkVisitDetailsCount
+    checkVisitDetailsCount,
+    updateAppointmentStatus
 };

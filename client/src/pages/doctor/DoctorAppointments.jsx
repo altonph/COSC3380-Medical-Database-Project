@@ -8,22 +8,15 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 
 const DoctorAppointment = () => {
-    const [date, setDate] = useState(new Date());
     const [appointments, setAppointments] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const fullCalendarRef = useRef(null);
     const [showModal, setShowModal] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState(selectedEvent?.extendedProps.appointment.Appointment_Status || '');
     const [modalPosition, setModalPosition] = useState({ top: '50%', left: '50%' });
-    const [hasVisitDetails, setHasVisitDetails] = useState(false);
     const [hasVisitDetailsForSelected, setHasVisitDetailsForSelected] = useState(false);
-  
-    const getAppointmentsForDate = (formattedDate) => {
-      return appointments.filter((appointment) => {
-        const appointmentDate = new Date(appointment.Date);
-        return formatDate(appointmentDate) === formattedDate;
-      });
-    };
+    const [completed, setCompleted] = useState(false);
+    const [cancelled, setCancelled] = useState(false);
 
     const convertTo12HourFormat = (time) => {
       const [hours, minutes] = time.split(':');
@@ -34,13 +27,21 @@ const DoctorAppointment = () => {
     
     const eventContent = (eventInfo) => {
       const appointment = eventInfo.event.extendedProps.appointment;
+      let eventClass = '';
+    
+      if (appointment.Appointment_status === 'Scheduled') {
+        eventClass = 'bg-blue-100'; 
+      } else if (appointment.Appointment_status === 'Completed') {
+        eventClass = 'bg-green-100'; 
+      }
+    
       return (
-          <div>
-              <p><span className="font-semibold">Patient:</span> {appointment.patientID}</p>
-              <p><span className="font-semibold">Appointment type:</span> {appointment.Appointment_Type}</p>
-          </div>
+        <div className={`${eventClass}`}>
+          <p><span className="font-semibold">Patient:</span> {appointment.patientID}</p>
+          <p><span className="font-semibold">Appointment type:</span> {appointment.Appointment_type}</p>
+        </div>
       );
-    };
+    };    
 
     const handleEventClick = (clickInfo) => {
       setSelectedEvent(clickInfo.event);
@@ -53,7 +54,10 @@ const DoctorAppointment = () => {
     const handleCloseModal = () => {
       setShowModal(false);
       setSelectedEvent(null);
+      setCompleted(false); 
+      setCancelled(false); 
     };
+    
 
     useEffect(() => {
       const handleClickOutsideModal = (event) => {
@@ -91,8 +95,74 @@ const DoctorAppointment = () => {
       } catch (error) {
           console.error('Error handling add visit details:', error);
       }
-  };
-  
+    };
+
+    const handleAppointmentSubmission = async () => {
+      try {
+        if (!selectedEvent) return;
+        
+        if (!hasVisitDetailsForSelected && completed) {
+          alert("Please submit visit details for this appointment before marking it as complete.");
+          return;
+        }
+    
+        if (hasVisitDetailsForSelected && cancelled) {
+          alert("Sorry, you can't cancel an appointment after its visit details have been submitted.");
+          return;
+        }
+        
+        let appointmentStatus = '';
+        let cancellationReason = null; 
+        if (completed) {
+          appointmentStatus = 'Completed';
+        } else if (cancelled) {
+          appointmentStatus = 'Cancelled';
+          cancellationReason = document.getElementById('cancellationReason').value;
+        } else {
+          const appointmentData = selectedEvent.extendedProps.appointment;
+          appointmentStatus = appointmentData.Appointment_status;
+        }
+    
+        const appointmentData = selectedEvent.extendedProps.appointment;
+        const token = localStorage.getItem('token');
+        const requestBody = {
+          dentistID: appointmentData.dentistID,
+          patientID: appointmentData.patientID,
+          Date: formatDate(new Date(appointmentData.Date)),
+          Start_time: appointmentData.Start_time,
+          End_time: appointmentData.End_time,
+          Appointment_Status: appointmentStatus,
+          Cancellation_Reason: cancellationReason 
+        };
+    
+        const response = await fetch(`http://localhost:5000/api/doctor/appointments/update-status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(requestBody)
+        });
+    
+        if (!response.ok) {
+          throw new Error('Failed to update appointment status');
+        }
+    
+        const updatedAppointment = { ...appointmentData, Appointment_Status: appointmentStatus };
+        const updatedAppointments = appointments.map(appointment => {
+          if (appointment.patientID === updatedAppointment.patientID && appointment.dentistID === updatedAppointment.dentistID && appointment.Start_time === updatedAppointment.Start_time
+          && formatDate(new Date(appointment.Date)) === formatDate(new Date(updatedAppointment.Date))) {
+            console.log("Matching appointment found");
+            return updatedAppointment;
+          }
+          return appointment;
+        });
+        setAppointments(updatedAppointments);
+        handleCloseModal();
+      } catch (error) {
+        console.error('Error updating appointment status:', error);
+      }
+    };      
 
     const fetchVisitDetailsCount = async (appointmentData) => {
       try {
@@ -114,7 +184,6 @@ const DoctorAppointment = () => {
           const data = await response.json();
           const visitDetailsCount = data.visitDetailsCount;
           console.log(visitDetailsCount);
-          // Update hasVisitDetailsForSelected state based on the visit details count
           setHasVisitDetailsForSelected(visitDetailsCount > 0);
       } catch (error) {
           console.error('Error fetching visit details count:', error);
@@ -146,9 +215,24 @@ const DoctorAppointment = () => {
 
       fetchAppointments();
     }, []); 
-  
-    const formattedDate = formatDate(date);
-    const appointmentsForDate = getAppointmentsForDate(formattedDate);
+
+    useEffect(() => {
+      setSelectedStatus(selectedEvent?.extendedProps.appointment.Appointment_Status || '');
+    }, [selectedEvent]);
+
+    const handleCancelledCheckboxChange = () => {
+      if (!cancelled) {
+        setCompleted(false);
+      }
+      setCancelled(!cancelled);
+    };
+    
+    const handleCompletedCheckboxChange = () => {
+      if (!completed) {
+        setCancelled(false);
+      }
+      setCompleted(!completed);
+    };  
 
     return (
       <>
@@ -156,7 +240,7 @@ const DoctorAppointment = () => {
           <nav>
             <HeaderPortalAdmin/>
           </nav>
-  
+    
           <div className="flex flex-1">
             <aside className="w-1/6 bg-gray-200 text-black">
               <nav className="p-4 text-xl">
@@ -167,21 +251,21 @@ const DoctorAppointment = () => {
                 </ul>
               </nav>
             </aside>
-  
+    
             <main className="flex-1 p-4">
               <h1 className="text-3xl font-bold mt-14 mb-4 p-8">Edit Appointments</h1>
-  
+    
               <div className="flex justify-center items-center mb-4">
                 <button onClick={() => fullCalendarRef.current.getApi().changeView('dayGridMonth')} className="bg-blue-500 text-white px-4 py-2 mr-2">Month View</button>
                 <button onClick={() => fullCalendarRef.current.getApi().changeView('timeGridWeek')} className="bg-blue-500 text-white px-4 py-2 mr-2">Week View</button>
                 <button onClick={() => fullCalendarRef.current.getApi().changeView('timeGridDay')} className="bg-blue-500 text-white px-4 py-2">Day View</button>
               </div>
-  
+    
               <div className="flex justify-center items-center mb-4">
                 <Link to="/doctor/appointments/make-appointment" className="bg-blue-500 text-white px-4 py-2 mr-2">Add New Appointment</Link>
                 <button className="bg-gray-500 text-white px-4 py-2">Delete Existing Appointment</button>
               </div>
-  
+    
               <div className="flex justify-center items-center">
                 <div className="mr-8">
                   <h2 className="text-lg font-semibold mb-2">Select Date:</h2>
@@ -189,7 +273,9 @@ const DoctorAppointment = () => {
                     ref={fullCalendarRef}
                     plugins={[dayGridPlugin, timeGridPlugin]}
                     initialView="dayGridMonth"
-                    events={appointments.map(appointment => {
+                    events={appointments
+                      .filter(appointment => appointment.Appointment_status !== 'Cancelled') 
+                      .map(appointment => {
                       const formattedDate = new Date(appointment.Date).toISOString().split('T')[0];
                       const startTime = `${formattedDate}T${appointment.Start_time}`;
                       const endTime = `${formattedDate}T${appointment.End_time}`;
@@ -210,7 +296,7 @@ const DoctorAppointment = () => {
                   />
                 </div>
               </div>
-  
+    
               {selectedEvent && showModal && (
                 <>
                   <div className="fixed inset-0 bg-black opacity-50 z-50"></div> 
@@ -224,11 +310,11 @@ const DoctorAppointment = () => {
                       <p><span className="font-semibold">Start Time:</span> {convertTo12HourFormat(selectedEvent.extendedProps.appointment.Start_time)}</p>
                       <p><span className="font-semibold">End Time:</span> {convertTo12HourFormat(selectedEvent.extendedProps.appointment.End_time)}</p>
                       <p><span className="font-semibold">Patient:</span> {selectedEvent.extendedProps.appointment.patientID}</p>
-                      <p><span className="font-semibold">Appointment Type:</span> {selectedEvent.extendedProps.appointment.Appointment_Type}</p>
-                      <p><span className="font-semibold">Appointment Status:</span> {selectedEvent.extendedProps.appointment.Appointment_Status}</p>
-                      <p><span className="font-semibold">Specialist Approval:</span> {selectedEvent.extendedProps.appointment.Specialist_Approval}</p>
-                      <p><span className="font-semibold">Is Active:</span> {selectedEvent.extendedProps.appointment.Is_active}</p>
-                      {selectedStatus === 'Cancelled' && (
+                      <p><span className="font-semibold">Appointment Type:</span> {selectedEvent.extendedProps.appointment.Appointment_type}</p>
+                      <p><span className="font-semibold">Appointment Status:</span> {selectedEvent.extendedProps.appointment.Appointment_status}</p>
+                      <p><span className="font-semibold">Primary Approval:</span> {selectedEvent.extendedProps.appointment.Primary_approval}</p>
+                      <p><span className="font-semibold">Is Active:</span> {selectedEvent.extendedProps.appointment.is_active}</p>
+                      {cancelled && (
                         <div>
                           <label htmlFor="cancellationReason" className="font-semibold">Cancellation Reason:</label>
                           <input 
@@ -248,18 +334,24 @@ const DoctorAppointment = () => {
                       >
                         Add Visit Details
                       </button>
-                      <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
-                        <option value="Completed">Completed</option>
-                        <option value="Cancelled">Cancelled</option>
-                      </select>
+                      <div className="font-semibold mb-2 flex items-center mt-4">
+                      <span>Cancel Appointment:</span>
+                        <input 
+                        type="checkbox" 
+                        id="cancelledCheckbox"
+                        className="ml-4"
+                        checked={cancelled} 
+                        onChange={handleCancelledCheckboxChange}
+                        />
+                      </div>
                     </div>
                     <div className="mt-4">
-                      <button className="bg-blue-500 text-white px-4 py-2 mr-2">Submit</button>
+                      <button onClick={handleAppointmentSubmission} className="bg-blue-500 text-white px-4 py-2 mr-2">Submit</button>
                     </div>
                   </div>
                 </>
               )}
-  
+    
             </main>
           </div>
           <nav>

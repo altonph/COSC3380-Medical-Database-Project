@@ -27,7 +27,39 @@ const DoctorAddVisitDetails = () => {
     const date = new Date(dateString);
     const isoDateString = date.toISOString(); 
     return isoDateString.split('T')[0]; 
-};
+  };
+
+  const updateAppointmentStatus = async (appointmentStatus, cancellationReason) => {
+    try {
+      const requestBody = {
+        dentistID: appointmentDetails.dentistID,
+        patientID: appointmentDetails.patientID,
+        Date: formatDate(appointmentDetails.Date),
+        Start_time: appointmentDetails.Start_time,
+        Appointment_Status: appointmentStatus,
+        Cancellation_Reason: cancellationReason
+      };
+
+      const response = await fetch('http://localhost:5000/api/doctor/appointments/update-status', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update appointment status');
+      }
+
+      console.log('Appointment status updated successfully');
+      return true;
+    } catch (error) {
+      console.error('Error updating appointment status:', error);
+      return false;
+    }
+  };
 
 
   const handleConfirm = () => {
@@ -66,6 +98,15 @@ const DoctorAddVisitDetails = () => {
     .catch(error => {
         console.error('Error:', error);
     });
+
+    try {
+      const success = updateAppointmentStatus('Completed', null);
+      if (success) {
+        setIsInsertSuccess(true);
+      }
+    } catch (error) {
+      console.error('Error confirming visit details:', error);
+    }
   };
 
   const handleConfirmPrescriptions = () => {
