@@ -19,6 +19,8 @@ const DoctorMakeAppointment = () => {
   const [patientID, setPatientID] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [patientExists, setPatientExists] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
 
 
   useEffect(() => {
@@ -52,8 +54,37 @@ const DoctorMakeAppointment = () => {
     return options;
   };
 
+  const checkPatientExistence = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/doctor/appointments/check-patientID', {
+        method: 'POST',
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ patientID })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.patientExists;
+      } else {
+        console.error('Error checking patient existence:', response.statusText);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error checking patient existence:', error);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const patientExists = await checkPatientExistence();
+    if (!patientExists) {
+      console.log('Insertion failed, patient does not exist');
+      return;
+    }
   
     const timePartsStart = startTime.split(' ');
     const timeStart = timePartsStart[1] === 'PM' ? parseInt(timePartsStart[0]) + 12 : parseInt(timePartsStart[0]);

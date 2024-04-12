@@ -470,6 +470,41 @@ const updateAppointmentStatus = (req, res) => {
     });
 };  
 
+const checkPatientExistence = (req, res) => {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        try {
+            const requestData = JSON.parse(body);
+            const { patientID } = requestData;
+
+            pool.query(
+                'SELECT COUNT(*) AS patientCount FROM patient WHERE patientID = ?',
+                [patientID],
+                (error, results) => {
+                    if (error) {
+                        console.error('Error checking patient existence:', error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                        return;
+                    }
+
+                    const patientCount = results[0].patientCount;
+                    const patientExists = patientCount > 0;
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ patientExists }));
+                }
+            );
+        } catch (error) {
+            console.error('Error parsing request body:', error);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Bad Request' }));
+        }
+    });
+};
+
 module.exports = {
     getAllPatients,
     getPatientById,
@@ -488,5 +523,6 @@ module.exports = {
     insertPrescription,
     insertAppointment,
     checkVisitDetailsCount,
-    updateAppointmentStatus
+    updateAppointmentStatus,
+    checkPatientExistence
 };

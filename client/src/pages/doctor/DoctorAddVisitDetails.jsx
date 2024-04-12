@@ -326,7 +326,13 @@ const DoctorAddVisitDetails = () => {
               </div>
   
               <div className="col-span-2">
-              <button onClick={handleConfirm} className="bg-blue-500 text-white px-4 py-2 mr-2 mt-4 mb-4">Confirm</button>
+              <button
+              onClick={handleConfirm}
+              className={`bg-${isInsertSuccess ? 'gray' : 'blue'}-500 text-white px-4 py-2 mr-2 mt-4 mb-4`}
+              disabled={isInsertSuccess} 
+              >
+              Confirm
+              </button>
               {isInsertSuccess && (
                 <label className="block mt-2 text-lg"> 
                   <input type="checkbox" className="mr-2 h-6 w-6 mt-4" onChange={handleCheckboxChange} /> 
