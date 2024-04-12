@@ -356,6 +356,68 @@ const insertPrescription = (req, res) => {
     });
 };
 
+const insertAppointment = (req, res) => {
+    let body = '';
+
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+
+    req.on('end', () => {
+        const appointmentData = JSON.parse(body);
+        const { officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status, Cancellation_Reason, Specialist_Approval, Is_active } = appointmentData;
+        const query = `
+            INSERT INTO appointment 
+            (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status, Cancellation_Reason, Primary_Approval, Is_active) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        pool.query(query, [officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status, Cancellation_Reason, Specialist_Approval, Is_active], (error, results) => {
+            if (error) {
+                console.error('Error inserting appointment:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            }
+            res.writeHead(201, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Appointment inserted successfully', appointmentID: results.insertId }));
+        });
+    });
+};
+
+const checkVisitDetailsCount = (req, res) => {
+    let body = '';
+
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+
+    req.on('end', () => {
+        try {
+            const appointmentData = JSON.parse(body);
+            const { officeID, dentistID, patientID, Date, Start_time } = appointmentData;
+
+            pool.query(
+                'SELECT COUNT(*) AS visitDetailsCount FROM visit_details WHERE officeID = ? AND dentistID = ? AND patientID = ? AND Date = ? AND Start_time = ?',
+                [officeID, dentistID, patientID, Date, Start_time],
+                (error, results) => {
+                    if (error) {
+                        console.error('Error checking visit details:', error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                        return;
+                    }
+
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ visitDetailsCount: results[0].visitDetailsCount }));
+                }
+            );
+        } catch (error) {
+            console.error('Error parsing request body:', error);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Bad Request' }));
+        }
+    });
+};
+
 module.exports = {
     getAllPatients,
     getPatientById,
@@ -371,5 +433,7 @@ module.exports = {
     getInformationByPatientId,
     updatePatientInformationByPatientId,
     insertVisitDetails,
-    insertPrescription
+    insertPrescription,
+    insertAppointment,
+    checkVisitDetailsCount
 };

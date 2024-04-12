@@ -15,6 +15,8 @@ const DoctorAppointment = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState(selectedEvent?.extendedProps.appointment.Appointment_Status || '');
     const [modalPosition, setModalPosition] = useState({ top: '50%', left: '50%' });
+    const [hasVisitDetails, setHasVisitDetails] = useState(false);
+    const [hasVisitDetailsForSelected, setHasVisitDetailsForSelected] = useState(false);
   
     const getAppointmentsForDate = (formattedDate) => {
       return appointments.filter((appointment) => {
@@ -43,7 +45,10 @@ const DoctorAppointment = () => {
     const handleEventClick = (clickInfo) => {
       setSelectedEvent(clickInfo.event);
       setShowModal(true);
+      const appointmentData = { ...clickInfo.event.extendedProps.appointment }; 
+      fetchVisitDetailsCount(appointmentData);
     };
+    
 
     const handleCloseModal = () => {
       setShowModal(false);
@@ -70,13 +75,51 @@ const DoctorAppointment = () => {
       return `${year}-${month}-${day}`;
     };
 
-    const handleAddVisitDetails = () => {
-      localStorage.setItem('appointmentDetails', JSON.stringify(selectedEvent.extendedProps.appointment));
-    };
-    
-    const handleStatusChange = (event) => {
-      const newStatus = event.target.value;
-    };
+    const handleAddVisitDetails = async () => {
+      try {
+          if (!selectedEvent) return;
+  
+          if (hasVisitDetailsForSelected) {
+              alert("Sorry, this appointment already has an associated visit details.");
+              return;
+          }
+  
+          const appointmentData = selectedEvent.extendedProps.appointment;
+          localStorage.setItem('appointmentDetails', JSON.stringify(appointmentData));
+  
+          window.location.href = "/doctor/appointments/add-visit-details";
+      } catch (error) {
+          console.error('Error handling add visit details:', error);
+      }
+  };
+  
+
+    const fetchVisitDetailsCount = async (appointmentData) => {
+      try {
+          const formattedDate = formatDate(new Date(appointmentData.Date));
+          appointmentData.Date = formattedDate;
+  
+          const token = localStorage.getItem('token');
+          const response = await fetch('http://localhost:5000/api/doctor/appointments/check-visit-details', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(appointmentData)
+          });
+          if (!response.ok) {
+              throw new Error('Failed to fetch visit details count');
+          }
+          const data = await response.json();
+          const visitDetailsCount = data.visitDetailsCount;
+          console.log(visitDetailsCount);
+          // Update hasVisitDetailsForSelected state based on the visit details count
+          setHasVisitDetailsForSelected(visitDetailsCount > 0);
+      } catch (error) {
+          console.error('Error fetching visit details count:', error);
+      }
+  };
     
 
     useEffect(() => {
@@ -113,7 +156,7 @@ const DoctorAppointment = () => {
           <nav>
             <HeaderPortalAdmin/>
           </nav>
-    
+  
           <div className="flex flex-1">
             <aside className="w-1/6 bg-gray-200 text-black">
               <nav className="p-4 text-xl">
@@ -124,21 +167,21 @@ const DoctorAppointment = () => {
                 </ul>
               </nav>
             </aside>
-    
+  
             <main className="flex-1 p-4">
               <h1 className="text-3xl font-bold mt-14 mb-4 p-8">Edit Appointments</h1>
-    
+  
               <div className="flex justify-center items-center mb-4">
                 <button onClick={() => fullCalendarRef.current.getApi().changeView('dayGridMonth')} className="bg-blue-500 text-white px-4 py-2 mr-2">Month View</button>
                 <button onClick={() => fullCalendarRef.current.getApi().changeView('timeGridWeek')} className="bg-blue-500 text-white px-4 py-2 mr-2">Week View</button>
                 <button onClick={() => fullCalendarRef.current.getApi().changeView('timeGridDay')} className="bg-blue-500 text-white px-4 py-2">Day View</button>
               </div>
-    
+  
               <div className="flex justify-center items-center mb-4">
                 <Link to="/doctor/appointments/make-appointment" className="bg-blue-500 text-white px-4 py-2 mr-2">Add New Appointment</Link>
                 <button className="bg-gray-500 text-white px-4 py-2">Delete Existing Appointment</button>
               </div>
-    
+  
               <div className="flex justify-center items-center">
                 <div className="mr-8">
                   <h2 className="text-lg font-semibold mb-2">Select Date:</h2>
@@ -167,7 +210,7 @@ const DoctorAppointment = () => {
                   />
                 </div>
               </div>
-    
+  
               {selectedEvent && showModal && (
                 <>
                   <div className="fixed inset-0 bg-black opacity-50 z-50"></div> 
@@ -198,21 +241,25 @@ const DoctorAppointment = () => {
                       )}
                     </div>
                     <div className="mt-4">
-                    <Link to="/doctor/appointments/add-visit-details" onClick={() => handleAddVisitDetails(selectedEvent.extendedProps.appointment)} className="bg-gray-500 text-white px-4 py-2 mr-2">
-                      Add Visit Details
-                    </Link>
+                      <button
+                        onClick={handleAddVisitDetails}
+                        disabled={hasVisitDetailsForSelected}
+                        className={`px-4 py-2 mr-2 ${hasVisitDetailsForSelected ? 'bg-gray-500' : 'bg-blue-500'} text-white`}
+                      >
+                        Add Visit Details
+                      </button>
                       <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
                         <option value="Completed">Completed</option>
                         <option value="Cancelled">Cancelled</option>
                       </select>
                     </div>
                     <div className="mt-4">
-                    <button className="bg-blue-500 text-white px-4 py-2 mr-2">Submit</button>
+                      <button className="bg-blue-500 text-white px-4 py-2 mr-2">Submit</button>
                     </div>
                   </div>
                 </>
               )}
-
+  
             </main>
           </div>
           <nav>
@@ -220,7 +267,7 @@ const DoctorAppointment = () => {
           </nav>
         </div>
       </>
-    );       
+    );      
   };    
 
 export default DoctorAppointment;

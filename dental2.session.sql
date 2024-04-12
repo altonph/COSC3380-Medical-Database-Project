@@ -17,6 +17,10 @@ INSERT INTO office_dentist (officeID, dentistID)
 VALUES (1, 1);
 
 -- @block
+INSERT INTO office_dentist (officeID, dentistID)
+VALUES (1, 2);
+
+-- @block
 SELECT * FROM office_dentist;
 
 -- @block
@@ -67,8 +71,8 @@ VALUES (1, 2, 1, 1, '2024-04-03', '12:00:00', '13:00:00', 'Checkup', 'Scheduled'
 SELECT * FROM APPOINTMENT;
 
 -- @block
-INSERT INTO visit_details (patientID, dentistID, Visit_Type, Diagnosis, Treatment, Notes)
-VALUES (1, 1, 'Checkup', 'No specific diagnosis', 'Routine checkup', 'Patient seems to be in good health overall.');
+INSERT INTO visit_details (patientID, dentistID, Diagnosis, Treatment, Notes)
+VALUES (1, 1, 'Checkup', 'No specific diagnosis', 'Patient seems to be in good health overall.');
 
 -- @block
 SELECT * FROM visit_details;
@@ -129,3 +133,6 @@ SELECT * FROM login;
 
 -- @block
 SELECT * FROM staff;
+
+-- @block
+DELETE FROM visit_details;
