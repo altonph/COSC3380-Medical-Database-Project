@@ -8,7 +8,7 @@ const { handleProtectedRoute } = require('./controllers/authController');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
 const { staffRoutes, staffverifyToken } = require('./routes/staffRoutes');
-const { handleGenerateSalaryReport } = require('./routes/adminRoutes'); 
+const { handleGenerateAppointmentReport } = require('./routes/adminRoutes'); 
 const { handleAssignDentistToOffice } = require('./routes/officeRoutes');
 const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff, handleGetAvailableTimeBlocks } = require('./routes/dentistRoutes');
 
@@ -75,7 +75,9 @@ const server = http.createServer((req, res) => {
         handleArchivePatient(req, res);
     } else if (req.url.startsWith('/api/dentist/getAvailableTimeBlocks') && req.method === 'GET') {
         handleGetAvailableTimeBlocks(req, res); 
-    } 
+    } else if (req.url.startsWith('/api/admin/appointment-data-report') && req.method === 'GET') {
+        handleGenerateAppointmentReport(req, res); 
+    }
     
     
     //handleUpdateAppointmentWithStaff
