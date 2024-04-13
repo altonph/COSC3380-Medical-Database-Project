@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { getAllPatients, getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, updateVisitDetailsByPatientId, getAppointmentsByDoctorUsername, insertVisitDetails, insertPrescription, insertAppointment, checkVisitDetailsCount, updateAppointmentStatus, checkPatientExistence } = require('../controllers/doctorController');
+const { getAllPatients, getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, updateVisitDetailsByPatientId, getAppointmentsByDoctorUsername, insertVisitDetails, insertPrescription, insertAppointment, checkVisitDetailsCount, updateAppointmentStatus, checkPatientExistence, generateInvoice } = require('../controllers/doctorController');
 
 const doctorRoutes = (req, res) => {
     const { url, method } = req;
@@ -136,6 +136,12 @@ const doctorRoutes = (req, res) => {
             return unauthorizedResponse(res);
         }
         checkPatientExistence(req, res);
+    } else if (method === 'POST' && url === '/api/doctor/appointments/generate-invoice') {
+        const decodedToken = verifyToken(authHeader);
+        if (!decodedToken) {
+            return unauthorizedResponse(res);
+        }
+        generateInvoice(req, res);
     }
     else {
         return notFoundResponse(res);

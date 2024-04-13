@@ -28,15 +28,20 @@ const DoctorAppointment = () => {
     const eventContent = (eventInfo) => {
       const appointment = eventInfo.event.extendedProps.appointment;
       let eventClass = '';
+      let textColorClass = '';
     
       if (appointment.Appointment_status === 'Scheduled') {
         eventClass = 'bg-blue-100'; 
       } else if (appointment.Appointment_status === 'Completed') {
         eventClass = 'bg-green-100'; 
+      } else {
+        eventClass = 'bg-white'; 
       }
+      
+      textColorClass = 'text-black';
     
       return (
-        <div className={`${eventClass}`}>
+        <div className={`${eventClass} ${textColorClass}`}>
           <p><span className="font-semibold">Patient:</span> {appointment.patientID}</p>
           <p><span className="font-semibold">Appointment type:</span> {appointment.Appointment_type}</p>
         </div>

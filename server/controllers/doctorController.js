@@ -505,6 +505,125 @@ const checkPatientExistence = (req, res) => {
     });
 };
 
+const generateInvoice = (req, res) => {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        try {
+            const requestData = JSON.parse(body);
+            const { visitID, dentistID, patientID, visitDate, Start_time } = requestData;
+            
+            pool.query(
+                'SELECT * FROM visit_details WHERE visitID = ?',
+                [visitID],
+                (error, results) => {
+                    if (error) {
+                        console.error('Error retrieving visit details:', error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                        return;
+                    }
+
+                    if (results.length === 0) {
+                        res.writeHead(404, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Visit not found' }));
+                        return;
+                    }
+
+                    const visitDetails = results[0];
+
+                    pool.query(
+                        'SELECT Policy_number, Insurance_Company_Name FROM patient WHERE patientID = ?',
+                        [patientID],
+                        (error, results) => {
+                            if (error) {
+                                console.error('Error retrieving patient information:', error);
+                                res.writeHead(500, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                return;
+                            }
+
+                            if (results.length === 0) {
+                                res.writeHead(404, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ error: 'Patient not found' }));
+                                return;
+                            }
+
+                            const patientPolicyNumber = results[0].Policy_number;
+                            const insuranceCompany = results[0].Insurance_Company_Name;
+
+                            pool.query(
+                                'SELECT Appointment_type FROM appointment WHERE dentistID = ? AND patientID = ? AND Date = ? AND Start_time = ?',
+                                [dentistID, patientID, visitDate, Start_time],
+                                (error, results) => {
+                                    if (error) {
+                                        console.error('Error retrieving appointment information:', error);
+                                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                        return;
+                                    }
+
+                                    const appointmentType = results[0] ? results[0].Appointment_type : null;
+
+                                    let grossAmount = 0;
+                                    let insuranceCoverage = 0;
+                                    let netAmount = 0;
+
+                                    switch (appointmentType) {
+                                        case 'Cleaning':
+                                            grossAmount = 150.00;
+                                            insuranceCoverage = insuranceCompany ? grossAmount * 0.8 : 0;
+                                            break;
+                                        case 'Whitening':
+                                            grossAmount = 650.00;
+                                            insuranceCoverage = insuranceCompany ? grossAmount * 0.5 : 0;
+                                            break;
+                                        case 'Extraction':
+                                            grossAmount = 300.00;
+                                            insuranceCoverage = insuranceCompany ? grossAmount * 0.5 : 0;
+                                            break;
+                                        case 'Root Canal':
+                                            grossAmount = 1100.00;
+                                            insuranceCoverage = insuranceCompany ? grossAmount * 0.3 : 0;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+
+                                    netAmount = grossAmount - insuranceCoverage + 20.00;
+
+                                    const currentDate = new Date().toISOString().split('T')[0];
+                                    pool.query(
+                                        'INSERT INTO invoice (Policy_number, patientID, visitID, Date, Gross_Amount, Insurance_coverage, Net_Amount, Paid_Amount, Is_paid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                                        [patientPolicyNumber, patientID, visitID, currentDate, grossAmount, insuranceCoverage, netAmount, 0, false],
+                                        (error, results) => {
+                                            if (error) {
+                                                console.error('Error generating invoice:', error);
+                                                res.writeHead(500, { 'Content-Type': 'application/json' });
+                                                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                                return;
+                                            }
+
+                                            res.writeHead(201, { 'Content-Type': 'application/json' });
+                                            res.end(JSON.stringify({ message: 'Invoice generated successfully', invoiceID: results.insertId }));
+                                        }
+                                    );
+                                }
+                            );
+                        }
+                    );
+                }
+            );
+        } catch (error) {
+            console.error('Error parsing request body:', error);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Bad Request' }));
+        }
+    });
+};
+
 module.exports = {
     getAllPatients,
     getPatientById,
@@ -524,5 +643,6 @@ module.exports = {
     insertAppointment,
     checkVisitDetailsCount,
     updateAppointmentStatus,
-    checkPatientExistence
+    checkPatientExistence,
+    generateInvoice
 };

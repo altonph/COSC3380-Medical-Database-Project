@@ -233,19 +233,25 @@ const PatientDetails = () => {
               <table className="border-collapse border border-gray-400">
                 <thead>
                   <tr>
-                    <th className="border border-gray-400 px-20 py-2">Date</th>
+                    <th className="border border-gray-400 px-20 py-2">Date Created</th>
+                    <th className="border border-gray-400 px-20 py-2">Policy Number</th>
                     <th className="border border-gray-400 px-20 py-2">Description</th>
+                    <th className="border border-gray-400 px-20 py-2">Gross Amount</th>
+                    <th className="border border-gray-400 px-20 py-2">Insurance Coverage</th>
+                    <th className="border border-gray-400 px-20 py-2">Net Amount</th>
                     <th className="border border-gray-400 px-20 py-2">Paid Amount</th>
-                    <th className="border border-gray-400 px-32 py-2">Total Amount</th>
                   </tr>
                 </thead>
                 <tbody>
                   {patientBillingHistory.map(entry => (
                     <tr key={entry.date}>
                       <td className="border border-gray-400 px-20 py-4">{formatDate(entry.Date)}</td>
+                      <td className="border border-gray-400 px-20 py-4">{entry.Policy_number}</td>
                       <td className="border border-gray-400 px-20 py-4">{entry.Description}</td>
+                      <td className="border border-gray-400 px-20 py-4">{entry.Gross_Amount}</td>
+                      <td className="border border-gray-400 px-20 py-4">{entry.Insurance_coverage}</td>
+                      <td className="border border-gray-400 px-20 py-4">{entry.Net_Amount}</td>
                       <td className="border border-gray-400 px-20 py-4">{entry.Paid_Amount}</td>
-                      <td className="border border-gray-400 px-32 py-4">{entry.Total_Amount}</td>
                     </tr>
                   ))}
                 </tbody>

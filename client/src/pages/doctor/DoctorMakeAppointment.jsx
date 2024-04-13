@@ -112,63 +112,87 @@ const DoctorMakeAppointment = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
+  const startTimeParts = selectedStartTime.split(' ');
+  const startHour = parseInt(startTimeParts[0].split(':')[0]);
+  const startMinute = parseInt(startTimeParts[0].split(':')[1]);
+  const startPeriod = startTimeParts[1];
+
+  const endTimeParts = selectedEndTime.split(' ');
+  const endHour = parseInt(endTimeParts[0].split(':')[0]);
+  const endMinute = parseInt(endTimeParts[0].split(':')[1]);
+  const endPeriod = endTimeParts[1];
+
+  const startHour24 = (startPeriod === 'PM' && startHour !== 12) ? startHour + 12 : startHour;
+  const endHour24 = (endPeriod === 'PM' && endHour !== 12) ? endHour + 12 : endHour;
+
+  const startTimeInMinutes = startHour24 * 60 + startMinute;
+  const endTimeInMinutes = endHour24 * 60 + endMinute;
+
+  if (endTimeInMinutes <= startTimeInMinutes) {
+    console.log('End time must be after start time');
+    return;
+  }
+
     const patientExists = await checkPatientExistence();
     if (!patientExists) {
-      console.log('Insertion failed, patient does not exist');
-      return;
+        console.log('Insertion failed, patient does not exist');
+        return;
     }
-  
+
     const timePartsStart = selectedStartTime.split(' ');
     const timeStart = timePartsStart[1] === 'PM' ? parseInt(timePartsStart[0]) + 12 : parseInt(timePartsStart[0]);
     const formattedStartTime = `${timeStart}:00:00`;
-  
+
     const timePartsEnd = selectedEndTime.split(' ');
     let timeEnd = parseInt(timePartsEnd[0]);
     if (timePartsEnd[1] === 'PM' && timeEnd !== 12) {
-      timeEnd += 12;
+        timeEnd += 12;
     }
     const formattedEndTime = `${timeEnd}:00:00`;
+    console.log("Formatted start time is ", formattedStartTime);
+    console.log("Formatted end time is ", formattedEndTime);
     const sqlFormattedDate = preferredDate.toISOString().split('T')[0];
-  
+
     try {
-      const response = await fetch('http://localhost:5000/api/doctor/appointments', {
-        method: 'POST',
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          officeID: location,
-          dentistID: practitioner,
-          staffID: 1,
-          patientID: patientID,
-          Date: sqlFormattedDate,
-          Start_time: formattedStartTime,
-          End_time: formattedEndTime,
-          Appointment_Type: reasonForAppointment,
-          Appointment_Status: "Scheduled",
-          Primary_Approval: false,
-          Is_active: true
-        }),
-      });
-  
-      if (response.ok) {
-        console.log('Appointment successfully scheduled!');
-        setNotification('Appointment scheduled successfully!');
-        setTimeout(() => {
-          setNotification('');
-          navigateTo('/doctor/appointments');
-        }, 1000);
-  
-      } else {
-        console.error('Failed to make appointment:', response.statusText);
-      }
-  
+        const response = await fetch('http://localhost:5000/api/doctor/appointments', {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                officeID: location,
+                dentistID: practitioner,
+                staffID: 1,
+                patientID: patientID,
+                Date: sqlFormattedDate,
+                Start_time: formattedStartTime,
+                End_time: formattedEndTime,
+                Appointment_Type: reasonForAppointment,
+                Appointment_Status: "Scheduled",
+                Primary_Approval: false,
+                Is_active: true
+            }),
+        });
+
+        if (response.ok) {
+            console.log('Appointment successfully scheduled!');
+            setNotification('Appointment scheduled successfully!');
+            setTimeout(() => {
+                setNotification('');
+                navigateTo('/doctor/appointments');
+            }, 1000);
+
+        } else {
+            console.error('Failed to make appointment:', response.statusText);
+        }
+
     } catch (error) {
-      console.error('Error making appointment:', error);
+        console.error('Error making appointment:', error);
     }
   };
+
   
   const handleLocationChange = (e) => {
     setLocation(e.target.value);

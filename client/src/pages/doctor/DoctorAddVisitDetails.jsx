@@ -62,7 +62,7 @@ const DoctorAddVisitDetails = () => {
   };
 
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const visitDetailsData = {
         patientID: appointmentDetails.patientID,
         dentistID: appointmentDetails.dentistID,
@@ -73,39 +73,56 @@ const DoctorAddVisitDetails = () => {
         Treatment: treatment,
         Notes: notes
     };
-    console.log(visitDetailsData);
-
-    fetch('http://localhost:5000/api/doctor/appointments/visit-details', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(visitDetailsData)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Success:', data);
-        const { visitID } = data;
-        console.log('VisitID:', visitID);
-        setIsInsertSuccess(true);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
 
     try {
-      const success = updateAppointmentStatus('Completed', null);
-      if (success) {
+        const response = await fetch('http://localhost:5000/api/doctor/appointments/visit-details', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(visitDetailsData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to submit visit details');
+        }
+
+        const data = await response.json();
+        const { visitID } = data;
+
+        const success = await updateAppointmentStatus('Completed', null);
+        if (!success) {
+            throw new Error('Failed to update appointment status');
+        }
+
+        const invoiceRequestData = {
+            visitID: visitID,
+            dentistID: appointmentDetails.dentistID,
+            patientID: appointmentDetails.patientID,
+            visitDate: formatDate(appointmentDetails.Date),
+            Start_time: appointmentDetails.Start_time
+        };
+
+        const invoiceResponse = await fetch('http://localhost:5000/api/doctor/appointments/generate-invoice', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(invoiceRequestData)
+        });
+
+        if (!invoiceResponse.ok) {
+            throw new Error('Failed to generate invoice');
+        }
+
+        const invoiceData = await invoiceResponse.json();
+        console.log('Invoice generated successfully:', invoiceData);
+
         setIsInsertSuccess(true);
-      }
     } catch (error) {
-      console.error('Error confirming visit details:', error);
+        console.error('Error confirming visit details:', error);
     }
   };
 

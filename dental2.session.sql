@@ -42,34 +42,27 @@ VALUES (1, 'John', 'Doe', 'johndoe@example.com', '1234567890', '1990-05-15', '12
 SELECT * FROM staff;
 
 -- @block
-INSERT INTO insurance (Policy_number, Insurance_Company_Name)
-VALUES ('ABC123456789', 'XYZ Insurance Company');
-
--- @block
-SELECT * FROM insurance;
-
--- @block
 INSERT INTO patient (Policy_number, Insurance_Company_Name, Gender, FName, LName, DOB, Email, Phone_num, Address)
-VALUES ('ABC123456789', 'XYZ Insurance Company', 'Male', 'John', 'Doe', '1990-01-01', 'johndoe@example.com', '1234567890', '123 Main St');
+VALUES ('ABC123456789', 'Anthem', 'Male', 'John', 'Doe', '1990-01-01', 'johndoe@example.com', '1234567890', '123 Main St');
 
 -- @block
 SELECT * FROM patient;
 
 -- @block
 INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
-VALUES (1, 1, 1, 1, '2024-04-03', '09:00:00', '10:00:00', 'Checkup', 'Scheduled');
+VALUES (1, 1, 1, 1, '2024-04-03', '09:00:00', '10:00:00', 'Whitening', 'Scheduled');
 
 -- @block
 INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
-VALUES (1, 2, 1, 1, '2024-04-03', '09:00:00', '10:00:00', 'Checkup', 'Scheduled');
+VALUES (1, 2, 1, 1, '2024-04-03', '09:00:00', '10:00:00', 'Whitening', 'Scheduled');
 
 -- @block
 INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
-VALUES (1, 2, 1, 1, '2024-04-03', '12:00:00', '13:00:00', 'Checkup', 'Scheduled');
+VALUES (1, 2, 1, 1, '2024-04-03', '12:00:00', '13:00:00', 'Cleaning', 'Scheduled');
 
 -- @block
 INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
-VALUES (1, 2, 1, 1, '2024-04-19', '12:00:00', '14:00:00', 'Checkup', 'Scheduled');
+VALUES (1, 2, 1, 1, '2024-04-19', '12:00:00', '14:00:00', 'Cleaning', 'Scheduled');
 
 -- @block
 SELECT * FROM APPOINTMENT;
