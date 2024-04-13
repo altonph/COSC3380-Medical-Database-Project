@@ -1,5 +1,5 @@
 //dentistRoutes.js
-const { assignDentistSchedule, getDentistsByOfficeAndDay, updateAppointmentWithStaff } = require('../controllers/dentistController');
+const { assignDentistSchedule, getDentistsByOfficeAndDay, updateAppointmentWithStaff, getAvailableTimeBlocks } = require('../controllers/dentistController');
 const { parse } = require('url');
 
 const handleAssignDentistSchedule = (req, res) => {
@@ -74,8 +74,40 @@ const handleUpdateAppointmentWithStaff = (req, res) => {
     }
 };
 
+const handleGetAvailableTimeBlocks = (req, res) => {
+    const { url, method } = req;
+    const parsedUrl = parse(url, true);
+    const { query } = parsedUrl;
+
+    if (method === 'GET' && parsedUrl.pathname === '/api/dentist/getAvailableTimeBlocks') {
+        const { dentistID, date } = query;
+
+        if (!dentistID || !date) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'dentistID and date are required query parameters' }));
+            return;
+        }
+
+        getAvailableTimeBlocks(parseInt(dentistID), date, (error, availableTimeBlocks) => {
+            if (error) {
+                console.error('Error fetching available time blocks:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            } else {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(availableTimeBlocks));
+            }
+        });
+
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
 module.exports = { 
     handleAssignDentistSchedule,
     handleGetDentistsByOfficeAndDay,
-    handleUpdateAppointmentWithStaff
+    handleUpdateAppointmentWithStaff,
+    handleGetAvailableTimeBlocks
 };

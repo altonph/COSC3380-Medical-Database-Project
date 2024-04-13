@@ -10,7 +10,7 @@ const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes');
 const { staffRoutes, staffverifyToken } = require('./routes/staffRoutes');
 const { handleGenerateSalaryReport } = require('./routes/adminRoutes'); 
 const { handleAssignDentistToOffice } = require('./routes/officeRoutes');
-const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff } = require('./routes/dentistRoutes');
+const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff, handleGetAvailableTimeBlocks } = require('./routes/dentistRoutes');
 
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -73,7 +73,9 @@ const server = http.createServer((req, res) => {
         handleArchiveStaff(req, res);
     } else if (req.url.startsWith('/api/patient/archive') && req.method === 'PATCH') {
         handleArchivePatient(req, res);
-    }
+    } else if (req.url.startsWith('/api/dentist/getAvailableTimeBlocks') && req.method === 'GET') {
+        handleGetAvailableTimeBlocks(req, res); 
+    } 
     
     
     //handleUpdateAppointmentWithStaff

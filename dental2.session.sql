@@ -49,8 +49,8 @@ VALUES ('ABC123456789', 'XYZ Insurance Company');
 SELECT * FROM insurance;
 
 -- @block
-INSERT INTO patient (Policy_number, Gender, FName, LName, DOB, Email, Phone_num, Address)
-VALUES ('ABC123456789', 'Male', 'John', 'Doe', '1990-01-01', 'johndoe@example.com', '1234567890', '123 Main St');
+INSERT INTO patient (Policy_number, Insurance_Company_Name, Gender, FName, LName, DOB, Email, Phone_num, Address)
+VALUES ('ABC123456789', 'XYZ Insurance Company', 'Male', 'John', 'Doe', '1990-01-01', 'johndoe@example.com', '1234567890', '123 Main St');
 
 -- @block
 SELECT * FROM patient;
@@ -66,6 +66,10 @@ VALUES (1, 2, 1, 1, '2024-04-03', '09:00:00', '10:00:00', 'Checkup', 'Scheduled'
 -- @block
 INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
 VALUES (1, 2, 1, 1, '2024-04-03', '12:00:00', '13:00:00', 'Checkup', 'Scheduled');
+
+-- @block
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (1, 2, 1, 1, '2024-04-19', '12:00:00', '14:00:00', 'Checkup', 'Scheduled');
 
 -- @block
 SELECT * FROM APPOINTMENT;

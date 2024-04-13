@@ -106,8 +106,87 @@ const updateAppointmentWithStaff = (dentistID, patientID, date, startTime, staff
     });
 };
 
+const formatTime = (time) => {
+    const parts = time.split(':');
+    return `${parts[0]}:${parts[1]}`;
+};
+
+const getAvailableTimeBlocks = (dentistID, date, callback) => {
+    const workStartTime = '08:00';
+    const workEndTime = '17:00';
+
+    const sqlQuery = `
+        SELECT Start_time, End_time
+        FROM appointment
+        WHERE dentistID = ? AND Date = ? AND Appointment_status != 'Cancelled'
+    `;
+
+    pool.query(sqlQuery, [dentistID, date], (error, results) => {
+        if (error) {
+            console.error('Error fetching appointments for the dentist:', error);
+            callback(error, null);
+            return;
+        }
+
+        const existingAppointments = results.map(appointment => ({
+            start: formatTime(appointment.Start_time),
+            end: formatTime(appointment.End_time)
+        }));
+
+        const availableTimeBlocks = calculateAvailableTimeBlocks(workStartTime, workEndTime, existingAppointments);
+
+        callback(null, availableTimeBlocks);
+    });
+};
+
+const calculateAvailableTimeBlocks = (workStartTime, workEndTime, existingAppointments) => {
+    const availableTimeBlocks = [];
+
+    const startHour = parseInt(workStartTime.split(':')[0]);
+    const endHour = parseInt(workEndTime.split(':')[0]);
+
+    let currentStartTime = null;
+    let currentEndTime = null;
+
+    for (let hour = startHour; hour < endHour; hour++) {
+        const startTime = `${hour}:00`; 
+        const endTime = `${hour + 1}:00`; 
+
+        const isBooked = existingAppointments.some(appointment => {
+            return (
+                (startTime >= appointment.start && startTime < appointment.end) ||
+                (endTime > appointment.start && endTime <= appointment.end) ||
+                (appointment.start >= startTime && appointment.start < endTime) || 
+                (appointment.end > startTime && appointment.end <= endTime)
+            );
+        });
+
+        if (!isBooked) {
+            if (currentStartTime === null) {
+                currentStartTime = startTime;
+                currentEndTime = endTime;
+            } else {
+                currentEndTime = endTime;
+            }
+        } else {
+            if (currentStartTime !== null) {
+                availableTimeBlocks.push({ start: currentStartTime, end: currentEndTime });
+                currentStartTime = null;
+                currentEndTime = null;
+            }
+        }
+    }
+
+    if (currentStartTime !== null) {
+        availableTimeBlocks.push({ start: currentStartTime, end: currentEndTime });
+    }
+
+    return availableTimeBlocks;
+};
+
 module.exports = { 
     assignDentistSchedule,
     getDentistsByOfficeAndDay,
-    updateAppointmentWithStaff
+    updateAppointmentWithStaff,
+    getAvailableTimeBlocks
 };

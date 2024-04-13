@@ -10,24 +10,28 @@ const DoctorMakeAppointment = () => {
 
   const navigateTo = useNavigate();
   const [preferredDate, setPreferredDate] = useState(null);
-  const [preferredTime, setPreferredTime] = useState('');
   const [practitioner, setPractitioner] = useState('');
   const [location, setLocation] = useState('');
   const [reasonForAppointment, setReasonForAppointment] = useState('');
   const [dentists, setDentists] = useState([]);
   const [notification, setNotification] = useState('');
   const [patientID, setPatientID] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [patientExists, setPatientExists] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
-
+  const [availableTimeBlocks, setAvailableTimeBlocks] = useState([]);
+  const [selectedBlock, setSelectedBlock] = useState(null); 
+  const [selectedStartTime, setSelectedStartTime] = useState('');
+  const [selectedEndTime, setSelectedEndTime] = useState('');
 
   useEffect(() => {
     if (location && preferredDate) {
       fetchDentistsByOfficeAndDay(location, getDayOfWeek(preferredDate));
     }
   }, [location, preferredDate]);
+
+  useEffect(() => {
+    if (practitioner && preferredDate) {
+      fetchDentistAvailability(practitioner, preferredDate);
+    }
+  }, [practitioner, preferredDate]);
 
   const fetchDentistsByOfficeAndDay = async (officeID, dayOfWeek) => {
     try {
@@ -44,16 +48,45 @@ const DoctorMakeAppointment = () => {
     }
   };
 
-  const generateTimeOptions = () => {
-    const options = [];
-    for (let i = 8; i <= 16; i++) {
-      const formattedHour = i > 12 ? i - 12 : i;
-      const amPm = i >= 12 ? 'PM' : 'AM';
-      options.push(`${formattedHour}:00 ${amPm}`);
+  const fetchDentistAvailability = async (dentistID, date) => {
+    try {
+      const formattedDate = date.toISOString().split('T')[0];
+  
+      const response = await fetch(`http://localhost:5000/api/dentist/getAvailableTimeBlocks?dentistID=${dentistID}&date=${formattedDate}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Dentist availability:', data);
+        setAvailableTimeBlocks(data);
+      } else {
+        console.error('Failed to fetch dentist availability:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching dentist availability:', error);
     }
-    return options;
   };
 
+  const generateTimeOptions = (block) => {
+    const options = [];
+    const startTime = new Date(`01/01/0001 ${block.start}`);
+    const endTime = new Date(`01/01/0001 ${block.end}`);
+    const interval = 60 * 60 * 1000; 
+  
+    for (let time = startTime; time <= endTime; time.setTime(time.getTime() + interval)) {
+      options.push(formatTime(time));
+    }
+  
+    return options;
+  };
+  
+  const formatTime = (time) => {
+    const hours = time.getHours();
+    const minutes = time.getMinutes().toString().padStart(2, '0');
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12; 
+  
+    return `${formattedHours}:${minutes} ${period}`;
+  };
+  
   const checkPatientExistence = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/doctor/appointments/check-patientID', {
@@ -79,25 +112,26 @@ const DoctorMakeAppointment = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const patientExists = await checkPatientExistence();
     if (!patientExists) {
       console.log('Insertion failed, patient does not exist');
       return;
     }
   
-    const timePartsStart = startTime.split(' ');
+    const timePartsStart = selectedStartTime.split(' ');
     const timeStart = timePartsStart[1] === 'PM' ? parseInt(timePartsStart[0]) + 12 : parseInt(timePartsStart[0]);
     const formattedStartTime = `${timeStart}:00:00`;
   
-    const timePartsEnd = endTime.split(' ');
-    const timeEnd = timePartsEnd[1] === 'PM' ? parseInt(timePartsEnd[0]) + 12 : parseInt(timePartsEnd[0]);
+    const timePartsEnd = selectedEndTime.split(' ');
+    let timeEnd = parseInt(timePartsEnd[0]);
+    if (timePartsEnd[1] === 'PM' && timeEnd !== 12) {
+      timeEnd += 12;
+    }
     const formattedEndTime = `${timeEnd}:00:00`;
-  
     const sqlFormattedDate = preferredDate.toISOString().split('T')[0];
   
     try {
-      
       const response = await fetch('http://localhost:5000/api/doctor/appointments', {
         method: 'POST',
         headers: {
@@ -107,8 +141,8 @@ const DoctorMakeAppointment = () => {
         body: JSON.stringify({
           officeID: location,
           dentistID: practitioner,
-          staffID: 1, 
-          patientID: patientID, 
+          staffID: 1,
+          patientID: patientID,
           Date: sqlFormattedDate,
           Start_time: formattedStartTime,
           End_time: formattedEndTime,
@@ -135,13 +169,11 @@ const DoctorMakeAppointment = () => {
       console.error('Error making appointment:', error);
     }
   };
-
+  
   const handleLocationChange = (e) => {
-
     setLocation(e.target.value);
     setPractitioner('');
-
-  };
+  };  
 
   const getDayOfWeek = (date) => {
 
@@ -150,6 +182,19 @@ const DoctorMakeAppointment = () => {
 
     return daysOfWeek[dayIndex];
   };
+
+  const handleBlockSelection = (block) => {
+    setSelectedBlock(block);
+    setSelectedStartTime(block.start);
+    setSelectedEndTime(block.end);
+  };
+
+  const formatBlockLabel = (block) => {
+    const start = formatTime(new Date(`01/01/2000 ${block.start}`)); 
+    const end = formatTime(new Date(`01/01/2000 ${block.end}`)); 
+    return `${start} - ${end}`;
+  };
+  
 
   return (
     <div className="flex h-screen flex-col">
@@ -223,39 +268,54 @@ const DoctorMakeAppointment = () => {
               </div>
   
               <div className="mb-4">
-                <div className="flex">
-                  <div className="w-1/2 mr-2">
-                    <label className="block text-sm font-bold mb-2">Start Time:</label>
-                    <select
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                      className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="" disabled>Select Start Time</option>
-                      {generateTimeOptions().map((time) => (
-                        <option key={time} value={time}>
-                          {time}
-                        </option>
-                      ))}
-                    </select>
+                <label className="block text-sm font-bold mb-2">Available Time Blocks:</label>
+                {availableTimeBlocks.map((block, index) => (
+                  <div key={index} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedBlock === block}
+                      onChange={() => handleBlockSelection(block)}
+                      className="mr-2"
+                    />
+                    <label>{formatBlockLabel(block)}</label> 
                   </div>
-                  <div className="w-1/2 ml-2">
-                    <label className="block text-sm font-bold mb-2">End Time:</label>
-                    <select
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                      className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="" disabled>Select End Time</option>
-                      {generateTimeOptions().map((time) => (
-                        <option key={time} value={time}>
-                          {time}
-                        </option>
-                      ))}
-                    </select>
+                ))}
+              </div>
+  
+              {(selectedBlock && (
+                <div className="mb-4">
+                  <div className="flex">
+                    <div className="w-1/2 mr-2">
+                      <label className="block text-sm font-bold mb-2">Start Time:</label>
+                      <select
+                        value={selectedStartTime}
+                        onChange={(e) => setSelectedStartTime(e.target.value)}
+                        className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                      >
+                        {generateTimeOptions(selectedBlock).map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="w-1/2 ml-2">
+                      <label className="block text-sm font-bold mb-2">End Time:</label>
+                      <select
+                        value={selectedEndTime}
+                        onChange={(e) => setSelectedEndTime(e.target.value)}
+                        className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                      >
+                        {generateTimeOptions(selectedBlock).map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ))}
   
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Reason for Appointment:</label>
@@ -286,7 +346,7 @@ const DoctorMakeAppointment = () => {
         <Footer />
       </nav>
     </div>
-  );  
+  );    
 };
 
 export default DoctorMakeAppointment;

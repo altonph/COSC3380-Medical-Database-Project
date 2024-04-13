@@ -263,7 +263,6 @@ const DoctorAppointment = () => {
     
               <div className="flex justify-center items-center mb-4">
                 <Link to="/doctor/appointments/make-appointment" className="bg-blue-500 text-white px-4 py-2 mr-2">Add New Appointment</Link>
-                <button className="bg-gray-500 text-white px-4 py-2">Delete Existing Appointment</button>
               </div>
     
               <div className="flex justify-center items-center">
