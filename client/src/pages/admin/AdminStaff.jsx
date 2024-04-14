@@ -32,6 +32,25 @@ const AdminStaff = () => {
         Salary: ""
     });
 
+    const [editModeStaff, setEditModeStaff] = useState(false);
+    const [editedStaff, setEditedStaff] = useState(null);
+    const [selectedStaffID, setSelectedStaffID] = useState(null);
+
+    const [editedStaffProfile, setEditedStaffProfile] = useState({
+        staffID: "",
+        FName: "",
+        LName: "",
+        Email: "",
+        Position: "",
+        Phone_num: "",
+        Address: "",
+        DOB: "",
+        Start_date: "",
+        End_date: "",
+        Is_active: true,
+        Salary: ""
+    });
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setEditedDentistProfile({ ...editedDentistProfile, [name]: value });
@@ -60,6 +79,37 @@ const AdminStaff = () => {
             setSelectedDentistID(null);
         } catch (error) {
             console.error("Error updating dentist profile:", error);
+        }
+    };
+
+    const handleStaffInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditedStaffProfile({ ...editedStaffProfile, [name]: value });
+    };
+
+    const handleEditStaffClick = (staffID) => {
+        // Set edit mode to true and populate selectedStaffID
+        setEditModeStaff(true);
+        setSelectedStaffID(staffID);
+    };
+
+    const handleCancelEditStaff = () => {
+        // Reset edit mode, clear editedStaff state, and deselect staff
+        setEditModeStaff(false);
+        setEditedStaff(null);
+        setSelectedStaffID(null);
+    };
+
+    const handleConfirmEditStaff = async () => {
+        try {
+            // Send editedStaff data to backend API for updating
+            // You can use selectedStaffID to specify which staff to update
+            // Reset edit mode, clear editedStaff state, and deselect staff
+            setEditModeStaff(false);
+            setEditedStaff(null);
+            setSelectedStaffID(null);
+        } catch (error) {
+            console.error("Error updating staff profile:", error);
         }
     };
 
@@ -189,13 +239,15 @@ const AdminStaff = () => {
                                                 </td>
                                                 <td className="border px-2 py-1">
                                                     {editMode && selectedDentistID === dentist.dentistID ? (
-                                                        <input
-                                                            type="text"
+                                                        <select
                                                             name="Specialty"
                                                             value={editedDentistProfile.Specialty || dentist.Specialty}
                                                             onChange={(e) => handleInputChange(e, dentist.dentistID)}
                                                             style={{ width: "90%" }}
-                                                        />
+                                                        >
+                                                        <option value="General Dentistry">General Dentistry</option>
+                                                        <option value="Endodontist">Endodontist</option>
+                                                        </select>
                                                     ) : (
                                                         dentist.Specialty
                                                     )}
@@ -276,7 +328,6 @@ const AdminStaff = () => {
                                                                 onClick={() => handleEditClick(dentist.dentistID)}>
                                                                 Edit
                                                             </button>
-                                                            {/* Placeholder for delete button */}
                                                             <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Delete</button>
                                                         </>
                                                     )}
@@ -287,7 +338,7 @@ const AdminStaff = () => {
                                 </table>
                             </div>
                         </div>
-
+                        
                         {/* Staff Profiles */}
                         <div className="mt-8">
                             <h1 className="text-2xl font-bold mb-4">Staff Profiles</h1>
@@ -311,27 +362,148 @@ const AdminStaff = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {staff.map(staff => (
-                                            <tr key={staff.staffID} className="hover:bg-gray-100">
-                                                <td className="border px-2 py-1">{staff.staffID}</td>
-                                                <td className="border px-2 py-1">{staff.Fname}</td>
-                                                <td className="border px-2 py-1">{staff.Lname}</td>
-                                                <td className="border px-2 py-1">{staff.Email}</td>
-                                                <td className="border px-2 py-1">{staff.Position}</td>
-                                                <td className="border px-2 py-1">{staff.Phone_num}</td>
-                                                <td className="border px-2 py-1">{staff.Address}</td>
-                                                <td className="border px-2 py-1">{new Date(staff.DOB).toLocaleDateString()}</td>
-                                                <td className="border px-2 py-1">{new Date(staff.Start_date).toLocaleDateString()}</td>
-                                                <td className="border px-2 py-1">{staff.End_date ? new Date(staff.End_date).toLocaleDateString() : "N/A"}</td>
-                                                <td className="border px-2 py-1">{staff.Salary}</td>
-                                                <td className="border px-2 py-1">{formatActiveStatus(staff.Is_active)}</td>
+                                        {staff.map(staffMember => (
+                                            <tr key={staffMember.staffID} className="hover:bg-gray-100">
+                                                <td className="border px-2 py-1">{staffMember.staffID}</td>
+                                                <td className="border px-2 py-1">
+                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="FName"
+                                                            value={editedStaffProfile.Fname || staffMember.Fname}
+                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
+                                                            style={{ width: "90%" }}
+                                                        />
+                                                    ) : (
+                                                        staffMember.Fname
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="LName"
+                                                            value={editedStaffProfile.Lname || staffMember.Lname}
+                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
+                                                            style={{ width: "90%" }}
+                                                        />
+                                                    ) : (
+                                                        staffMember.Lname
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="Email"
+                                                            value={editedStaffProfile.Email || staffMember.Email}
+                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
+                                                            style={{ width: "90%" }}
+                                                        />
+                                                    ) : (
+                                                        staffMember.Email
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                        <select
+                                                            name="Position"
+                                                            value={editedStaffProfile.Position || staffMember.Position}
+                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
+                                                            style={{ width: "90%" }}
+                                                        >
+                                                            <option value="Receptionist">Receptionist</option>
+                                                            <option value="Hygienist">Hygienist</option>
+                                                        </select>
+                                                    ) : (
+                                                        staffMember.Position
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="Phone_num"
+                                                            value={editedStaffProfile.Phone_num || staffMember.Phone_num}
+                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
+                                                            style={{ width: "90%" }}
+                                                        />
+                                                    ) : (
+                                                        staffMember.Phone_num
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="Address"
+                                                            value={editedStaffProfile.Address || staffMember.Address}
+                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
+                                                            style={{ width: "90%" }}
+                                                        />
+                                                    ) : (
+                                                        staffMember.Address
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                        <input
+                                                            type="date"
+                                                            name="DOB"
+                                                            value={editedStaffProfile.Start_date || new Date(staffMember.DOB).toISOString().substr(0, 10)}
+                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
+                                                        />
+                                                    ) : (
+                                                        new Date(staffMember.DOB).toLocaleDateString()
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                        <input
+                                                            type="date"
+                                                            name="Start_date"
+                                                            value={editedStaffProfile.Start_date || new Date(staffMember.Start_date).toISOString().substr(0, 10)}
+                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
+                                                        />
+                                                    ) : (
+                                                        new Date(staffMember.Start_date).toLocaleDateString()
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">{staffMember.End_date ? new Date(staffMember.End_date).toLocaleDateString() : "N/A"}</td>
+                                                <td className="border px-2 py-1">
+                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="Salary"
+                                                            value={editedStaffProfile.Salary || staffMember.Salary}
+                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
+                                                        />
+                                                    ) : (
+                                                        staffMember.Salary
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">{formatActiveStatus(staffMember.Is_active)}</td>
                                                 <td className="border px-2 py-1 space-x-2">
-                                                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">Edit</button>
-                                                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Delete</button>
+                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                        <>
+                                                            <button onClick={handleConfirmEditStaff} className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded">Confirm</button>
+                                                            <button onClick={handleCancelEditStaff} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Cancel</button>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                                                                onClick={() => handleEditStaffClick(staffMember.staffID)}>
+                                                                Edit
+                                                            </button>
+                                                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Delete</button>
+                                                        </>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}
                                     </tbody>
+
+
                                 </table>
                             </div>
                         </div>
