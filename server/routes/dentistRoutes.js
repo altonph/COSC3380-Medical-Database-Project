@@ -1,5 +1,5 @@
 //dentistRoutes.js
-const { assignDentistSchedule, getDentistsByOfficeAndDay, updateAppointmentWithStaff, getAvailableTimeBlocks } = require('../controllers/dentistController');
+const { assignDentistSchedule, getDentistsByOfficeAndDay, updateAppointmentWithStaff, getAvailableTimeBlocks, getAvailableStaff } = require('../controllers/dentistController');
 const { parse } = require('url');
 
 const handleAssignDentistSchedule = (req, res) => {
@@ -105,9 +105,33 @@ const handleGetAvailableTimeBlocks = (req, res) => {
     }
 };
 
+const handleGetAvailableStaff = (req, res) => {
+    if (req.method === 'GET' && req.url === '/api/dentist/getAvailableStaff') {
+        let data = '';
+        req.on('data', chunk => {
+            data += chunk;
+        });
+
+        req.on('end', () => {
+            try {
+                const requestData = JSON.parse(data);
+                getAvailableStaff(requestData, res);
+            } catch (error) {
+                console.error('Error parsing JSON data:', error);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid JSON data' }));
+            }
+        });
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
 module.exports = { 
     handleAssignDentistSchedule,
     handleGetDentistsByOfficeAndDay,
     handleUpdateAppointmentWithStaff,
-    handleGetAvailableTimeBlocks
+    handleGetAvailableTimeBlocks,
+    handleGetAvailableStaff
 };

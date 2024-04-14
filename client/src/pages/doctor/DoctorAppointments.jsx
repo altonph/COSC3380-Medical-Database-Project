@@ -314,6 +314,7 @@ const DoctorAppointment = () => {
                       <p><span className="font-semibold">Start Time:</span> {convertTo12HourFormat(selectedEvent.extendedProps.appointment.Start_time)}</p>
                       <p><span className="font-semibold">End Time:</span> {convertTo12HourFormat(selectedEvent.extendedProps.appointment.End_time)}</p>
                       <p><span className="font-semibold">Patient:</span> {selectedEvent.extendedProps.appointment.patientID}</p>
+                      <p><span className="font-semibold">Staff:</span> {selectedEvent.extendedProps.appointment.staffID}</p>
                       <p><span className="font-semibold">Appointment Type:</span> {selectedEvent.extendedProps.appointment.Appointment_type}</p>
                       <p><span className="font-semibold">Appointment Status:</span> {selectedEvent.extendedProps.appointment.Appointment_status}</p>
                       <p><span className="font-semibold">Primary Approval:</span> {selectedEvent.extendedProps.appointment.Primary_approval}</p>
