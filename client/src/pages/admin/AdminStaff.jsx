@@ -38,6 +38,7 @@ const AdminStaff = () => {
 
     const [editedStaffProfile, setEditedStaffProfile] = useState({
         staffID: "",
+        officeID: "",
         FName: "",
         LName: "",
         Email: "",
@@ -71,14 +72,27 @@ const AdminStaff = () => {
 
     const handleConfirmEdit = async () => {
         try {
-            // Send editedDentist data to backend API for updating
-            // You can use selectedDentistID to specify which dentist to update
-            // Reset edit mode, clear editedDentist state, and deselect dentist
-            setEditMode(false);
-            setEditedDentist(null);
-            setSelectedDentistID(null);
+            const response = await fetch(`http://localhost:5000/api/dentist/editDentist/${selectedDentistID}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(editedDentistProfile) // Send the entire edited profile
+            });
+    
+            if (response.ok) {
+                // Data successfully updated
+                // Reset edit mode, clear editedDentistProfile state, and deselect dentist
+                setEditMode(false);
+                setEditedDentistProfile(null);
+                setSelectedDentistID(null);
+            } else {
+                console.error('Failed to update dentist information:', response.statusText);
+                // Handle error case here
+            }
         } catch (error) {
-            console.error("Error updating dentist profile:", error);
+            console.error('Error updating dentist information:', error);
+            // Handle error case here
         }
     };
 
@@ -102,14 +116,27 @@ const AdminStaff = () => {
 
     const handleConfirmEditStaff = async () => {
         try {
-            // Send editedStaff data to backend API for updating
-            // You can use selectedStaffID to specify which staff to update
-            // Reset edit mode, clear editedStaff state, and deselect staff
-            setEditModeStaff(false);
-            setEditedStaff(null);
-            setSelectedStaffID(null);
+            const response = await fetch(`http://localhost:5000/api/staff/editStaff/${selectedStaffID}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(editedStaffProfile) // Send the entire edited profile
+            });
+    
+            if (response.ok) {
+                // Data successfully updated
+                // Reset edit mode, clear editedStaffProfile state, and deselect staff
+                setEditModeStaff(false);
+                setEditedStaffProfile(null);
+                setSelectedStaffID(null);
+            } else {
+                console.error('Failed to update staff information:', response.statusText);
+                // Handle error case here
+            }
         } catch (error) {
-            console.error("Error updating staff profile:", error);
+            console.error('Error updating staff information:', error);
+            // Handle error case here
         }
     };
 
@@ -145,6 +172,17 @@ const AdminStaff = () => {
 
     const formatActiveStatus = (isActive) => {
         return isActive ? "Active" : "Inactive";
+    };
+
+    const formatOfficeLocation = (officeID) => {
+        switch (officeID) {
+            case 1:
+                return "Austin";
+            case 2:
+                return "Phoenix";
+            default:
+                return "Unknown";
+        }
     };
 
     return (
@@ -347,6 +385,7 @@ const AdminStaff = () => {
                                     <thead>
                                         <tr className="bg-gray-200">
                                             <th className="px-2 py-1">StaffID</th>
+                                            <th className="px-2 py-1">Office</th>
                                             <th className="px-2 py-1">First Name</th>
                                             <th className="px-2 py-1">Last Name</th>
                                             <th className="px-2 py-1">Email</th>
@@ -365,6 +404,21 @@ const AdminStaff = () => {
                                         {staff.map(staffMember => (
                                             <tr key={staffMember.staffID} className="hover:bg-gray-100">
                                                 <td className="border px-2 py-1">{staffMember.staffID}</td>
+                                                <td className="border px-2 py-1">
+                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                        <select
+                                                            name="Position"
+                                                            value={editedStaffProfile.officeID || staffMember.officeID}
+                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
+                                                            style={{ width: "90%" }}
+                                                        >
+                                                            <option value="1">Austin</option>
+                                                            <option value="2">Phoenix</option>
+                                                        </select>
+                                                    ) : (
+                                                        formatOfficeLocation(staffMember.officeID)
+                                                    )}
+                                                </td>
                                                 <td className="border px-2 py-1">
                                                     {editModeStaff && selectedStaffID === staffMember.staffID ? (
                                                         <input
