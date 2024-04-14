@@ -1,19 +1,51 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import HeaderPortalAdmin from "../../components/HeaderPortalAdmin";
 import Footer from "../../components/Footer";
 
 const AdminStaff = () => {
-    // Dummy data for dentists
-    const dentists = [
-        {dentistID: 1, FName: "John", LName: "Doe", Specialty: "General Dentistry", Email: "johndoe@gmail.com", Phone_num: "1234567890", Address: "123 Main St", DOB: "1980-05-06", Start_date: "2015-01-01", End_date: null, Is_active: true, Salary: 80000},
-        // Add more dentist data as needed
-    ];
+    // State variables to hold dentist and staff data
+    const [dentists, setDentists] = useState([]);
+    const [staff, setStaff] = useState([]);
 
-    // Dummy data for staff
-    const staff = [
-        {staffID: 1, officeID: 1, Fname: "Emily", Lname: "Smith", Email: "emilysmith@gmail.com", Phone_num: "9876543210", DOB: "1985-08-15", Address: "456 Oak St", Position: "Receptionist", Start_date: "2017-06-01", End_date: null, Is_active: true, Salary: 50000},
-        // Add more staff data as needed
-    ];
+    useEffect(() => {
+        // Fetch dentist and staff data when component mounts
+        fetchDentists();
+        fetchStaff();
+    }, []);
+
+    const fetchDentists = async () => {
+        try {
+            const response = await fetch("http://localhost:5000/api/admin/getDentists");
+            if (response.ok) {
+                const data = await response.json();
+                setDentists(data);
+            } else {
+                console.error("Failed to fetch dentists:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error fetching dentists:", error);
+        }
+    };
+
+    const fetchStaff = async () => {
+        try {
+            // Fetch staff data here
+            // Replace the URL with your actual backend endpoint
+            const response = await fetch("http://localhost:5000/api/admin/getStaff");
+            if (response.ok) {
+                const data = await response.json();
+                setStaff(data);
+            } else {
+                console.error("Failed to fetch staff:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error fetching staff:", error);
+        }
+    };
+
+    const formatActiveStatus = (isActive) => {
+        return isActive ? "Active" : "Inactive";
+    };
 
     return (
         <>
@@ -49,16 +81,17 @@ const AdminStaff = () => {
                                             <th className="px-2 py-1">DentistID</th>
                                             <th className="px-2 py-1">First Name</th>
                                             <th className="px-2 py-1">Last Name</th>
-                                            <th className="px-2 py-1">Specialty</th>
                                             <th className="px-2 py-1">Email</th>
-                                            <th className="px-2 py-1">Phone Number</th>
+                                            <th className="px-2 py-1">Specialty</th>
+                                            <th className="px-2 py-1">Phone</th>
                                             <th className="px-2 py-1">Address</th>
-                                            <th className="px-2 py-1">Date of Birth</th>
+                                            <th className="px-2 py-1">DOB</th>
                                             <th className="px-2 py-1">Start Date</th>
                                             <th className="px-2 py-1">End Date</th>
-                                            <th className="px-2 py-1">Is Active</th>
                                             <th className="px-2 py-1">Salary</th>
+                                            <th className="px-2 py-1">Active</th>
                                             <th className="px-2 py-1">Actions</th>
+                                            {/* Add other header columns as needed */}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -67,15 +100,15 @@ const AdminStaff = () => {
                                                 <td className="border px-2 py-1">{dentist.dentistID}</td>
                                                 <td className="border px-2 py-1">{dentist.FName}</td>
                                                 <td className="border px-2 py-1">{dentist.LName}</td>
-                                                <td className="border px-2 py-1">{dentist.Specialty}</td>
                                                 <td className="border px-2 py-1">{dentist.Email}</td>
+                                                <td className="border px-2 py-1">{dentist.Specialty}</td>
                                                 <td className="border px-2 py-1">{dentist.Phone_num}</td>
                                                 <td className="border px-2 py-1">{dentist.Address}</td>
-                                                <td className="border px-2 py-1">{dentist.DOB}</td>
-                                                <td className="border px-2 py-1">{dentist.Start_date}</td>
-                                                <td className="border px-2 py-1">{dentist.End_date}</td>
-                                                <td className="border px-2 py-1">{dentist.Is_active ? "Yes" : "No"}</td>
+                                                <td className="border px-2 py-1">{new Date(dentist.DOB).toLocaleDateString()}</td>
+                                                <td className="border px-2 py-1">{new Date(dentist.Start_date).toLocaleDateString()}</td>
+                                                <td className="border px-2 py-1">{dentist.End_date ? new Date(dentist.End_date).toLocaleDateString() : "N/A"}</td>
                                                 <td className="border px-2 py-1">{dentist.Salary}</td>
+                                                <td className="border px-2 py-1">{formatActiveStatus(dentist.Is_active)}</td>
                                                 <td className="border px-2 py-1 space-x-2">
                                                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">Edit</button>
                                                     <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Delete</button>
@@ -97,34 +130,33 @@ const AdminStaff = () => {
                                             <th className="px-2 py-1">StaffID</th>
                                             <th className="px-2 py-1">First Name</th>
                                             <th className="px-2 py-1">Last Name</th>
-                                            <th className="px-2 py-1">Position</th>
                                             <th className="px-2 py-1">Email</th>
-                                            <th className="px-2 py-1">Phone Number</th>
+                                            <th className="px-2 py-1">Position</th>
+                                            <th className="px-2 py-1">Phone</th>
                                             <th className="px-2 py-1">Address</th>
-                                            <th className="px-2 py-1">Date of Birth</th>
-
+                                            <th className="px-2 py-1">DOB</th>
                                             <th className="px-2 py-1">Start Date</th>
                                             <th className="px-2 py-1">End Date</th>
-                                            <th className="px-2 py-1">Is Active</th>
                                             <th className="px-2 py-1">Salary</th>
+                                            <th className="px-2 py-1">Active</th>
                                             <th className="px-2 py-1">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {staff.map(staffMember => (
-                                            <tr key={staffMember.staffID} className="hover:bg-gray-100">
-                                                <td className="border px-2 py-1">{staffMember.staffID}</td>
-                                                <td className="border px-2 py-1">{staffMember.Fname}</td>
-                                                <td className="border px-2 py-1">{staffMember.Lname}</td>
-                                                <td className="border px-2 py-1">{staffMember.Position}</td>
-                                                <td className="border px-2 py-1">{staffMember.Email}</td>
-                                                <td className="border px-2 py-1">{staffMember.Phone_num}</td>
-                                                <td className="border px-2 py-1">{staffMember.Address}</td>
-                                                <td className="border px-2 py-1">{staffMember.DOB}</td>
-                                                <td className="border px-2 py-1">{staffMember.Start_date}</td>
-                                                <td className="border px-2 py-1">{staffMember.End_date}</td>
-                                                <td className="border px-2 py-1">{staffMember.Is_active ? "Yes" : "No"}</td>
-                                                <td className="border px-2 py-1">{staffMember.Salary}</td>
+                                        {staff.map(staff => (
+                                            <tr key={staff.staffID} className="hover:bg-gray-100">
+                                                <td className="border px-2 py-1">{staff.staffID}</td>
+                                                <td className="border px-2 py-1">{staff.Fname}</td>
+                                                <td className="border px-2 py-1">{staff.Lname}</td>
+                                                <td className="border px-2 py-1">{staff.Email}</td>
+                                                <td className="border px-2 py-1">{staff.Position}</td>
+                                                <td className="border px-2 py-1">{staff.Phone_num}</td>
+                                                <td className="border px-2 py-1">{staff.Address}</td>
+                                                <td className="border px-2 py-1">{new Date(staff.DOB).toLocaleDateString()}</td>
+                                                <td className="border px-2 py-1">{new Date(staff.Start_date).toLocaleDateString()}</td>
+                                                <td className="border px-2 py-1">{staff.End_date ? new Date(staff.End_date).toLocaleDateString() : "N/A"}</td>
+                                                <td className="border px-2 py-1">{staff.Salary}</td>
+                                                <td className="border px-2 py-1">{formatActiveStatus(staff.Is_active)}</td>
                                                 <td className="border px-2 py-1 space-x-2">
                                                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">Edit</button>
                                                     <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Delete</button>
@@ -139,7 +171,7 @@ const AdminStaff = () => {
                 </div>
 
                 <nav>
-                    <Footer/>
+                    <Footer />
                 </nav>
             </div>
         </>
