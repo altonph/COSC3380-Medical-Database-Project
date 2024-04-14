@@ -13,6 +13,56 @@ const AdminStaff = () => {
         fetchStaff();
     }, []);
 
+    const [editMode, setEditMode] = useState(false);
+    const [editedDentist, setEditedDentist] = useState(null);
+    const [selectedDentistID, setSelectedDentistID] = useState(null);
+
+    const [editedDentistProfile, setEditedDentistProfile] = useState({
+        dentistID: "",
+        FName: "",
+        LName: "",
+        Specialty: "",
+        Email: "",
+        Phone_num: "",
+        Address: "",
+        DOB: "",
+        Start_date: "",
+        End_date: "",
+        Is_active: true,
+        Salary: ""
+    });
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditedDentistProfile({ ...editedDentistProfile, [name]: value });
+    };
+
+    const handleEditClick = (dentistID) => {
+        // Set edit mode to true and populate selectedDentistID
+        setEditMode(true);
+        setSelectedDentistID(dentistID);
+    };
+
+    const handleCancelEdit = () => {
+        // Reset edit mode, clear editedDentist state, and deselect dentist
+        setEditMode(false);
+        setEditedDentist(null);
+        setSelectedDentistID(null);
+    };
+
+    const handleConfirmEdit = async () => {
+        try {
+            // Send editedDentist data to backend API for updating
+            // You can use selectedDentistID to specify which dentist to update
+            // Reset edit mode, clear editedDentist state, and deselect dentist
+            setEditMode(false);
+            setEditedDentist(null);
+            setSelectedDentistID(null);
+        } catch (error) {
+            console.error("Error updating dentist profile:", error);
+        }
+    };
+
     const fetchDentists = async () => {
         try {
             const response = await fetch("http://localhost:5000/api/admin/getDentists");
@@ -98,20 +148,138 @@ const AdminStaff = () => {
                                         {dentists.map(dentist => (
                                             <tr key={dentist.dentistID} className="hover:bg-gray-100">
                                                 <td className="border px-2 py-1">{dentist.dentistID}</td>
-                                                <td className="border px-2 py-1">{dentist.FName}</td>
-                                                <td className="border px-2 py-1">{dentist.LName}</td>
-                                                <td className="border px-2 py-1">{dentist.Email}</td>
-                                                <td className="border px-2 py-1">{dentist.Specialty}</td>
-                                                <td className="border px-2 py-1">{dentist.Phone_num}</td>
-                                                <td className="border px-2 py-1">{dentist.Address}</td>
-                                                <td className="border px-2 py-1">{new Date(dentist.DOB).toLocaleDateString()}</td>
-                                                <td className="border px-2 py-1">{new Date(dentist.Start_date).toLocaleDateString()}</td>
+                                                <td className="border px-2 py-1">
+                                                    {editMode && selectedDentistID === dentist.dentistID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="FName"
+                                                            value={editedDentistProfile.FName || dentist.FName}
+                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
+                                                            style={{ width: "90%" }}
+                                                        />
+                                                    ) : (
+                                                        dentist.FName
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editMode && selectedDentistID === dentist.dentistID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="LName"
+                                                            value={editedDentistProfile.LName || dentist.LName}
+                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
+                                                            style={{ width: "90%" }}
+                                                        />
+                                                    ) : (
+                                                        dentist.LName
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editMode && selectedDentistID === dentist.dentistID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="Email"
+                                                            value={editedDentistProfile.Email || dentist.Email}
+                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
+                                                            style={{ width: "90%" }}
+                                                        />
+                                                    ) : (
+                                                        dentist.Email
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editMode && selectedDentistID === dentist.dentistID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="Specialty"
+                                                            value={editedDentistProfile.Specialty || dentist.Specialty}
+                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
+                                                            style={{ width: "90%" }}
+                                                        />
+                                                    ) : (
+                                                        dentist.Specialty
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editMode && selectedDentistID === dentist.dentistID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="Phone_num"
+                                                            value={editedDentistProfile.Phone_num || dentist.Phone_num}
+                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
+                                                            style={{ width: "90%" }}
+                                                        />
+                                                    ) : (
+                                                        dentist.Phone_num
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editMode && selectedDentistID === dentist.dentistID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="Address"
+                                                            value={editedDentistProfile.Address || dentist.Address}
+                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
+                                                            style={{ width: "90%" }}
+                                                        />
+                                                    ) : (
+                                                        dentist.Address
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editMode && selectedDentistID === dentist.dentistID ? (
+                                                        <input
+                                                            type="date"
+                                                            name="DOB"
+                                                            value={editedDentistProfile.Start_date || new Date(dentist.DOB).toISOString().substr(0, 10)}
+                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
+                                                        />
+                                                    ) : (
+                                                        new Date(dentist.DOB).toLocaleDateString()
+                                                    )}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {editMode && selectedDentistID === dentist.dentistID ? (
+                                                        <input
+                                                            type="date"
+                                                            name="Start_date"
+                                                            value={editedDentistProfile.Start_date || new Date(dentist.Start_date).toISOString().substr(0, 10)}
+                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
+                                                        />
+                                                    ) : (
+                                                        new Date(dentist.Start_date).toLocaleDateString()
+                                                    )}
+                                                </td>
                                                 <td className="border px-2 py-1">{dentist.End_date ? new Date(dentist.End_date).toLocaleDateString() : "N/A"}</td>
-                                                <td className="border px-2 py-1">{dentist.Salary}</td>
+                                                <td className="border px-2 py-1">
+                                                    {editMode && selectedDentistID === dentist.dentistID ? (
+                                                        <input
+                                                            type="text"
+                                                            name="Salary"
+                                                            value={editedDentistProfile.Salary || dentist.Salary}
+                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
+                                                        />
+                                                    ) : (
+                                                        dentist.Salary
+                                                    )}
+                                                </td>
                                                 <td className="border px-2 py-1">{formatActiveStatus(dentist.Is_active)}</td>
                                                 <td className="border px-2 py-1 space-x-2">
-                                                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">Edit</button>
-                                                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Delete</button>
+                                                    {editMode && selectedDentistID === dentist.dentistID ? (
+                                                        <>
+                                                            <button onClick={handleConfirmEdit} className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded">Confirm</button>
+                                                            <button onClick={handleCancelEdit} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Cancel</button>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                                                                onClick={() => handleEditClick(dentist.dentistID)}>
+                                                                Edit
+                                                            </button>
+                                                            {/* Placeholder for delete button */}
+                                                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Delete</button>
+                                                        </>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}
