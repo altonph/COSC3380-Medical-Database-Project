@@ -9,10 +9,12 @@ const AdminLogin = () => {
   const [Password, setPassword] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const MAX_USERNAME_LENGTH = 50;
-  const MAX_PASSWORD_LENGTH = 100;
   const navigateTo = useNavigate();
 
+  const MAX_USERNAME_LENGTH = 50;
+  const MAX_PASSWORD_LENGTH = 100;
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
