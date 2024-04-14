@@ -1,6 +1,5 @@
 // adminRoutes.js
-const { generateAppointmentDataReport } = require('../controllers/adminController');
-const { generateRevenueReport } = require('../controllers/adminController');
+const { generateAppointmentDataReport, generateRevenueReport, getAllDentists, getAllPatients, getAllStaff } = require('../controllers/adminController');
 const url = require('url');
 
 const handleGenerateAppointmentReport = (req, res) => {
@@ -43,8 +42,38 @@ const handleGenerateRevenueReport = (req, res) => {
     
 };
 
+const handleGetAllDentists = (req, res) => {
+    if (req.url === '/api/admin/getDentists' && req.method === 'GET') {
+        getAllDentists(res);
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
+const handleGetAllPatients = (req, res) => {
+    if (req.url === '/api/admin/getPatients' && req.method === 'GET') {
+        getAllPatients(res);
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
+const handleGetAllStaff = (req, res) => {
+    if (req.url === '/api/admin/getStaff' && req.method === 'GET') {
+        getAllStaff(res);
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
 
 module.exports = {
     handleGenerateRevenueReport,
-    handleGenerateAppointmentReport
+    handleGenerateAppointmentReport,
+    handleGetAllDentists,
+    handleGetAllPatients,
+    handleGetAllStaff
 };

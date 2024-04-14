@@ -128,8 +128,63 @@ const generateRevenueReport = (req, res, office, startDate, endDate) => {
     });
 };
 
+function getAllDentists(res) {
+    pool.query(
+        'SELECT * FROM dentist',
+        (error, results) => {
+            if (error) {
+                console.error('Error fetching dentist information:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Error fetching dentist information' }));
+                return;
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(results));
+        }
+    );
+}
+
+function getAllPatients(res) {
+    pool.query(
+        'SELECT * FROM patient',
+        (error, results) => {
+            if (error) {
+                console.error('Error fetching dentist information:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Error fetching patient information' }));
+                return;
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(results));
+        }
+    );
+}
+
+function getAllStaff(res) {
+    pool.query(
+        'SELECT * FROM staff',
+        (error, results) => {
+            if (error) {
+                console.error('Error fetching staff information:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Error fetching staff information' }));
+                return;
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(results));
+        }
+    );
+}
+
+
 
 module.exports = {
     generateRevenueReport,
-    generateAppointmentDataReport
+    generateAppointmentDataReport,
+    getAllDentists,
+    getAllPatients,
+    getAllStaff
 };
