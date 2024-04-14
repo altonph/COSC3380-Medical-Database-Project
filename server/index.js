@@ -11,6 +11,7 @@ const { staffRoutes, staffverifyToken } = require('./routes/staffRoutes');
 const { handleGenerateAppointmentReport } = require('./routes/adminRoutes'); 
 const { handleAssignDentistToOffice } = require('./routes/officeRoutes');
 const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff, handleGetAvailableTimeBlocks } = require('./routes/dentistRoutes');
+const { handleGenerateRevenueReport } = require('./routes/adminRoutes');    
 
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -78,6 +79,9 @@ const server = http.createServer((req, res) => {
     } else if (req.url.startsWith('/api/admin/appointment-data-report') && req.method === 'POST') {
         handleGenerateAppointmentReport(req, res); 
     }
+    else if (req.url.startsWith('/api/admin/finance-revenue-report') && req.method === 'GET') {
+        handleGenerateRevenueReport(req, res);
+    }  
     
     
     //handleUpdateAppointmentWithStaff

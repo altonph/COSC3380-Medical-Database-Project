@@ -84,6 +84,51 @@ const generateAppointmentDataReport = (req, res, office_id, start_date, end_date
     });
 };
 
+const generateRevenueReport = (req, res, office, startDate, endDate) => {
+    let sqlQuery = `
+        SELECT 
+            a.Appointment_Type,
+            a.Date,
+            d.FName AS Dentist_FirstName,
+            d.LName AS Dentist_LastName,
+            p.FName AS Patient_FirstName,
+            p.LName AS Patient_LastName,
+            i.Total_Amount
+        FROM appointment a
+        JOIN visit_details vd ON a.patientID = vd.patientID
+        JOIN invoice i ON vd.visitID = i.visitID
+        JOIN dentist d ON a.dentistID = d.dentistID
+        JOIN patient p ON a.patientID = p.patientID`;
+
+    const queryParams = [];
+
+    if (office && office !== 'All') {
+        sqlQuery += ` AND a.officeID = ?`;
+        queryParams.push(office);
+    }
+
+    if (startDate && endDate) {
+        sqlQuery += ` AND a.Date BETWEEN ? AND ?`;
+        queryParams.push(startDate, endDate);
+    }
+
+    sqlQuery += ` ORDER BY a.Appointment_Type`;
+
+    pool.query(sqlQuery, queryParams, (error, rows) => {
+        if (error) {
+            console.error('Error generating revenue report:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(rows));
+
+    });
+};
+
+
 module.exports = {
+    generateRevenueReport,
     generateAppointmentDataReport
 };

@@ -1,5 +1,6 @@
 // adminRoutes.js
 const { generateAppointmentDataReport } = require('../controllers/adminController');
+const { generateRevenueReport } = require('../controllers/adminController');
 const url = require('url');
 
 const handleGenerateAppointmentReport = (req, res) => {
@@ -22,6 +23,28 @@ const handleGenerateAppointmentReport = (req, res) => {
     }
 };
 
+const handleGenerateRevenueReport = (req, res) => {
+    const { url, method } = req;
+    
+    if (url.startsWith('/api/admin/finance-revenue-report') && method === 'GET'){
+        const queryParamss = url.split('?');
+        const queryParams = new URLSearchParams(queryParamss[1]);
+
+        const office = queryParams.get('office');
+        const startDate = queryParams.get('startDate');
+        const endDate = queryParams.get('endDate');
+
+        generateRevenueReport(req, res, office, startDate, endDate);
+
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+    
+};
+
+
 module.exports = {
+    handleGenerateRevenueReport,
     handleGenerateAppointmentReport
 };
