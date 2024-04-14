@@ -36,7 +36,7 @@ import AdminPortal from "./pages/admin/AdminPortal";
 import AdminAppointment from "./pages/admin/AdminAppointments";
 import AdminPatients from "./pages/admin/AdminPatients";
 import AdminLogin from "./pages/admin/AdminLogin";
-import DataReports from "./pages/admin/DataReports";
+import AppointmentDataReport from "./pages/admin/AppointmentDataReport";
 import AdminStaff from "./pages/admin/AdminStaff";
 import DoctorPortal from "./pages/doctor/DoctorPortal";
 import AdminProfile from "./pages/admin/AdminProfile";
@@ -91,7 +91,7 @@ function App() {
             <Route path="/admin/appointments" element={<AdminAppointment/>}/>
             <Route path="/admin/patients" element={<AdminPatients/>}/>
             <Route path="/admin/login" element={<AdminLogin/>}/>
-            <Route path="/admin/data-reports" element={<DataReports/>}/>
+            <Route path="/admin/appointment-data-report" element={<AppointmentDataReport/>}/>
             <Route path="/admin/staff" element={<AdminStaff/>}/>
             <Route path="/admin/profile" element={<AdminProfile/>}/>
           </Routes>
