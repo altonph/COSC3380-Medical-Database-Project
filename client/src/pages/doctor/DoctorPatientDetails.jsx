@@ -163,7 +163,6 @@ const PatientDetails = () => {
                   <li key={index} className="mb-4">
                     <p><span className="font-semibold">Visit ID:</span> {visitDetail.visitID}</p>
                     <p><span className="font-semibold">Dentist ID:</span> {visitDetail.dentistID}</p>
-                    <p><span className="font-semibold">Visit Type:</span> {visitDetail.Visit_Type}</p>
                     <p><span className="font-semibold">Diagnosis:</span> {visitDetail.Diagnosis}</p>
                     <p><span className="font-semibold">Treatment:</span> {visitDetail.Treatment}</p>
                     <p><span className="font-semibold">Notes:</span> {visitDetail.Notes}</p>

@@ -349,7 +349,6 @@ const DoctorMakeAppointment = () => {
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                 >
                   <option value="" disabled>Select Reason</option>
-                  <option value="Checkup">Checkup</option>
                   <option value="Cleaning">Cleaning</option>
                   <option value="Whitening">Whitening</option>
                   <option value="Extraction">Extraction</option>

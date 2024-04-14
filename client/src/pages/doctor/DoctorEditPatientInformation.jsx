@@ -18,7 +18,7 @@ const DoctorEditPatientInformation = () => {
         }
 
         const response = await fetch(
-          `http://localhost:5000/api/doctor/patients/${patientID}/information`,
+          `http://localhost:5000/api/doctor/patients/${patientID}`,
           {
             method: "GET",
             headers: {

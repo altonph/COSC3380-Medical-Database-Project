@@ -48,6 +48,32 @@ const getMedicalHistoryByPatientId = (req, res, patientId) => {
     });
 };
 
+const insertMedicalHistoryByPatientId = (req, res, patientId) => {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        const medicalHistoryData = JSON.parse(body);
+        const { Allergies, Feet, Inches, Weight, Notes } = medicalHistoryData;
+        const currentDate = new Date().toISOString().split('T')[0];
+        const query = `
+            INSERT INTO medical_records (patientID, Date_Created, Allergies, Feet, Inches, Weight, Notes) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        pool.query(query, [patientId, currentDate, Allergies, Feet, Inches, Weight, Notes], (error, results) => {
+            if (error) {
+                console.error('Error inserting medical history:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            }
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Medical history inserted successfully', recordsID: results.insertId }));
+        });
+    });
+};
+
 const getPrescriptionsByPatientId = (req, res, patientId) => {
     pool.query('SELECT * FROM prescription WHERE patientID = ?', [patientId], (error, results) => {
         if (error) {
@@ -505,6 +531,41 @@ const checkPatientExistence = (req, res) => {
     });
 };
 
+const updatePrimaryApproval = (req, res) => {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        try {
+            const appointmentData = JSON.parse(body);
+            const { dentistID, patientID, Date, Start_time } = appointmentData;
+
+            const query = `
+                UPDATE appointment 
+                SET Primary_Approval = 'Approved'
+                WHERE dentistID = ? AND patientID = ? AND Date = ? AND Start_time = ?`;
+            const queryParams = [dentistID, patientID, Date, Start_time];
+
+            pool.query(query, queryParams, (error, results) => {
+                if (error) {
+                    console.error('Error updating primary approval:', error);
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                    return;
+                }
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Primary approval updated successfully' }));
+            });
+        } catch (error) {
+            console.error('Error parsing request body:', error);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Bad Request' }));
+        }
+    });
+};
+
 const generateInvoice = (req, res) => {
     let body = '';
     req.on('data', chunk => {
@@ -593,6 +654,7 @@ const generateInvoice = (req, res) => {
                                     }
 
                                     netAmount = grossAmount - insuranceCoverage + 20.00;
+                                    grossAmount = grossAmount + 20.00;
 
                                     const currentDate = new Date().toISOString().split('T')[0];
                                     pool.query(
@@ -632,6 +694,7 @@ module.exports = {
     getInvoicesByPatientId,
     getVisitDetailsByPatientId,
     updateMedicalHistoryByPatientId,
+    insertMedicalHistoryByPatientId,
     updatePrescriptionsByPatientId,
     updateVisitDetailsByPatientId,
     getAppointmentsByDoctorUsername,
@@ -644,5 +707,6 @@ module.exports = {
     checkVisitDetailsCount,
     updateAppointmentStatus,
     checkPatientExistence,
-    generateInvoice
+    generateInvoice,
+    updatePrimaryApproval
 };

@@ -54,7 +54,11 @@ VALUES (1, 1, 1, 1, '2024-04-03', '09:00:00', '10:00:00', 'Whitening', 'Schedule
 
 -- @block
 INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
-VALUES (1, 2, 1, 1, '2024-04-03', '09:00:00', '10:00:00', 'Whitening', 'Scheduled');
+VALUES (1, 2, 1, 1, '2024-04-03', '09:30:00', '10:30:00', 'Whitening', 'Scheduled');
+
+-- @block
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (1, 2, 1, 1, '2024-04-29', '09:30:00', '10:30:00', 'Whitening', 'Scheduled');
 
 -- @block
 INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
