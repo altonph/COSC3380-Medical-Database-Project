@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { getAllPatients, getPatientById, getMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePrescriptionsByPatientId, updateVisitDetailsByPatientId, getAppointmentsByDoctorUsername, insertVisitDetails, insertPrescription, insertAppointment, checkVisitDetailsCount, updateAppointmentStatus, checkPatientExistence, generateInvoice } = require('../controllers/doctorController');
+const { getAllPatients, getPatientById, getMedicalHistoryByPatientId, insertMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePatientInformationByPatientId,getInformationByPatientId, updatePrescriptionsByPatientId, updateVisitDetailsByPatientId, getAppointmentsByDoctorUsername, insertVisitDetails, insertPrescription, insertAppointment, checkVisitDetailsCount, updateAppointmentStatus, checkPatientExistence, generateInvoice, updatePrimaryApproval } = require('../controllers/doctorController');
 
 const doctorRoutes = (req, res) => {
     const { url, method } = req;
@@ -59,6 +59,14 @@ const doctorRoutes = (req, res) => {
         const parts = url.split('/');
         const patientId = parts[parts.length - 2];
         updateMedicalHistoryByPatientId(req, res, patientId);
+    } else if (method === 'POST' && url.startsWith('/api/doctor/patients/') && url.endsWith('/medical-history')) {
+        const decodedToken = verifyToken(authHeader);
+        if (!decodedToken) {
+            return unauthorizedResponse(res);
+        }
+        const parts = url.split('/');
+        const patientId = parts[parts.length - 2];
+        insertMedicalHistoryByPatientId(req, res, patientId);
     } else if (method === 'PUT' && url.startsWith('/api/doctor/patients/') && url.endsWith('/prescriptions')) {
         const decodedToken = verifyToken(authHeader);
         if (!decodedToken) {
@@ -142,6 +150,12 @@ const doctorRoutes = (req, res) => {
             return unauthorizedResponse(res);
         }
         generateInvoice(req, res);
+    } else if (method === 'PATCH' && url === '/api/doctor/appointments/update-primary-approval') {
+        const decodedToken = verifyToken(authHeader);
+        if (!decodedToken) {
+            return unauthorizedResponse(res);
+        }
+        updatePrimaryApproval(req, res);
     }
     else {
         return notFoundResponse(res);

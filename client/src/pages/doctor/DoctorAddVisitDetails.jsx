@@ -13,7 +13,9 @@ const DoctorAddVisitDetails = () => {
   const [showPrescriptionDropdown, setShowPrescriptionDropdown] = useState(false);
   const [numberOfPrescriptions, setNumberOfPrescriptions] = useState(1);
   const [isInsertSuccess, setIsInsertSuccess] = useState(false);
+  const [isInsertSuccessPrescriptions, setIsInsertSuccessPrescriptions] = useState(false);
   const [scheduleFollowUp, setScheduleFollowUp] = useState(false);
+  const [approveForSpecialist, setApproveForSpecialist] = useState(false);
 
   useEffect(() => {
     const storedAppointment = localStorage.getItem('appointmentDetails');
@@ -96,6 +98,26 @@ const DoctorAddVisitDetails = () => {
             throw new Error('Failed to update appointment status');
         }
 
+        if (approveForSpecialist) {
+          const patchRequestBody = {
+              dentistID: appointmentDetails.dentistID,
+              patientID: appointmentDetails.patientID,
+              Date: formatDate(appointmentDetails.Date),
+              Start_time: appointmentDetails.Start_time
+          };
+          const patchResponse = await fetch('http://localhost:5000/api/doctor/appointments/update-primary-approval', {
+              method: 'PATCH',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(patchRequestBody)
+          });
+          if (!patchResponse.ok) {
+              throw new Error('Failed to update primary approval');
+          }
+      }
+
         const invoiceRequestData = {
             visitID: visitID,
             dentistID: appointmentDetails.dentistID,
@@ -158,6 +180,7 @@ const DoctorAddVisitDetails = () => {
         })
         .then(data => {
             console.log('Prescription inserted successfully:', data);
+            setIsInsertSuccessPrescriptions(true);
         })
         .catch(error => {
             console.error('Error inserting prescription:', error);
@@ -341,6 +364,17 @@ const DoctorAddVisitDetails = () => {
                   rows="4"
                 />
               </div>
+
+              <div>
+                  <label className="block mt-2 text-lg">
+                    <input
+                      type="checkbox"
+                      className="mr-2 h-6 w-6 mt-4"
+                      onChange={(e) => setApproveForSpecialist(e.target.checked)}
+                    />
+                    Approve for patient to see specialist
+                  </label>
+                </div>
   
               <div className="col-span-2">
               <button
@@ -352,7 +386,7 @@ const DoctorAddVisitDetails = () => {
               </button>
               {isInsertSuccess && (
                 <label className="block mt-2 text-lg"> 
-                  <input type="checkbox" className="mr-2 h-6 w-6 mt-4" onChange={handleCheckboxChange} /> 
+                  <input type="checkbox" className="mr-2 h-6 w-6 mt-4 mb-8" onChange={handleCheckboxChange} /> 
                   Add Prescriptions
                 </label>
               )}
@@ -368,15 +402,7 @@ const DoctorAddVisitDetails = () => {
               )}
               {showPrescriptionDropdown && renderPrescriptionInputs()}
               {showPrescriptionDropdown && (
-                <button onClick={handleConfirmPrescriptions} className="bg-blue-500 text-white px-4 py-2 mt-4">Confirm Prescriptions</button>
-              )}
-              {isInsertSuccess && (
-                <div>
-                  <label className="block mt-2 text-lg"> 
-                    <input type="checkbox" className="mr-2 h-6 w-6 mt-4" onChange={(e) => setScheduleFollowUp(e.target.checked)} /> 
-                    Schedule Follow Up Appointment
-                  </label>
-                </div>
+                <button onClick={handleConfirmPrescriptions} className={`bg-${isInsertSuccessPrescriptions ? 'gray' : 'blue'}-500 text-white px-4 py-2 mr-2 mt-4 mb-4`} disabled={isInsertSuccessPrescriptions} >Confirm Prescriptions</button>
               )}
             </div>
             <Link to="/doctor/appointments" className="bg-blue-500 text-white px-4 py-2 mt-4">Return to Appointments Page</Link>

@@ -317,7 +317,6 @@ const DoctorAppointment = () => {
                       <p><span className="font-semibold">Appointment Type:</span> {selectedEvent.extendedProps.appointment.Appointment_type}</p>
                       <p><span className="font-semibold">Appointment Status:</span> {selectedEvent.extendedProps.appointment.Appointment_status}</p>
                       <p><span className="font-semibold">Primary Approval:</span> {selectedEvent.extendedProps.appointment.Primary_approval}</p>
-                      <p><span className="font-semibold">Is Active:</span> {selectedEvent.extendedProps.appointment.is_active}</p>
                       {cancelled && (
                         <div>
                           <label htmlFor="cancellationReason" className="font-semibold">Cancellation Reason:</label>
