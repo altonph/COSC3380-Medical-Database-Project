@@ -117,7 +117,8 @@ const generateRevenueReport = (req, res, office, startDate, endDate) => {
     pool.query(sqlQuery, queryParams, (error, rows) => {
         if (error) {
             console.error('Error generating revenue report:', error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
             return;
         }
 
