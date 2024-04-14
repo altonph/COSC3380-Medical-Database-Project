@@ -23,6 +23,7 @@ import StaffPortal from "./pages/staff/StaffPortal";
 import StaffPatients from "./pages/staff/StaffPatients";
 import StaffPatientDetails from "./pages/staff/StaffPatientDetails";
 import StaffEditPatientInformation from "./pages/staff/StaffEditPatientInformation";
+import StaffAddMedicalHistory from "./pages/staff/StaffAddMedicalHistory";
 import StaffEditVisitDetails from "./pages/staff/StaffEditVisitDetails";
 import StaffEditMedicalHistory from "./pages/staff/StaffEditMedicalHistory";
 import StaffEditPrescriptions from "./pages/staff/StaffEditPrescriptions";
@@ -85,6 +86,7 @@ function App() {
             <Route path="/staff/patients/:patientID" element={<StaffPatientDetails />} />
             <Route path="/staff/patients/:patientID/patient-information" element={<StaffEditPatientInformation/>} />
             <Route path="/staff/patients/:patientID/visit-details" element={<StaffEditVisitDetails/>} />
+            <Route path="/staff/patients/:patientID/add-medical-history" element={<StaffAddMedicalHistory/>} />
             <Route path="/staff/patients/:patientID/medical-history" element={<StaffEditMedicalHistory />} />
             <Route path="/staff/patients/:patientID/prescriptions" element={<StaffEditPrescriptions />} />
             <Route path="/staff/appointments" element={<StaffAppointment />} />

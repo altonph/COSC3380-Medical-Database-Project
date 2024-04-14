@@ -107,16 +107,16 @@ const StaffPatients = () => {
                         <table className="table-auto">
                             <thead>
                                 <tr>
-                                    <th className="px-4 py-2 text-sm">PatientID</th>
+                                    <th className="px-4 py-2 text-sm">Patient ID</th>
                                     <th className="px-4 py-2 text-sm">Policy Number</th>
+                                    <th className="px-4 py-2 text-sm">Insurance Company Name</th>
                                     <th className="px-4 py-2 text-sm">Gender</th>
-                                    <th className="px-4 py-2 text-sm">FirstName</th>
-                                    <th className="px-4 py-2 text-sm">LastName</th>
+                                    <th className="px-4 py-2 text-sm">First Name</th>
+                                    <th className="px-4 py-2 text-sm">Last Name</th>
                                     <th className="px-4 py-2 text-sm">DOB</th>
                                     <th className="px-4 py-2 text-sm">Email</th>
-                                    <th className="px-4 py-2 text-sm">PhoneNumber</th>
+                                    <th className="px-4 py-2 text-sm">Phone Number</th>
                                     <th className="px-4 py-2 text-sm">Address</th>
-                                    <th className="px-4 py-2 text-sm">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -125,7 +125,8 @@ const StaffPatients = () => {
                                         <td className="border px-4 py-2 text-xs">
                                             <Link to={`/staff/patients/${patient.patientID}`}>{patient.patientID}</Link>
                                         </td>
-                                        <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="insuranceID" value={editedPatients.insuranceID || ''} onChange={handleInputChange} /> : patient.Policy_number}</td>
+                                        <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="insuranceID" value={editedPatients.Policy_number || ''} onChange={handleInputChange} /> : patient.Policy_number}</td>
+                                        <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="insuranceID" value={editedPatients.Insurance_Company_Name || ''} onChange={handleInputChange} /> : patient.Insurance_Company_Name}</td>
                                         <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="Gender" value={editedPatients.Gender || ''} onChange={handleInputChange} /> : patient.Gender}</td>
                                         <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="FName" value={editedPatients.FName || ''} onChange={handleInputChange} /> : patient.FName}</td>
                                         <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="LName" value={editedPatients.LName || ''} onChange={handleInputChange} /> : patient.LName}</td>
@@ -136,13 +137,11 @@ const StaffPatients = () => {
                                         <td className="border px-4 py-2 text-xs">
                                             {isEditing(patient.patientID) ? (
                                                 <>
-                                                    <button className="bg-blue-500 text-white px-2 py-1 mr-2" onClick={() => handleSave(patient.patientID)}>Save</button>
-                                                    <button className="bg-red-500 text-white px-2 py-1 mr-2" onClick={handleCancel}>Cancel</button>
+                                                    
                                                 </>
                                             ) : (
                                                 <>
-                                                    <button className="bg-blue-500 text-white px-2 py-1 mr-2" onClick={() => handleEdit(patient.patientID)}>Edit</button>
-                                                    <button className="bg-red-500 text-white px-2 py-1 mr-2" onClick={() => handleDelete(patient.patientID)}>Delete</button>
+                                                
                                                 </>
                                             )}
                                         </td>

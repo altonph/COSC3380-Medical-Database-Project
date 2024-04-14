@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import HeaderPortalPatient from "../../components/HeaderPortalPatient";
+import HeaderPortalDoctor from "../../components/HeaderPortalDoctor";
 import Footer from "../../components/Footer";
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +20,8 @@ const DoctorMakeAppointment = () => {
   const [selectedBlock, setSelectedBlock] = useState(null); 
   const [selectedStartTime, setSelectedStartTime] = useState('');
   const [selectedEndTime, setSelectedEndTime] = useState('');
+  const [availableStaff, setAvailableStaff] = useState([]);
+  const [selectedAssistingHygienist, setSelectedAssistingHygienist] = useState('');
 
   useEffect(() => {
     if (location && preferredDate) {
@@ -32,6 +34,12 @@ const DoctorMakeAppointment = () => {
       fetchDentistAvailability(practitioner, preferredDate);
     }
   }, [practitioner, preferredDate]);
+
+  useEffect(() => {
+    if (location && preferredDate && selectedStartTime && selectedEndTime) {
+      fetchAvailableStaff(location, preferredDate, selectedStartTime, selectedEndTime);
+    }
+  }, [location, preferredDate, selectedStartTime, selectedEndTime]);
 
   const fetchDentistsByOfficeAndDay = async (officeID, dayOfWeek) => {
     try {
@@ -64,6 +72,30 @@ const DoctorMakeAppointment = () => {
       console.error('Error fetching dentist availability:', error);
     }
   };
+
+  const fetchAvailableStaff = async (officeID, date, startTime, endTime) => {
+    try {
+        const response = await fetch('http://localhost:5000/api/doctor/appointments/available-staff', {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ officeID, date, startTime, endTime })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Available staff:', data);
+            setAvailableStaff(data.availableStaff);
+        } else {
+            console.error('Failed to fetch available staff:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error fetching available staff:', error);
+    }
+  };
+
 
   const generateTimeOptions = (block) => {
     const options = [];
@@ -113,26 +145,28 @@ const DoctorMakeAppointment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-  const startTimeParts = selectedStartTime.split(' ');
-  const startHour = parseInt(startTimeParts[0].split(':')[0]);
-  const startMinute = parseInt(startTimeParts[0].split(':')[1]);
-  const startPeriod = startTimeParts[1];
+    const staffID = selectedAssistingHygienist !== "" ? selectedAssistingHygienist : null;
 
-  const endTimeParts = selectedEndTime.split(' ');
-  const endHour = parseInt(endTimeParts[0].split(':')[0]);
-  const endMinute = parseInt(endTimeParts[0].split(':')[1]);
-  const endPeriod = endTimeParts[1];
+    const startTimeParts = selectedStartTime.split(' ');
+    const startHour = parseInt(startTimeParts[0].split(':')[0]);
+    const startMinute = parseInt(startTimeParts[0].split(':')[1]);
+    const startPeriod = startTimeParts[1];
 
-  const startHour24 = (startPeriod === 'PM' && startHour !== 12) ? startHour + 12 : startHour;
-  const endHour24 = (endPeriod === 'PM' && endHour !== 12) ? endHour + 12 : endHour;
+    const endTimeParts = selectedEndTime.split(' ');
+    const endHour = parseInt(endTimeParts[0].split(':')[0]);
+    const endMinute = parseInt(endTimeParts[0].split(':')[1]);
+    const endPeriod = endTimeParts[1];
 
-  const startTimeInMinutes = startHour24 * 60 + startMinute;
-  const endTimeInMinutes = endHour24 * 60 + endMinute;
+    const startHour24 = (startPeriod === 'PM' && startHour !== 12) ? startHour + 12 : startHour;
+    const endHour24 = (endPeriod === 'PM' && endHour !== 12) ? endHour + 12 : endHour;
 
-  if (endTimeInMinutes <= startTimeInMinutes) {
-    console.log('End time must be after start time');
-    return;
-  }
+    const startTimeInMinutes = startHour24 * 60 + startMinute;
+    const endTimeInMinutes = endHour24 * 60 + endMinute;
+
+    if (endTimeInMinutes <= startTimeInMinutes) {
+        console.log('End time must be after start time');
+        return;
+    }
 
     const patientExists = await checkPatientExistence();
     if (!patientExists) {
@@ -141,7 +175,10 @@ const DoctorMakeAppointment = () => {
     }
 
     const timePartsStart = selectedStartTime.split(' ');
-    const timeStart = timePartsStart[1] === 'PM' ? parseInt(timePartsStart[0]) + 12 : parseInt(timePartsStart[0]);
+    let timeStart = parseInt(timePartsStart[0]);
+    if (timePartsStart[1] === 'PM' && timeStart !== 12) {
+        timeStart += 12;
+    }
     const formattedStartTime = `${timeStart}:00:00`;
 
     const timePartsEnd = selectedEndTime.split(' ');
@@ -150,6 +187,7 @@ const DoctorMakeAppointment = () => {
         timeEnd += 12;
     }
     const formattedEndTime = `${timeEnd}:00:00`;
+
     console.log("Formatted start time is ", formattedStartTime);
     console.log("Formatted end time is ", formattedEndTime);
     const sqlFormattedDate = preferredDate.toISOString().split('T')[0];
@@ -164,7 +202,7 @@ const DoctorMakeAppointment = () => {
             body: JSON.stringify({
                 officeID: location,
                 dentistID: practitioner,
-                staffID: 1,
+                staffID: staffID, 
                 patientID: patientID,
                 Date: sqlFormattedDate,
                 Start_time: formattedStartTime,
@@ -192,6 +230,7 @@ const DoctorMakeAppointment = () => {
         console.error('Error making appointment:', error);
     }
   };
+
 
   
   const handleLocationChange = (e) => {
@@ -223,7 +262,7 @@ const DoctorMakeAppointment = () => {
   return (
     <div className="flex h-screen flex-col">
       <nav>
-        <HeaderPortalPatient />
+        <HeaderPortalDoctor />
       </nav>
       <div className="flex flex-1">
         <aside className="w-1/6 bg-gray-200 text-black">
@@ -340,6 +379,22 @@ const DoctorMakeAppointment = () => {
                   </div>
                 </div>
               ))}
+
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Assisting Hygienist:</label>
+                <select
+                  value={selectedAssistingHygienist}
+                  onChange={(e) => setSelectedAssistingHygienist(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                >
+                <option value="">None</option>
+                {availableStaff.map((staffID) => (
+                  <option key={staffID} value={staffID}>
+                    {`Staff ID: ${staffID}`}
+                  </option>
+                ))}
+                </select>
+              </div>
   
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Reason for Appointment:</label>

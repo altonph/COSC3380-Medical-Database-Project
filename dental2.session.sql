@@ -18,6 +18,11 @@ VALUES (1, 1);
 
 -- @block
 INSERT INTO office_dentist (officeID, dentistID)
+VALUES (2, 1);
+
+
+-- @block
+INSERT INTO office_dentist (officeID, dentistID)
 VALUES (1, 2);
 
 -- @block
@@ -29,6 +34,10 @@ VALUES (1, 1, TRUE, FALSE, TRUE, FALSE, TRUE);
 
 -- @block
 INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
+VALUES (2, 1, FALSE, TRUE, FALSE, TRUE, FALSE);
+
+-- @block
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
 VALUES (1, 2, TRUE, FALSE, TRUE, FALSE, TRUE);
 
 -- @block
@@ -37,6 +46,18 @@ SELECT * FROM schedule;
 -- @block
 INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, Salary)
 VALUES (1, 'John', 'Doe', 'johndoe@example.com', '1234567890', '1990-05-15', '123 Main St, Anytown, USA', 'Receptionist', '2022-01-01', 30000);
+
+-- @block
+INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, Salary)
+VALUES (2, 'Michael', 'Johnson', 'mikejohnson@example.com', '1234567890', '2000-05-15', '123 Main St, Anytown, USA', 'Hygienist', '2022-01-01', 30000);
+
+-- @block
+INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, Salary)
+VALUES (1, 'Michelle', 'Michelle', 'mm@example.com', '1234567890', '2000-05-15', '123 Main St, Anytown, USA', 'Hygienist', '2022-01-01', 30000);
+
+-- @block
+INSERT INTO staff (officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, Salary)
+VALUES (2, 'Random', 'Person', 'randomperson@example.com', '1234567890', '2000-05-15', '123 Main St, Anytown, USA', 'Receptionist', '2022-01-01', 30000);
 
 -- @block
 SELECT * FROM staff;
@@ -66,7 +87,27 @@ VALUES (1, 2, 1, 1, '2024-04-03', '12:00:00', '13:00:00', 'Cleaning', 'Scheduled
 
 -- @block
 INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (1, 2, 1, 1, '2024-04-29', '12:00:00', '13:00:00', 'Cleaning', 'Scheduled');
+
+-- @block
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (1, 1, 1, 1, '2024-04-29', '12:00:00', '13:00:00', 'Cleaning', 'Scheduled');
+
+-- @block
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
 VALUES (1, 2, 1, 1, '2024-04-19', '12:00:00', '14:00:00', 'Cleaning', 'Scheduled');
+
+-- @block
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (1, 2, 3, 1, '2024-04-19', '14:00:00', '15:00:00', 'Cleaning', 'Scheduled');
+
+-- @block
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (2, 2, 3, 1, '2024-04-29', '9:00:00', '10:00:00', 'Cleaning', 'Scheduled');
+
+-- @block
+INSERT INTO appointment (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status)
+VALUES (2, 1, 10, 1, '2024-04-22', '9:00:00', '10:00:00', 'Cleaning', 'Scheduled');
 
 -- @block
 SELECT * FROM APPOINTMENT;
@@ -137,3 +178,6 @@ SELECT * FROM staff;
 
 -- @block
 DELETE FROM visit_details;
+
+-- @block
+DELETE FROM appointment;

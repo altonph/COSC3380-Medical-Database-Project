@@ -17,7 +17,7 @@ const StaffEditMedicalHistory = () => {
         }
 
         const response = await fetch(
-          `http://localhost:5000/api/staff/patients/${patientID}/medical-history`,
+          `http://localhost:5000/api/doctor/patients/${patientID}/medical-history`,
           {
             method: "GET",
             headers: {
@@ -64,7 +64,7 @@ const StaffEditMedicalHistory = () => {
 
       const updatedHistory = editableMedicalHistory[index];
       const response = await fetch(
-        `http://localhost:5000/api/staff/patients/${patientID}/medical-history`,
+        `http://localhost:5000/api/doctor/patients/${patientID}/medical-history`,
         {
           method: "PUT",
           headers: {
@@ -156,8 +156,8 @@ const StaffEditMedicalHistory = () => {
                             <input type="text" id={`notes${index}`} name="Notes" value={history.Notes} onChange={(e) => handleInputChange(e, index)} />
                           </div>
                           <div className="mt-2">
-                            <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" onClick={() => handleSaveClick(index)}>Save</button>
-                            <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-2" onClick={() => handleCancelClick(index)}>Cancel</button>
+                            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onClick={() => handleSaveClick(index)}>Save</button>
+                            <button className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 ml-2" onClick={() => handleCancelClick(index)}>Cancel</button>
                           </div>
                         </>
                       ) : (
@@ -183,6 +183,9 @@ const StaffEditMedicalHistory = () => {
 
             <div className="mt-8">
               <Link to={`/staff/patients/${patientID}`} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Back to Patient {patientID}</Link>
+              {medicalHistory.length === 0 && (
+                <Link to={`/staff/patients/${patientID}/add-medical-history`} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 ml-4">Add Medical History</Link>
+              )}
             </div>
           </main>
         </div>

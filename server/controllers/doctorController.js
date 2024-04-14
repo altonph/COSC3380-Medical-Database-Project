@@ -686,6 +686,65 @@ const generateInvoice = (req, res) => {
     });
 };
 
+const getAvailableStaff = (req, res) => {
+    let body = '';
+
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+
+    req.on('end', async () => {
+        try {
+            const requestData = JSON.parse(body);
+            const { officeID, date, startTime, endTime } = requestData;
+
+            const overlappingStaffQuery = `
+                SELECT DISTINCT staffID
+                FROM appointment
+                WHERE officeID = ? 
+                AND Date = ?
+                AND Appointment_status <> 'Cancelled'
+                AND ((Start_time >= ? AND Start_time < ?)
+                OR (End_time > ? AND End_time <= ?)
+                OR (Start_time <= ? AND End_time >= ?))
+            `;
+
+            const availableStaffQuery = `
+                SELECT DISTINCT staffID
+                FROM staff
+                WHERE officeID = ?
+                AND staffID NOT IN (
+                    SELECT DISTINCT staffID
+                    FROM appointment
+                    WHERE officeID = ?
+                    AND Date = ?
+                    AND Appointment_status <> 'Cancelled'
+                    AND ((Start_time >= ? AND Start_time < ?)
+                    OR (End_time > ? AND End_time <= ?)
+                    OR (Start_time <= ? AND End_time >= ?))
+                )
+                AND position = 'Hygienist'
+            `;
+
+            const overlappingStaffResults = await pool.promise().query(overlappingStaffQuery, [officeID, date, startTime, endTime, startTime, endTime, startTime, endTime]);
+            const availableStaffResults = await pool.promise().query(availableStaffQuery, [officeID, officeID, date, startTime, endTime, startTime, endTime, startTime, endTime]);
+
+            const overlappingStaffIDs = overlappingStaffResults[0].map(row => row.staffID);
+            const availableStaffIDs = availableStaffResults[0].map(row => row.staffID);
+
+            const availableStaff = availableStaffIDs.filter(staffID => !overlappingStaffIDs.includes(staffID));
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ availableStaff }));
+        } catch (error) {
+            console.error('Error parsing request body:', error);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Bad Request' }));
+        }
+    });
+};
+
+
 module.exports = {
     getAllPatients,
     getPatientById,
@@ -708,5 +767,6 @@ module.exports = {
     updateAppointmentStatus,
     checkPatientExistence,
     generateInvoice,
-    updatePrimaryApproval
+    updatePrimaryApproval,
+    getAvailableStaff
 };

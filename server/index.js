@@ -76,6 +76,8 @@ const server = http.createServer((req, res) => {
         handleArchivePatient(req, res);
     } else if (req.url.startsWith('/api/dentist/getAvailableTimeBlocks') && req.method === 'GET') {
         handleGetAvailableTimeBlocks(req, res); 
+    } else if (req.url.startsWith('/api/dentist/getAvailableStaff') && req.method === 'GET') {
+        handleGetAvailableStaff(req, res); 
     } else if (req.url.startsWith('/api/admin/appointment-data-report') && req.method === 'POST') {
         handleGenerateAppointmentReport(req, res); 
     } else if (req.url.startsWith('/api/admin/finance-revenue-report') && req.method === 'GET') {
