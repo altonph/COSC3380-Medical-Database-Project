@@ -9,14 +9,41 @@ const AdminStaff = () => {
     const [dentists, setDentists] = useState([]);
     const [staff, setStaff] = useState([]);
 
-    const [dob, setDob] = useState(null);
-    const [startDate, setStartDate] = useState(null);
-
     useEffect(() => {
         // Fetch dentist and staff data when component mounts
         fetchDentists();
         fetchStaff();
     }, []);
+
+    const fetchDentists = async () => {
+        try {
+            const response = await fetch("http://localhost:5000/api/admin/getDentists");
+            if (response.ok) {
+                const data = await response.json();
+                setDentists(data);
+            } else {
+                console.error("Failed to fetch dentists:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error fetching dentists:", error);
+        }
+    };
+
+    const fetchStaff = async () => {
+        try {
+            // Fetch staff data here
+            // Replace the URL with your actual backend endpoint
+            const response = await fetch("http://localhost:5000/api/admin/getStaff");
+            if (response.ok) {
+                const data = await response.json();
+                setStaff(data);
+            } else {
+                console.error("Failed to fetch staff:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error fetching staff:", error);
+        }
+    };
 
     const [editMode, setEditMode] = useState(false);
     const [editedDentist, setEditedDentist] = useState(null);
@@ -70,7 +97,6 @@ const AdminStaff = () => {
         return `${year}-${month}-${day}`;
     };
     
-
     const handleEditClick = (dentistID) => {
         // Set edit mode to true and populate selectedDentistID
         setEditMode(true);
@@ -99,8 +125,6 @@ const AdminStaff = () => {
         });
     };
     
-    
-
     const handleCancelEdit = () => {
         // Reset edit mode, clear editedDentist state, and deselect dentist
         setEditMode(false);
@@ -205,36 +229,6 @@ const AdminStaff = () => {
         }
     };
 
-    const fetchDentists = async () => {
-        try {
-            const response = await fetch("http://localhost:5000/api/admin/getDentists");
-            if (response.ok) {
-                const data = await response.json();
-                setDentists(data);
-            } else {
-                console.error("Failed to fetch dentists:", response.statusText);
-            }
-        } catch (error) {
-            console.error("Error fetching dentists:", error);
-        }
-    };
-
-    const fetchStaff = async () => {
-        try {
-            // Fetch staff data here
-            // Replace the URL with your actual backend endpoint
-            const response = await fetch("http://localhost:5000/api/admin/getStaff");
-            if (response.ok) {
-                const data = await response.json();
-                setStaff(data);
-            } else {
-                console.error("Failed to fetch staff:", response.statusText);
-            }
-        } catch (error) {
-            console.error("Error fetching staff:", error);
-        }
-    };
-
     const formatActiveStatus = (isActive) => {
         return isActive ? "Active" : "Inactive";
     };
@@ -250,23 +244,99 @@ const AdminStaff = () => {
         }
     };
 
-    // Handle date change for date pickers
-    const handleDobChange = (date) => {
-        setDob(date);
-        setEditedDentistProfile({ ...editedDentistProfile, DOB: date });
-    };
+    // Add state variables for delete mode, deleted staff, and deleted staff profile
+const [deleteModeStaff, setDeleteModeStaff] = useState(false);
+const [deletedStaff, setDeletedStaff] = useState(null);
+const [deletedStaffProfile, setDeletedStaffProfile] = useState({
+    staffID: "",
+    End_date: "", // Only End date will be editable for deletion
+    Is_active: false // Set Is_active to false for deletion
+});
 
-    const handleStartDateChange = (date) => {
-        setStartDate(date);
-        setEditedDentistProfile({ ...editedDentistProfile, Start_date: date });
-    };
+// Handle delete click for staff
+const handleDeleteStaffClick = (staffID) => {
+    // Set delete mode to true and populate selectedStaffID
+    setDeleteModeStaff(true);
+    setSelectedStaffID(staffID);
+    
+    // Find the staff member being deleted
+    const staffToDelete = staff.find(member => member.staffID === staffID);
+    
+    // Set the deletedStaffProfile state with the current values of the staff member
+    setDeletedStaffProfile({
+        staffID: staffToDelete.staffID,
+        End_date: staffToDelete.End_date || "", // Set End date (if available)
+        Is_active: false // Set Is_active to false for deletion
+    });
+};
 
-    // Modify the dropdown selection to update the office ID
-    const handleOfficeChange = (e) => {
-        const { value } = e.target;
-        setEditedStaffProfile({ ...editedStaffProfile, officeID: value });
-    };
+// Handle cancel delete for staff
+const handleCancelDeleteStaff = () => {
+    // Reset delete mode and deselect staff
+    setDeleteModeStaff(false);
+    setSelectedStaffID(null);
+};
 
+// Handle input change for deletion
+const handleDeleteStaffInputChange = (e, staffID) => {
+    const { name, value } = e.target;
+    setEditedStaffProfile({ ...editedStaffProfile, [name]: value });
+};
+
+
+// Handle confirm delete for staff
+const handleConfirmDeleteStaff = async () => {
+    // Check if End date is entered
+    if (!deletedStaffProfile.End_date) {
+        // Display an error message or alert indicating that End date is required
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:5000/api/staff/deleteStaff/${selectedStaffID}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(deletedStaffProfile)
+        });
+
+        if (response.ok) {
+            // Data successfully updated
+            setDeleteModeStaff(false);
+            setSelectedStaffID(null);
+            window.location.reload();
+        } else {
+            console.error('Failed to delete staff member:', response.statusText);
+            // Handle error case here
+        }
+    } catch (error) {
+        console.error('Error deleting staff member:', error);
+        // Handle error case here
+    }
+};
+
+
+
+    // const [dob, setDob] = useState(null);
+    // const [startDate, setStartDate] = useState(null);
+
+    // // Handle date change for date pickers
+    // const handleDobChange = (date) => {
+    //     setDob(date);
+    //     setEditedDentistProfile({ ...editedDentistProfile, DOB: date });
+    // };
+
+    // const handleStartDateChange = (date) => {
+    //     setStartDate(date);
+    //     setEditedDentistProfile({ ...editedDentistProfile, Start_date: date });
+    // };
+
+    // // Modify the dropdown selection to update the office ID
+    // const handleOfficeChange = (e) => {
+    //     const { value } = e.target;
+    //     setEditedStaffProfile({ ...editedStaffProfile, officeID: value });
+    // };
 
     return (
         <>
@@ -613,7 +683,18 @@ const AdminStaff = () => {
                                                         new Date(staffMember.Start_date).toLocaleDateString()
                                                     )}
                                                 </td>
-                                                <td className="border px-2 py-1">{staffMember.End_date ? new Date(staffMember.End_date).toLocaleDateString() : "N/A"}</td>
+                                                <td className="border px-2 py-1">
+                                                    {deleteModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                        <input
+                                                            type="date"
+                                                            name="End_date"
+                                                            value={editedStaffProfile.End_date || new Date().toISOString().substr(0, 10)}
+                                                            onChange={(e) => handleDeleteStaffInputChange(e, staffMember.staffID)}
+                                                        />
+                                                    ) : (
+                                                        staffMember.End_date ? new Date(staffMember.End_date).toLocaleDateString() : "N/A"
+                                                    )}
+                                                </td>
                                                 <td className="border px-2 py-1">
                                                     {editModeStaff && selectedStaffID === staffMember.staffID ? (
                                                         <input
@@ -639,7 +720,14 @@ const AdminStaff = () => {
                                                                 onClick={() => handleEditStaffClick(staffMember.staffID)}>
                                                                 Edit
                                                             </button>
-                                                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Delete</button>
+                                                            {deleteModeStaff && selectedStaffID === staffMember.staffID ? (
+                                                                <>
+                                                                    <button onClick={handleConfirmDeleteStaff} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Confirm Delete</button>
+                                                                    <button onClick={handleCancelDeleteStaff} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded">Cancel Delete</button>
+                                                                </>
+                                                            ) : (
+                                                                <button onClick={() => handleDeleteStaffClick(staffMember.staffID)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Delete</button>
+                                                            )}
                                                         </>
                                                     )}
                                                 </td>
