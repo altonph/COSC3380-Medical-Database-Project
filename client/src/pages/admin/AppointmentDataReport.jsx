@@ -109,7 +109,9 @@ function AppointmentDataReport() {
               <li><a href="/admin/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
               <li><a href="/admin/staff" className="block py-2 text-center text-gray-600 hover:text-black">Staff</a></li>
               <li><a href="/admin/appointment-data-report" className="block py-2 text-center font-bold underline">Appointment Data Report</a></li>
-              <li><a href="/admin/finance-data-report" className="block py-2 text-center">Finance Data Report</a></li>
+              <li><a href="/admin/finance-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Finance Data Report</a></li>
+              <li><a href="/admin/demographic-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Demographic Data Report</a></li>
+
             </ul>
           </nav>
         </aside>

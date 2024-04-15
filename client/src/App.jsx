@@ -47,6 +47,7 @@ import DoctorProfile from "./pages/doctor/DoctorProfile";
 import ContactPage from "./pages/ContactPage";
 import AdminRegisterDentist from "./pages/admin/AdminRegisterDentist";
 import AdminRegisterStaff from "./pages/admin/AdminRegisterStaff";
+import DemographicDataReport from "./pages/admin/DemographicDataReport";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -100,6 +101,7 @@ function App() {
             <Route path="/admin/login" element={<AdminLogin/>}/>
             <Route path="/admin/appointment-data-report" element={<AppointmentDataReport/>}/>
             <Route path="/admin/finance-data-report" element={<FinanceDataReport/>}/>
+            <Route path="/admin/demographic-data-report" element={<DemographicDataReport/>}/>
             <Route path="/admin/staff" element={<AdminStaff/>}/>
             <Route path="/admin/profile" element={<AdminProfile/>}/>
             <Route path="/admin/register-dentist" element={<AdminRegisterDentist/>}/>
