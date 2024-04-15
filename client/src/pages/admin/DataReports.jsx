@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import HeaderPortalAdmin from '../../components/HeaderPortalAdmin';
 import Footer from '../../components/Footer';
 
+
 function DataReports() {
   const [speciality, setSpeciality] = useState('');
   const [reportData, setReportData] = useState([]);
