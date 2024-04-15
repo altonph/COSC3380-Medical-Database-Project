@@ -88,7 +88,7 @@ const DoctorPatients = () => {
         <>
             <div className="flex h-screen flex-col">
                 <nav>
-                    <HeaderPortalStaff />
+                    <HeaderPortalAdmin />
                 </nav>
 
                 <div className="flex flex-1">
@@ -123,7 +123,7 @@ const DoctorPatients = () => {
                                 {patients.map(patient => (
                                     <tr key={patient.patientID}>
                                         <td className="border px-4 py-2 text-xs">
-                                            <Link to={`/staff/patients/${patient.patientID}`}>{patient.patientID}</Link>
+                                            <Link to={`/doctor/patients/${patient.patientID}`}>{patient.patientID}</Link>
                                         </td>
                                         <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="insuranceID" value={editedPatients.Policy_number || ''} onChange={handleInputChange} /> : patient.Policy_number}</td>
                                         <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="insuranceID" value={editedPatients.Insurance_Company_Name || ''} onChange={handleInputChange} /> : patient.Insurance_Company_Name}</td>

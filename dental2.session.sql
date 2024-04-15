@@ -20,6 +20,11 @@ VALUES (1, 1);
 INSERT INTO office_dentist (officeID, dentistID)
 VALUES (2, 1);
 
+-- @block
+INSERT INTO office_dentist (officeID, dentistID)
+VALUES (1, 7);
+
+
 
 -- @block
 INSERT INTO office_dentist (officeID, dentistID)
@@ -39,6 +44,15 @@ VALUES (2, 1, FALSE, TRUE, FALSE, TRUE, FALSE);
 -- @block
 INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
 VALUES (1, 2, TRUE, FALSE, TRUE, FALSE, TRUE);
+
+-- @block
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
+VALUES (1, 7, TRUE, FALSE, TRUE, FALSE, TRUE);
+
+-- @block
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
+VALUES (2, 7, TRUE, FALSE, TRUE, FALSE, TRUE);
+
 
 -- @block
 SELECT * FROM schedule;

@@ -232,6 +232,7 @@ function loginDoctor(username, password, res, jwt) {
 
             const doctor = results[0];
             const doctorId = doctor.DentistID;
+            const doctorSpecialty = doctor.Specialty;
 
             bcrypt.compare(password, doctor.Password, (err, result) => {
                 if (err) {
@@ -250,10 +251,11 @@ function loginDoctor(username, password, res, jwt) {
                     const token = jwt.sign({ 
                         doctorId, 
                         username: doctor.Username, 
-                        role: doctor.User_role
+                        role: doctor.User_role,
+                        specialty: doctorSpecialty
                     }, process.env.JWT_SECRET, { expiresIn: '2h' });                
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ token, role: doctor.User_role })); 
+                    res.end(JSON.stringify({ token, role: doctor.User_role, specialty: doctor.Specialty })); 
                 } else {
                     res.writeHead(401, { 'Content-Type': 'text/plain' });
                     res.end('Incorrect password');

@@ -10,9 +10,9 @@ const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes');
 const { staffRoutes, staffverifyToken } = require('./routes/staffRoutes');
 const { handleGenerateAppointmentReport, handleGetAllDentists, handleGetAllPatients, handleGetAllStaff } = require('./routes/adminRoutes'); 
 const { handleAssignDentistToOffice } = require('./routes/officeRoutes');
-const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff, handleGetAvailableTimeBlocks } = require('./routes/dentistRoutes');
+const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff, handleGetAvailableTimeBlocks, handleGetAllDentistsByOfficeAndDay } = require('./routes/dentistRoutes');
 const { handleGenerateRevenueReport } = require('./routes/adminRoutes');    
-
+const { getSpecialtyByDoctorUsername } = require('./controllers/doctorController');
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, UPDATE, PATCH, OPTIONS');
@@ -60,6 +60,8 @@ const server = http.createServer((req, res) => {
         handleAssignDentistSchedule(req, res);
     } else if (req.url.startsWith('/api/dentist/getDentist') && req.method === 'GET') {
         handleGetDentistsByOfficeAndDay(req, res);
+    } else if (req.url.startsWith('/api/dentist/getAllDentists') && req.method === 'GET') {
+        handleGetAllDentistsByOfficeAndDay(req, res);
     } else if (req.url.startsWith('/api/dentist/updateAppointmentWithStaff') && req.method === 'PATCH') {
         handleUpdateAppointmentWithStaff(req, res);
     } else if (req.url.startsWith('/api/dentist/editDentist') && req.method === 'PATCH') {
@@ -89,6 +91,9 @@ const server = http.createServer((req, res) => {
     }  else if (req.url.startsWith('/api/admin/getStaff') && req.method === 'GET') {
         handleGetAllStaff(req, res);
     }  
+    else if (req.url === '/api/doctor/appointments/get-specialty' && req.method === 'GET') {
+        getSpecialtyByDoctorUsername(req, res);
+    }
     
     
     

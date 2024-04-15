@@ -744,6 +744,98 @@ const getAvailableStaff = (req, res) => {
     });
 };
 
+const verifyPrimaryApproval = (req, res) => {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        try {
+            const requestData = JSON.parse(body);
+            const { patientID, dentistID } = requestData;
+
+            pool.query(
+                'SELECT Specialty FROM dentist WHERE dentistID = ?',
+                [dentistID],
+                (error, results) => {
+                    if (error) {
+                        console.error('Error checking doctor specialty:', error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                        return;
+                    }
+
+                    const doctorSpecialty = results[0].Specialty;
+                    console.log(doctorSpecialty);
+
+                    if (doctorSpecialty !== 'Endodontist') {
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ verified: false }));
+                    } else {
+                        pool.query(
+                            'SELECT COUNT(*) AS approvedCount FROM appointment WHERE patientID = ? AND Primary_approval = "Approved"',
+                            [patientID],
+                            (error, results) => {
+                                if (error) {
+                                    console.error('Error checking primary approval:', error);
+                                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                    return;
+                                }
+
+                                const approvedCount = results[0].approvedCount;
+                                const verified = approvedCount > 0;
+
+                                res.writeHead(200, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ verified }));
+                            }
+                        );
+                    }
+                }
+            );
+        } catch (error) {
+            console.error('Error parsing request body:', error);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Bad Request' }));
+        }
+    });
+};
+
+const getSpecialtyByDoctorUsername = (req, res, username) => {
+    pool.query('SELECT dentistID FROM login WHERE Username = ?', [username], (error, results) => {
+        if (error) {
+            console.error('Error retrieving doctor ID:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            return;
+        }
+
+        if (results.length === 0) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Doctor not found' }));
+            return;
+        }
+
+        const doctorId = results[0].dentistID;
+        pool.query('SELECT Specialty FROM dentist WHERE dentistID = ?', [doctorId], (error, results) => {
+            if (error) {
+                console.error('Error retrieving dentist specialty:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            }
+
+            if (results.length === 0) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Dentist specialty not found' }));
+                return;
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(results[0]));
+        });
+    });
+};
 
 module.exports = {
     getAllPatients,
@@ -768,5 +860,7 @@ module.exports = {
     checkPatientExistence,
     generateInvoice,
     updatePrimaryApproval,
-    getAvailableStaff
+    getAvailableStaff,
+    verifyPrimaryApproval,
+    getSpecialtyByDoctorUsername
 };
