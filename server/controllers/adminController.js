@@ -93,7 +93,7 @@ const generateRevenueReport = (req, res, office, startDate, endDate) => {
             d.LName AS Dentist_LastName,
             p.FName AS Patient_FirstName,
             p.LName AS Patient_LastName,
-            i.Total_Amount
+            i.Gross_Amount
         FROM appointment a
         JOIN visit_details vd ON a.patientID = vd.patientID
         JOIN invoice i ON vd.visitID = i.visitID
