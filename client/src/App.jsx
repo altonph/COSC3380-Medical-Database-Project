@@ -45,6 +45,7 @@ import DoctorPortal from "./pages/doctor/DoctorPortal";
 import AdminProfile from "./pages/admin/AdminProfile";
 import DoctorProfile from "./pages/doctor/DoctorProfile";
 import ContactPage from "./pages/ContactPage";
+import AdminRegisterDentist from "./pages/admin/AdminRegisterDentist";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -100,6 +101,7 @@ function App() {
             <Route path="/admin/finance-data-report" element={<FinanceDataReport/>}/>
             <Route path="/admin/staff" element={<AdminStaff/>}/>
             <Route path="/admin/profile" element={<AdminProfile/>}/>
+            <Route path="/admin/register-dentist" element={<AdminRegisterDentist/>}/>
           </Routes>
         </Router>
   );

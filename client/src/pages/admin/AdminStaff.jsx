@@ -269,7 +269,10 @@ const AdminStaff = () => {
                     <main className="flex-1 p-4">
                         {/* Dentist Profiles */}
                         <div>
-                            <h1 className="text-2xl font-bold mb-4">Dentist Profiles</h1>
+                            <div className="flex items-center gap-4 mb-4">
+                                <h1 className="text-2xl font-bold">Dentist Profiles</h1>
+                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"><a href= "/admin/register-dentist">+ Register Dentist</a></button>
+                            </div>
                             <div className="overflow-x-auto">
                                 <table className="table-auto bg-white border border-gray-300 rounded-lg shadow-md">
                                     <thead>
@@ -437,7 +440,10 @@ const AdminStaff = () => {
                         
                         {/* Staff Profiles */}
                         <div className="mt-8">
-                            <h1 className="text-2xl font-bold mb-4">Staff Profiles</h1>
+                            <div className="flex items-center gap-4 mb-4">
+                                <h1 className="text-2xl font-bold">Staff Profiles</h1>
+                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"><a href="/admin/register-staff">+ Register Staff</a></button>
+                            </div>
                             <div className="overflow-x-auto">
                                 <table className="table-auto bg-white border border-gray-300 rounded-lg shadow-md">
                                     <thead>
