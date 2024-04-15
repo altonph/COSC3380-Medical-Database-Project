@@ -16,6 +16,33 @@ const DoctorAddVisitDetails = () => {
   const [isInsertSuccessPrescriptions, setIsInsertSuccessPrescriptions] = useState(false);
   const [scheduleFollowUp, setScheduleFollowUp] = useState(false);
   const [approveForSpecialist, setApproveForSpecialist] = useState(false);
+  const [doctorSpecialty, setDoctorSpecialty] = useState(null);
+
+    useEffect(() => {
+      const fetchDoctorSpecialty = async () => {
+          try {
+              const token = localStorage.getItem('token');
+
+              const response = await fetch('http://localhost:5000/api/doctor/appointments/get-specialty', {
+                  method: 'GET',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}`
+                  }
+              });
+
+              if (!response.ok) {
+                  throw new Error('Failed to fetch doctor specialty');
+              }
+              const data = await response.json();
+              setDoctorSpecialty(data.Specialty);
+              console.log('Doctor Specialty:', data.Specialty);
+          } catch (error) {
+              console.error('Error fetching doctor specialty:', error);
+          }
+      };
+      fetchDoctorSpecialty();
+  }, []);
 
   useEffect(() => {
     const storedAppointment = localStorage.getItem('appointmentDetails');
@@ -365,7 +392,8 @@ const DoctorAddVisitDetails = () => {
                 />
               </div>
 
-              <div>
+              {doctorSpecialty === 'General Dentistry' && (
+                <div>
                   <label className="block mt-2 text-lg">
                     <input
                       type="checkbox"
@@ -375,6 +403,7 @@ const DoctorAddVisitDetails = () => {
                     Approve for patient to see specialist
                   </label>
                 </div>
+              )}
   
               <div className="col-span-2">
               <button

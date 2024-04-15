@@ -801,7 +801,14 @@ const verifyPrimaryApproval = (req, res) => {
     });
 };
 
-const getSpecialtyByDoctorUsername = (req, res, username) => {
+const jwt = require('jsonwebtoken');
+
+const getSpecialtyByDoctorUsername = (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const { username } = decodedToken;
+
     pool.query('SELECT dentistID FROM login WHERE Username = ?', [username], (error, results) => {
         if (error) {
             console.error('Error retrieving doctor ID:', error);
