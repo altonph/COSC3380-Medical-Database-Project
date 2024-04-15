@@ -17,6 +17,33 @@ const DoctorAppointment = () => {
     const [hasVisitDetailsForSelected, setHasVisitDetailsForSelected] = useState(false);
     const [completed, setCompleted] = useState(false);
     const [cancelled, setCancelled] = useState(false);
+    const [doctorSpecialty, setDoctorSpecialty] = useState(null);
+
+    useEffect(() => {
+      const fetchDoctorSpecialty = async () => {
+          try {
+              const token = localStorage.getItem('token');
+
+              const response = await fetch('http://localhost:5000/api/doctor/appointments/get-specialty', {
+                  method: 'GET',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}`
+                  }
+              });
+
+              if (!response.ok) {
+                  throw new Error('Failed to fetch doctor specialty');
+              }
+              const data = await response.json();
+              setDoctorSpecialty(data);
+              console.log('Doctor Specialty:', data);
+          } catch (error) {
+              console.error('Error fetching doctor specialty:', error);
+          }
+      };
+      fetchDoctorSpecialty();
+  }, []);
 
     const convertTo12HourFormat = (time) => {
       const [hours, minutes] = time.split(':');

@@ -195,3 +195,6 @@ DELETE FROM visit_details;
 
 -- @block
 DELETE FROM appointment;
+
+-- @block
+SELECT dentistID FROM login WHERE Username = 'jane_doe';
