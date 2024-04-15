@@ -16,14 +16,14 @@ const AdminRegisterStaff = () => {
     const [Position, setPosition] = useState('');
     const [Username, setUsername] = useState('');
     const [Password, setPassword] = useState('');
-    const [Office, setOffice] = useState('');
+    const [officeID, setofficeID] = useState('');
     const navigateTo = useNavigate(); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const body = {
-                Office: Office,
+                officeID: officeID,
                 Fname: Fname,
                 Lname: Lname,
                 Email: Email,
@@ -175,8 +175,8 @@ const AdminRegisterStaff = () => {
                         <div className="mb-4">
                             <label htmlFor="Office" className="block">Office</label>
                             <select 
-                                value={Office} 
-                                onChange={(e) => setOffice(e.target.value)} 
+                                value={officeID} 
+                                onChange={(e) => setofficeID(e.target.value)} 
                                 id="Office" 
                                 name="Office"
                                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"

@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import HeaderPortalAdmin from "../../components/HeaderPortalAdmin";
 import Footer from "../../components/Footer";
+import DatePicker from "react-datepicker"; // Import React Datepicker library
+import "react-datepicker/dist/react-datepicker.css"; // Import React Datepicker styles
 
 const AdminStaff = () => {
     // State variables to hold dentist and staff data
     const [dentists, setDentists] = useState([]);
     const [staff, setStaff] = useState([]);
+
+    const [dob, setDob] = useState(null);
+    const [startDate, setStartDate] = useState(null);
 
     useEffect(() => {
         // Fetch dentist and staff data when component mounts
@@ -243,6 +248,24 @@ const AdminStaff = () => {
         }
     };
 
+    // Handle date change for date pickers
+    const handleDobChange = (date) => {
+        setDob(date);
+        setEditedDentistProfile({ ...editedDentistProfile, DOB: date });
+    };
+
+    const handleStartDateChange = (date) => {
+        setStartDate(date);
+        setEditedDentistProfile({ ...editedDentistProfile, Start_date: date });
+    };
+
+    // Modify the dropdown selection to update the office ID
+    const handleOfficeChange = (e) => {
+        const { value } = e.target;
+        setEditedStaffProfile({ ...editedStaffProfile, officeID: value });
+    };
+
+
     return (
         <>
             <div className="flex h-screen flex-col">
@@ -383,7 +406,7 @@ const AdminStaff = () => {
                                                         <input
                                                             type="date"
                                                             name="DOB"
-                                                            value={editedDentistProfile.Start_date || new Date(dentist.DOB).toISOString().substr(0, 10)}
+                                                            value={editedDentistProfile.DOB || new Date(dentist.DOB).toISOString().substr(0, 10)}
                                                             onChange={(e) => handleInputChange(e, dentist.dentistID)}
                                                         />
                                                     ) : (
@@ -472,8 +495,8 @@ const AdminStaff = () => {
                                                 <td className="border px-2 py-1">
                                                     {editModeStaff && selectedStaffID === staffMember.staffID ? (
                                                         <select
-                                                            name="Position"
-                                                            value={editedStaffProfile.officeID || staffMember.officeID}
+                                                            name="officeID"
+                                                            value={editedStaffProfile.officeID}
                                                             onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
                                                             style={{ width: "90%" }}
                                                         >
@@ -569,7 +592,7 @@ const AdminStaff = () => {
                                                         <input
                                                             type="date"
                                                             name="DOB"
-                                                            value={editedStaffProfile.Start_date || new Date(staffMember.DOB).toISOString().substr(0, 10)}
+                                                            value={editedStaffProfile.DOB || new Date(staffMember.DOB).toISOString().substr(0, 10)}
                                                             onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
                                                         />
                                                     ) : (
