@@ -124,6 +124,7 @@ const AdminStaff = () => {
                 setEditMode(false);
                 setEditedDentistProfile(null);
                 setSelectedDentistID(null);
+                window.location.reload();
             } else {
                 console.error('Failed to update dentist information:', response.statusText);
                 // Handle error case here
@@ -193,6 +194,7 @@ const AdminStaff = () => {
                 setEditModeStaff(false);
                 setEditedStaffProfile(null);
                 setSelectedStaffID(null);
+                window.location.reload();
             } else {
                 console.error('Failed to update staff information:', response.statusText);
                 // Handle error case here
