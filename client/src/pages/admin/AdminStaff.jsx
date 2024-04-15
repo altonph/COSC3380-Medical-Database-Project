@@ -57,11 +57,44 @@ const AdminStaff = () => {
         setEditedDentistProfile({ ...editedDentistProfile, [name]: value });
     };
 
+    const formatDateForBackend = (dateString) => {
+        const date = new Date(dateString);
+        const year = date.getUTCFullYear();
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); 
+        const day = String(date.getUTCDate()).padStart(2, '0'); 
+        return `${year}-${month}-${day}`;
+    };
+    
+
     const handleEditClick = (dentistID) => {
         // Set edit mode to true and populate selectedDentistID
         setEditMode(true);
         setSelectedDentistID(dentistID);
+        
+        // Find the dentist being edited
+        const dentistToEdit = dentists.find(dentist => dentist.dentistID === dentistID);
+        
+        // Format the date of birth (DOB) into YYYY-MM-DD format
+        const formattedDOB = formatDateForBackend(dentistToEdit.DOB);
+        
+        // Set the editedDentistProfile state with the current values of the dentist
+        setEditedDentistProfile({
+            dentistID: dentistToEdit.dentistID,
+            FName: dentistToEdit.FName,
+            LName: dentistToEdit.LName,
+            Specialty: dentistToEdit.Specialty,
+            Email: dentistToEdit.Email,
+            Phone_num: dentistToEdit.Phone_num,
+            Address: dentistToEdit.Address,
+            DOB: formattedDOB, // Set the formatted date of birth
+            Start_date: dentistToEdit.Start_date,
+            End_date: dentistToEdit.End_date,
+            Is_active: dentistToEdit.Is_active,
+            Salary: dentistToEdit.Salary
+        });
     };
+    
+    
 
     const handleCancelEdit = () => {
         // Reset edit mode, clear editedDentist state, and deselect dentist
@@ -105,7 +138,32 @@ const AdminStaff = () => {
         // Set edit mode to true and populate selectedStaffID
         setEditModeStaff(true);
         setSelectedStaffID(staffID);
-    };
+        
+        // Find the staff member being edited
+        const staffToEdit = staff.find(member => member.staffID === staffID);
+        
+        // Format the date of birth (DOB) into YYYY-MM-DD format (if needed)
+        const formattedDOB = formatDateForBackend(staffToEdit.DOB);
+        const formattedStartDate = formatDateForBackend(staffToEdit.Start_date);
+        const formattedEndDate = formatDateForBackend(staffToEdit.End_date);
+        
+        // Set the editedStaffProfile state with the current values of the staff member
+        setEditedStaffProfile({
+            staffID: staffToEdit.staffID,
+            officeID: staffToEdit.officeID,
+            Fname: staffToEdit.Fname,
+            Lname: staffToEdit.Lname,
+            Email: staffToEdit.Email,
+            Position: staffToEdit.Position,
+            Phone_num: staffToEdit.Phone_num,
+            Address: staffToEdit.Address,
+            DOB: formattedDOB, // Set the formatted date of birth
+            Start_date: formattedStartDate,
+            End_date: formattedEndDate,
+            Is_active: staffToEdit.Is_active,
+            Salary: staffToEdit.Salary
+        });
+    };    
 
     const handleCancelEditStaff = () => {
         // Reset edit mode, clear editedStaff state, and deselect staff
