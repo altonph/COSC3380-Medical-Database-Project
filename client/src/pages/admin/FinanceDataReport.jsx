@@ -32,7 +32,7 @@ function FinanceDataReport() {
     // calculating total for each appt type //
     const getTotalForAppointmentType = (rows, appointmentType) => {
         let total = 0;
-        rows.filter(row => row.Appointment_Type === appointmentType).forEach(row => total += parseFloat(row.Total_Amount))
+        rows.filter(row => row.Appointment_Type === appointmentType).forEach(row => total += parseFloat(row.Gross_Amount))
         return total;
     }
     
@@ -43,7 +43,7 @@ function FinanceDataReport() {
             const dateB = new Date(b[fieldName]);
             return dateA - dateB;
         } 
-        else if (fieldName === 'Total_Amount') {
+        else if (fieldName === 'Gross_Amount') {
             return parseFloat(a[fieldName]) - parseFloat(b[fieldName]);
         }
         else {
@@ -66,7 +66,7 @@ function FinanceDataReport() {
     
     // function to calculate total revenue //
     const getTotalRevenue = (rows) => {
-        return rows.reduce((total, row) => total + parseFloat(row.Total_Amount), 0);
+        return rows.reduce((total, row) => total + parseFloat(row.Gross_Amount), 0);
     };
     
     
@@ -151,7 +151,7 @@ function FinanceDataReport() {
                                         <th onClick={() => sort('Date')} className="py-2 px-4 border-r border-gray-300">Date</th>
                                         <th onClick={() => sort('Dentist_FirstName')} className="py-2 px-4 border-r border-gray-300">Dentist Name</th>
                                         <th onClick={() => sort('Patient_FirstName')} className="py-2 px-4 border-r border-gray-300">Patient Name</th>
-                                        <th onClick={() => sort('Total_Amount')} className="py-2 px-4 border-r border-gray-300">Total</th>
+                                        <th onClick={() => sort('Gross_Amount')} className="py-2 px-4 border-r border-gray-300">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -161,7 +161,7 @@ function FinanceDataReport() {
                                         <td className="py-2 px-4 border-r border-gray-300">{new Date(row.Date).toLocaleDateString()}</td>
                                         <td className="py-2 px-4 border-r border-gray-300">{`${row.Dentist_FirstName} ${row.Dentist_LastName}`}</td>
                                         <td className="py-2 px-4 border-r border-gray-300">{`${row.Patient_FirstName} ${row.Patient_LastName}`}</td>
-                                        <td className="py-2 px-4 border-r border-gray-300">${row.Total_Amount}</td>
+                                        <td className="py-2 px-4 border-r border-gray-300">${row.Gross_Amount}</td>
                                     </tr>
                                 ))}
                                 </tbody>
@@ -174,11 +174,6 @@ function FinanceDataReport() {
                             <div className="mb-4">
                                 <div className="py-2 font-bold">Total Revenue Summed:</div>
                                 <div>Total: ${getTotalRevenue(revenueReportData)}</div>
-                            </div>
-                            <div className="mb-4">
-                                <div className="py-2 font-bold">Checkup:</div>
-                                <div>Total: ${getTotalForAppointmentType(revenueReportData, 'Checkup')}</div>
-                                <div>Percentage of Total Revenue: {(getTotalForAppointmentType(revenueReportData, 'Checkup') / getTotalRevenue(revenueReportData) * 100).toFixed(2)}%</div>
                             </div>
                             <div className="mb-4">
                                 <div className="py-2 font-bold">Cleaning:</div>
