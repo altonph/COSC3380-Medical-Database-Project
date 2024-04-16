@@ -56,10 +56,16 @@ const AdminPortal = () => {
         setEditedDentist({ dentistID: null, originalOffices: [] });
     };
 
-    const handleConfirmEdit = async (newOffices) => {
+    const handleOfficeChange = (e) => {
+        const { value } = e.target;
+        const offices = value.split(',').map(Number);
+        setEditedDentist(prevState => ({ ...prevState, originalOffices: offices }));
+    };
+    
+    const handleConfirmEdit = async () => {
         try {
             // Implement logic to update the offices for the edited dentist
-            console.log(`New offices for Dentist ${editedDentist.dentistID}:`, newOffices);
+            console.log(`New offices for Dentist ${editedDentist.dentistID}:`, editedDentist.originalOffices);
     
             const response = await fetch("http://localhost:5000/api/admin/updateDentistOffice", {
                 method: "POST",
@@ -68,12 +74,12 @@ const AdminPortal = () => {
                 },
                 body: JSON.stringify({
                     dentistID: editedDentist.dentistID,
-                    newOfficeIDs: newOffices
+                    newOfficeIDs: editedDentist.originalOffices
                 })
             });
     
             if (response.ok) {
-                //console.log("Offices updated successfully!");
+                console.log("Offices updated successfully!");
                 // Refresh the page to reflect the changes
                 fetchDentistsAndOffices();
             } else {
@@ -86,16 +92,86 @@ const AdminPortal = () => {
         }
     };
 
-    const handleOfficeChange = (e, dentistID) => {
-        const newOffices = e.target.value.split(',');
-        const updatedDentists = dentists.map(dentist => {
-            if (dentist.dentistID === dentistID) {
-                return { ...dentist, offices: newOffices };
+    const handleAssignOffice = async (dentistID, officeID) => {
+        try {
+            const response = await fetch("http://localhost:5000/api/office/assignDentist", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    officeID: officeID,
+                    dentistID: dentistID
+                })
+            });
+
+            if (response.ok) {
+                console.log("Dentist assigned to office successfully!");
+                // Refresh the page to reflect the changes
+                fetchDentistsAndOffices();
+            } else {
+                console.error("Failed to assign dentist to office");
             }
-            return dentist;
-        });
-        setDentists(updatedDentists);
+        } catch (error) {
+            console.error("Error assigning dentist to office:", error);
+        }
     };
+
+    const handleAssignBothOffices = async (dentistID) => {
+        try {
+            const response1 = await fetch("http://localhost:5000/api/office/assignDentist", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    officeID: 1, // Austin
+                    dentistID: dentistID
+                })
+            });
+    
+            const response2 = await fetch("http://localhost:5000/api/office/assignDentist", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    officeID: 2, // Phoenix
+                    dentistID: dentistID
+                })
+            });
+    
+            if (response1.ok && response2.ok) {
+                console.log("Dentist assigned to both offices successfully!");
+                // Refresh the page to reflect the changes
+                fetchDentistsAndOffices();
+            } else {
+                console.error("Failed to assign dentist to both offices");
+            }
+        } catch (error) {
+            console.error("Error assigning dentist to offices:", error);
+        }
+    };
+    
+
+    const renderActions = (dentist) => {
+        if (dentist.offices.length > 0) {
+            return (
+                <>
+                    <button onClick={() => handleEditOffice(dentist.dentistID, dentist.offices)}>Edit</button>
+                </>
+            );
+        } else {
+            return (
+                <>
+                    <button onClick={() => handleAssignOffice(dentist.dentistID, 1)}>Assign Austin</button>
+                    <button onClick={() => handleAssignOffice(dentist.dentistID, 2)}>Assign Phoenix</button>
+                    <button onClick={() => handleAssignBothOffices(dentist.dentistID)}>Assign Both</button>
+                </>
+            );
+        }
+    };
+    
 
     return (
         <>
@@ -134,42 +210,48 @@ const AdminPortal = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {dentists && dentists.map(dentist => (
-                                    <tr key={dentist.dentistID} className="bg-white">
-                                        <td className="border border-gray-400 px-4 py-2">{dentist.dentistID}</td>
-                                        <td className="border border-gray-400 px-4 py-2">{`${dentist.FName} ${dentist.LName}`}</td>
-                                        <td className="border border-gray-400 px-4 py-2">
-                                            {editedDentist.dentistID === dentist.dentistID ? (
-                                                <select value={dentist.offices} onChange={(e) => handleOfficeChange(e, dentist.dentistID)}>
-                                                    <option value="1">Austin</option>
-                                                    <option value="2">Phoenix</option>
-                                                    <option value="1,2">Both</option>
-                                                </select>
-                                            ) : (
-                                                <span>
-                                                    {dentist.offices.includes(1) && dentist.offices.includes(2) ? 'Both' :
-                                                        dentist.offices.map(officeID => (
-                                                            <span key={officeID}>
-                                                                {officeID === 1 ? 'Austin' : officeID === 2 ? 'Phoenix' : ''}
-                                                            </span>
-                                                        ))}
-                                                </span>
-                                            )}
-                                        </td>
+                            {dentists && dentists.map(dentist => (
+                                <tr key={dentist.dentistID} className="bg-white">
+                                    <td className="border border-gray-400 px-4 py-2">{dentist.dentistID}</td>
+                                    <td className="border border-gray-400 px-4 py-2">{`${dentist.FName} ${dentist.LName}`}</td>
+                                    <td className="border border-gray-400 px-4 py-2">
+                                        {editedDentist.dentistID === dentist.dentistID ? (
+                                            <select value={editedDentist.originalOffices.join(',')} onChange={handleOfficeChange}>
+                                                <option value="1">Austin</option>
+                                                <option value="2">Phoenix</option>
+                                                <option value="1,2">Both</option>
+                                            </select>
+                                        ) : (
+                                            <span>
+                                                {dentist.offices.length > 0 ? (
+                                                    <span>
+                                                        {dentist.offices.includes(1) && dentist.offices.includes(2) ? 'Both' :
+                                                            dentist.offices.map(officeID => (
+                                                                <span key={officeID}>
+                                                                    {officeID === 1 ? 'Austin' : officeID === 2 ? 'Phoenix' : ''}
+                                                                </span>
+                                                            ))}
+                                                    </span>
+                                                ) : (
+                                                    'None'
+                                                )}
+                                            </span>
+                                        )}
+                                    </td>
 
-                                        <td className="border border-gray-400 px-4 py-2">
-                                            {/* Edit button and dropdown */}
-                                            {editedDentist.dentistID === dentist.dentistID ? (
-                                                <>
-                                                    <button onClick={() => handleConfirmEdit(dentist.offices)}>Confirm</button>
-                                                    <button onClick={handleCancelEdit}>Cancel</button>
-                                                </>
-                                            ) : (
-                                                <button onClick={() => handleEditOffice(dentist.dentistID, dentist.offices)}>Edit</button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
+                                    <td className="border border-gray-400 px-4 py-2">
+                                        {/* Render actions based on dentist's offices */}
+                                        {editedDentist.dentistID === dentist.dentistID ? (
+                                            <>
+                                                <button onClick={handleConfirmEdit}>Confirm</button>
+                                                <button onClick={handleCancelEdit}>Cancel</button>
+                                            </>
+                                        ) : (
+                                            renderActions(dentist)
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
                             </tbody>
                         </table>
                     </main>
