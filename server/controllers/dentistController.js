@@ -211,6 +211,7 @@ const calculateAvailableTimeBlocks = (workStartTime, workEndTime, existingAppoin
     return availableTimeBlocks;
 };
 
+
 module.exports = { 
     assignDentistSchedule,
     getDentistsByOfficeAndDay,

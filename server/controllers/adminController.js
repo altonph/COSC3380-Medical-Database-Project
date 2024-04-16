@@ -179,6 +179,35 @@ function getAllStaff(res) {
     );
 }
 
+const getAllOfficeDentists = (res) => {
+    pool.query('SELECT * FROM office_dentist', (error, results) => {
+        if (error) {
+            console.error('Error fetching office_dentist entries:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Error fetching staff information' }));
+        } else {
+            console.log('Fetched all office_dentist entries successfully');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(results));
+        }
+    });
+};
+
+const getAllSchedules = (res) => {
+    pool.query('SELECT * FROM schedule', (error, results) => {
+        if (error) {
+            console.error('Error fetching schedule entries:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Error fetching staff information' }));
+        } else {
+            console.log('Fetched all schedule entries successfully');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(results));
+        }
+    });
+};
+
+
 
 
 module.exports = {
@@ -186,5 +215,7 @@ module.exports = {
     generateAppointmentDataReport,
     getAllDentists,
     getAllPatients,
-    getAllStaff
+    getAllStaff,
+    getAllOfficeDentists,
+    getAllSchedules
 };
