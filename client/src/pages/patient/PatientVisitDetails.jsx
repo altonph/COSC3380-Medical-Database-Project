@@ -10,6 +10,18 @@ function formatDate(dateString) {
     return `${month}/${day}/${year}`;
 }
 
+function formatTime(timeString) {
+    const [hours, minutes] = timeString.split(':');
+    let hour = parseInt(hours, 10);
+    const period = hour >= 12 ? 'PM' : 'AM';
+    if (hour > 12) {
+        hour -= 12;
+    } else if (hour === 0) {
+        hour = 12;
+    }
+    return `${hour}:${minutes} ${period}`;
+}
+
 const PatientVisitDetails = () => {
     const [visitDetails, setVisitDetails] = useState([]);
 
@@ -57,23 +69,30 @@ const PatientVisitDetails = () => {
                 </aside>
 
                 <main className="flex-1 p-4 mt-4">
-                    <h1 className="text-3xl font-bold p-2 ml-8 mb-4">Your Visit Details</h1>
+                <h1 className="text-3xl font-bold p-2 ml-8 mb-4">Your Visit Details</h1>
 
-                    <div className="container mx-auto mt-4">
-                        {Array.isArray(visitDetails) && visitDetails.map((detail, index) => (
+                <div className="container mx-auto mt-4">
+                    {visitDetails.length > 0 ? (
+                        visitDetails.map((detail, index) => (
                             <div key={index} className="border border-gray-200 rounded p-4 mb-4">
                                 <h2 className="text-lg font-semibold">Doctor: {detail.Dentist_FirstName} {detail.Dentist_LastName}</h2>
                                 <h2 className="text-lg font-semibold">Assisting Staff: {detail.Staff_FirstName} {detail.Staff_LastName}</h2>
                                 <p className="text-sm text-gray-600">Date: {formatDate(detail.Date)}</p>
                                 <p className="text-sm text-gray-600">Appointment Type: {detail.Appointment_type}</p>
-                                <p className="text-sm text-gray-600">Start Time: {detail.Start_time}</p>
+                                <p className="text-sm text-gray-600">Start Time: {formatTime(detail.Start_time)}</p>
                                 <p className="text-sm text-gray-600">Diagnosis: {detail.Diagnosis}</p>
                                 <p className="text-sm text-gray-600">Treatment: {detail.Treatment}</p>
                                 <p className="text-sm text-gray-600">Notes: {detail.Notes}</p>
                             </div>
-                        ))}
-                    </div>
-                </main>
+                        ))
+                    ) : (
+                        <div className="border border-gray-200 rounded p-4 mb-4">
+                            <p className="text-lg font-semibold">No visit details found.</p>
+                        </div>
+                    )}
+                </div>
+            </main>
+
             </div>
 
             <nav>

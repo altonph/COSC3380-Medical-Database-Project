@@ -128,7 +128,7 @@ SELECT * FROM APPOINTMENT;
 
 -- @block
 INSERT INTO visit_details (patientID, dentistID, Diagnosis, Treatment, Notes)
-VALUES (1, 1, 'Checkup', 'No specific diagnosis', 'Patient seems to be in good health overall.');
+VALUES (2, 1, 'Checkup', 'No specific diagnosis', 'Patient seems to be in good health overall.');
 
 -- @block
 SELECT * FROM visit_details;
@@ -200,4 +200,13 @@ DELETE FROM appointment;
 SELECT dentistID FROM login WHERE Username = 'jane_doe';
 
 -- @block
-DELETE FROM pa
+DELETE FROM medical_records WHERE patientID = 2;
+
+-- @block
+DELETE FROM visit_details WHERE patientID = 2;
+
+-- @block
+DELETE FROM prescription WHERE patientID = 2;
+
+-- @block
+SELECT * FROM APPOINTMENT WHERE patientID = 2;

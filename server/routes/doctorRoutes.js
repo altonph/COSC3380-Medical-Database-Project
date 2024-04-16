@@ -195,7 +195,7 @@ const doctorRoutes = (req, res) => {
             return unauthorizedResponse(res);
         }
         const userRole = decodedToken.role;
-        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff') {
+        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff' && userRole !== 'Patient') {
             return forbiddenResponse(res);
         }
         console.log(req.body);
@@ -227,7 +227,7 @@ const doctorRoutes = (req, res) => {
             return unauthorizedResponse(res);
         }
         const userRole = decodedToken.role;
-        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff') {
+        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff' && userRole !== 'Patient') {
             return forbiddenResponse(res);
         }
         checkPatientExistence(req, res);
@@ -257,7 +257,7 @@ const doctorRoutes = (req, res) => {
             return unauthorizedResponse(res);
         }
         const userRole = decodedToken.role;
-        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff') {
+        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff' && userRole !== 'Patient') {
             return forbiddenResponse(res);
         }
         getAvailableStaff(req, res);

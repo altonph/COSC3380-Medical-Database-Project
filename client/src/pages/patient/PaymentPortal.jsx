@@ -108,38 +108,6 @@ const PaymentPortal= () => {
     
                         </div>
     
-                        <div className="ml-16">
-                            <h1 className="text-xl font-bold pt-16 py-4">Billing History</h1>
-    
-                            <table className="border-collapse border border-gray-400">
-                                <thead>
-                                    <tr>
-                                        <th className="border border-gray-400 px-5 py-2">Date Created</th>
-                                        <th className="border border-gray-400 px-5 py-2">Appointment Type</th>
-                                        <th className="border border-gray-400 px-5 py-2">Policy Number</th>
-                                        <th className="border border-gray-400 px-5 py-2">Gross Amount</th>
-                                        <th className="border border-gray-400 px-5 py-2">Insurance Coverage</th>
-                                        <th className="border border-gray-400 px-5 py-2">Net Amount</th>
-                                        <th className="border border-gray-400 px-5 py-2">Paid Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {invoices.map(invoice => (
-                                        <tr key={invoice.id}>
-                                            <td className="border border-gray-400 px-5 py-4">{formatDate(invoice.Date)}</td>
-                                            <td className="border border-gray-400 px-5 py-4">{invoice.Appointment_type}</td>
-                                            <td className="border border-gray-400 px-5 py-4">{invoice.Policy_number}</td>
-                                            <td className="border border-gray-400 px-5 py-4">{invoice.Gross_Amount}</td>
-                                            <td className="border border-gray-400 px-5 py-4">{invoice.Insurance_coverage}</td>
-                                            <td className="border border-gray-400 px-5 py-4">{invoice.Net_Amount}</td>
-                                            <td className="border border-gray-400 px-5 py-4">{invoice.Paid_Amount}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-    
-                        </div>
-    
                         <h1 className="text-xl font-bold pt-16 py-4 ml-16">Questions?</h1>
                         <p className="ml-16 mb-8"> Call your practice at 123-456-7890 or email at shasta@shastadental.com.</p>
     
