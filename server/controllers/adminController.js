@@ -186,7 +186,7 @@ const getAllOfficeDentists = (res) => {
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Error fetching staff information' }));
         } else {
-            console.log('Fetched all office_dentist entries successfully');
+            //console.log('Fetched all office_dentist entries successfully');
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify(results));
         }

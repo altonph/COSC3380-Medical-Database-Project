@@ -9,7 +9,7 @@ const { handleGetPatient, handlePatientUpdate, handlePatientAppointment, handleG
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
 const { staffRoutes, staffverifyToken } = require('./routes/staffRoutes');
 const { handleGenerateAppointmentReport, handleGetAllDentists, handleGetAllPatients, handleGetAllStaff, handleGetAllOfficeDentists, handleGetAllSchedules } = require('./routes/adminRoutes'); 
-const { handleAssignDentistToOffice } = require('./routes/officeRoutes');
+const { handleAssignDentistToOffice , handleUpdateDentistOffice} = require('./routes/officeRoutes');
 const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff, handleGetAvailableTimeBlocks, handleGetAllDentistsByOfficeAndDay } = require('./routes/dentistRoutes');
 const { handleGenerateRevenueReport } = require('./routes/adminRoutes');    
 const { getSpecialtyByDoctorUsername } = require('./controllers/doctorController');
@@ -100,6 +100,8 @@ const server = http.createServer((req, res) => {
         handleGetAllOfficeDentists(req, res);
     }   else if (req.url === '/api/admin/getSchedules' && req.method === 'GET') {
         handleGetAllSchedules(req, res);
+    }   else if (req.url === '/api/admin/updateDentistOffice' && req.method === 'POST') {
+        handleUpdateDentistOffice(req, res);
     }
     
     
