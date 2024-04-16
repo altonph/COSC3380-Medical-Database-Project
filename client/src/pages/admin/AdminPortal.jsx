@@ -247,6 +247,8 @@ const AdminPortal = () => {
                 fetchSchedules();
             } else {
                 console.error("Failed to update schedule");
+                window.alert("Dentist cannot have overlapping schedules.");
+                fetchSchedules();
             }
         } catch (error) {
             console.error("Error updating schedule:", error);
@@ -255,9 +257,6 @@ const AdminPortal = () => {
         }
     };
     
-    
-    
-
     return (
         <>
             <div className="flex h-screen flex-col">
