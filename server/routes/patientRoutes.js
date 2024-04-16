@@ -1,6 +1,6 @@
 // patientRoutes.js
 const jwt = require('jsonwebtoken');
-const { getPatientProfile, updatePatientProfile, schedulePatientAppointment } = require('../controllers/patientController');
+const { getPatientProfile, updatePatientProfile, schedulePatientAppointment, getInvoicesByPatientUsername, getVisitDetailsByPatientUsername } = require('../controllers/patientController');
 
 const handleGetPatient = (req, res, jwt) => {
 
@@ -108,8 +108,50 @@ const verifyToken = (authHeader, jwt) => {
 
 };
 
+const handleGetInvoicesByPatientUsername = (req, res, jwt) => {
+    const { url, method } = req;
+
+    if (method === 'GET' && url === '/api/patient/invoices') { 
+        const decodedToken = verifyToken(req.headers.authorization, jwt);
+        if (!decodedToken) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Unauthorized' }));
+            return;
+        }
+
+        const { username } = decodedToken;
+        getInvoicesByPatientUsername(req, res, username);
+
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
+const handleGetVisitDetailsByPatient = (req, res, jwt) => {
+    const { url, method } = req;
+
+    if (method === 'GET' && url === '/api/patient/visit-details') { 
+        const decodedToken = verifyToken(req.headers.authorization, jwt);
+        if (!decodedToken) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Unauthorized' }));
+            return;
+        }
+
+        const { username } = decodedToken;
+        getVisitDetailsByPatientUsername(req, res, username);
+
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
 module.exports = {
     handleGetPatient,
     handlePatientUpdate,
-    handlePatientAppointment
+    handlePatientAppointment,
+    handleGetInvoicesByPatientUsername,
+    handleGetVisitDetailsByPatient
 };

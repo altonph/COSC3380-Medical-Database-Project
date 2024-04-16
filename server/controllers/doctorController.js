@@ -1,4 +1,5 @@
 const pool = require('../models/db');
+const jwt = require('jsonwebtoken');
 
 const getAllPatients = (req, res) => {
     pool.query('SELECT * FROM patient', (error, results) => {
@@ -800,8 +801,6 @@ const verifyPrimaryApproval = (req, res) => {
         }
     });
 };
-
-const jwt = require('jsonwebtoken');
 
 const getSpecialtyByDoctorUsername = (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
