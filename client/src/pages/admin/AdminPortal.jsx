@@ -4,13 +4,18 @@ import Footer from "../../components/Footer";
 
 const AdminPortal = () => {
     const [dentists, setDentists] = useState([]);
+
     const [editedDentist, setEditedDentist] = useState({
         dentistID: null,
         originalOffices: []
     });
+    
+    const [schedules, setSchedules] = useState([]);
+    const [editedSchedule, setEditedSchedule] = useState(null);
 
     useEffect(() => {
         fetchDentistsAndOffices();
+        fetchSchedules();
     }, []);
 
     const fetchDentistsAndOffices = async () => {
@@ -171,6 +176,86 @@ const AdminPortal = () => {
             );
         }
     };
+
+    const fetchSchedules = async () => {
+        try {
+            const response = await fetch("http://localhost:5000/api/admin/getSchedules");
+            if (response.ok) {
+                const data = await response.json();
+                setSchedules(data);
+            } else {
+                console.error("Failed to fetch schedules");
+            }
+        } catch (error) {
+            console.error("Error fetching schedules:", error);
+        }
+    };
+
+    const handleEditSchedule = (scheduleID) => {
+        setEditedSchedule(scheduleID);
+    };
+
+    const handleCancelEditSchedule = () => {
+        setEditedSchedule(null);
+    };
+
+    const handleScheduleChange = (e, day) => {
+        const { value } = e.target;
+        console.log("Value:", value);
+        const newValue = value === '1' ? true : false;
+        console.log("New Value:", newValue);
+    
+        setSchedules(prevSchedules => {
+            return prevSchedules.map(schedule => {
+                if (schedule.scheduleID === editedSchedule) {
+                    return { ...schedule, [day]: newValue };
+                }
+                return schedule;
+            });
+        });
+    };
+    
+    
+    const handleConfirmEditSchedule = async (scheduleID, updatedSchedule) => {
+        try {
+            // Construct the request payload with the correct format
+            const requestBody = {
+                scheduleID: updatedSchedule.scheduleID,
+                dentistID: updatedSchedule.dentistID,
+                officeID: updatedSchedule.officeID,
+                schedule: {
+                    Monday: updatedSchedule.Monday, // Send as '1' or '0'
+                    Tuesday: updatedSchedule.Tuesday, // Send as '1' or '0'
+                    Wednesday: updatedSchedule.Wednesday, // Send as '1' or '0'
+                    Thursday: updatedSchedule.Thursday, // Send as '1' or '0'
+                    Friday: updatedSchedule.Friday, // Send as '1' or '0'
+                }
+            };
+    
+            // Send the request with the updated payload
+            const response = await fetch("http://localhost:5000/api/admin/updateSchedule", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(requestBody)
+            });
+    
+            if (response.ok) {
+                console.log("Schedule updated successfully!");
+                // Refresh the page to reflect the changes
+                fetchSchedules();
+            } else {
+                console.error("Failed to update schedule");
+            }
+        } catch (error) {
+            console.error("Error updating schedule:", error);
+        } finally {
+            setEditedSchedule(null);
+        }
+    };
+    
+    
     
 
     return (
@@ -200,7 +285,7 @@ const AdminPortal = () => {
                         <h1 className="text-3xl font-bold mb-4 p-8">Dentist Office and Schedules</h1>
                         
                         {/* Dentist table */}
-                        <table className="w-full border-collapse border border-gray-400">
+                        <table className="w-full border-collapse border border-gray-400 mb-8">
                             <thead>
                                 <tr className="bg-gray-200">
                                     <th className="border border-gray-400 px-4 py-2">Dentist ID</th>
@@ -251,6 +336,91 @@ const AdminPortal = () => {
                                         )}
                                     </td>
                                 </tr>
+                            ))}
+                            </tbody>
+                        </table>
+
+                        {/* Schedule table */}
+                        <table className="w-full border-collapse border border-gray-400">
+                            <thead>
+                                <tr className="bg-gray-200">
+                                    <th className="border border-gray-400 px-4 py-2">Dentist ID</th>
+                                    <th className="border border-gray-400 px-4 py-2">Office</th>
+                                    {/* <th className="border border-gray-400 px-4 py-2">Dentist Name</th> */}
+                                    <th className="border border-gray-400 px-4 py-2">Monday</th>
+                                    <th className="border border-gray-400 px-4 py-2">Tuesday</th>
+                                    <th className="border border-gray-400 px-4 py-2">Wednesday</th>
+                                    <th className="border border-gray-400 px-4 py-2">Thursday</th>
+                                    <th className="border border-gray-400 px-4 py-2">Friday</th>
+                                    <th className="border border-gray-400 px-4 py-2">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {schedules.map(schedule => (
+                                <tr key={schedule.scheduleID} className="bg-white">
+                                <td className="border border-gray-400 px-4 py-2">{schedule.dentistID}</td>
+                                <td className="border border-gray-400 px-4 py-2">{schedule.officeID === 1 ? 'Austin' : schedule.officeID === 2 ? 'Phoenix' : 'Unknown'}</td>
+                                <td className="border border-gray-400 px-4 py-2">
+                                    {editedSchedule === schedule.scheduleID ? (
+                                        <select value={schedule.Monday ? '1' : '0'} onChange={(e) => handleScheduleChange(e, 'Monday')}>
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                    ) : (
+                                        schedule.Monday ? 'Yes' : 'No'
+                                    )}
+                                </td>
+                                <td className="border border-gray-400 px-4 py-2">
+                                    {editedSchedule === schedule.scheduleID ? (
+                                            <select value={schedule.Tuesday ? '1' : '0'} onChange={(e) => handleScheduleChange(e, 'Tuesday')}>
+                                                <option value="1">Yes</option>
+                                                <option value="0">No</option>
+                                            </select>
+                                        ) : (
+                                            schedule.Tuesday ? 'Yes' : 'No'
+                                        )}
+                                </td>
+                                <td className="border border-gray-400 px-4 py-2">
+                                    {editedSchedule === schedule.scheduleID ? (
+                                            <select value={schedule.Wednesday ? '1' : '0'} onChange={(e) => handleScheduleChange(e, 'Wednesday')}>
+                                                <option value="1">Yes</option>
+                                                <option value="0">No</option>
+                                            </select>
+                                        ) : (
+                                            schedule.Wednesday ? 'Yes' : 'No'
+                                        )}
+                                </td>
+                                <td className="border border-gray-400 px-4 py-2">
+                                    {editedSchedule === schedule.scheduleID ? (
+                                            <select value={schedule.Thursday ? '1' : '0'} onChange={(e) => handleScheduleChange(e, 'Thursday')}>
+                                                <option value="1">Yes</option>
+                                                <option value="0">No</option>
+                                            </select>
+                                        ) : (
+                                            schedule.Thursday ? 'Yes' : 'No'
+                                        )}
+                                </td>
+                                <td className="border border-gray-400 px-4 py-2">
+                                    {editedSchedule === schedule.scheduleID ? (
+                                            <select value={schedule.Friday ? '1' : '0'} onChange={(e) => handleScheduleChange(e, 'Friday')}>
+                                                <option value="1">Yes</option>
+                                                <option value="0">No</option>
+                                            </select>
+                                        ) : (
+                                            schedule.Friday ? 'Yes' : 'No'
+                                        )}
+                                </td>
+                                <td className="border border-gray-400 px-4 py-2">
+                                    {editedSchedule === schedule.scheduleID ? (
+                                        <>
+                                            <button onClick={() => handleConfirmEditSchedule(schedule.scheduleID, schedule)}>Confirm</button>
+                                            <button onClick={handleCancelEditSchedule}>Cancel</button>
+                                        </>
+                                    ) : (
+                                        <button onClick={() => handleEditSchedule(schedule.scheduleID)}>Edit</button>
+                                    )}
+                                </td>
+                            </tr>
                             ))}
                             </tbody>
                         </table>

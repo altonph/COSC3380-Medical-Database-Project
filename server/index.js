@@ -10,7 +10,7 @@ const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes');
 const { staffRoutes, staffverifyToken } = require('./routes/staffRoutes');
 const { handleGenerateAppointmentReport, handleGetAllDentists, handleGetAllPatients, handleGetAllStaff, handleGetAllOfficeDentists, handleGetAllSchedules } = require('./routes/adminRoutes'); 
 const { handleAssignDentistToOffice , handleUpdateDentistOffice} = require('./routes/officeRoutes');
-const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff, handleGetAvailableTimeBlocks, handleGetAllDentistsByOfficeAndDay } = require('./routes/dentistRoutes');
+const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff, handleGetAvailableTimeBlocks, handleGetAllDentistsByOfficeAndDay, handleEditDentistSchedule } = require('./routes/dentistRoutes');
 const { handleGenerateRevenueReport } = require('./routes/adminRoutes');    
 const { getSpecialtyByDoctorUsername } = require('./controllers/doctorController');
 const server = http.createServer((req, res) => {
@@ -112,6 +112,8 @@ const server = http.createServer((req, res) => {
         handleGetAllSchedules(req, res);
     }   else if (req.url === '/api/admin/updateDentistOffice' && req.method === 'POST') {
         handleUpdateDentistOffice(req, res);
+    } else if (req.url === '/api/admin/updateSchedule' && req.method === 'POST') {
+        handleEditDentistSchedule(req, res);
     }
     
     

@@ -23,6 +23,29 @@ const assignDentistSchedule = (officeID, dentistID, schedule, res) => {
 
 };
 
+const editDentistSchedule = (req, res) => {
+    const { dentistID, officeID, schedule } = req.body;
+
+    // Update the dentist's schedule
+    pool.query(
+        'UPDATE schedule SET Monday = ?, Tuesday = ?, Wednesday = ?, Thursday = ?, Friday = ? WHERE dentistID = ? AND officeID = ?',
+        [schedule.Monday, schedule.Tuesday, schedule.Wednesday, schedule.Thursday, schedule.Friday, dentistID, officeID],
+        (error, results) => {
+            if (error) {
+                console.error('Error updating dentist schedule:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            } else {
+                console.log('Dentist schedule updated successfully');
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Dentist schedule updated successfully' }));
+                return;
+            }
+        }
+    );
+};
+
 const getDentistsByOfficeAndDay = (req, res) => {
 
     const parsedUrl = parse(req.url, true);
@@ -217,5 +240,6 @@ module.exports = {
     getDentistsByOfficeAndDay,
     updateAppointmentWithStaff,
     getAvailableTimeBlocks,
-    getAllDentistsByOfficeAndDay
+    getAllDentistsByOfficeAndDay,
+    editDentistSchedule
 };
