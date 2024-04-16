@@ -276,8 +276,8 @@ const MakeAppointment = () => {
         <aside className="w-1/6 bg-gray-200 text-black">
           <nav className="p-4 text-xl">
             <ul>
-            <li><a href="/patient/home" className="block py-2 text-center font-bold underline">Home</a></li>
-            <li><a href="/patient/appointment" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
+            <li><a href="/patient/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
+            <li><a href="/patient/appointment" className="block py-2 text-center font-bold underline">Appointments</a></li>
             <li><a href="/patient/payment" className="block py-2 text-center text-gray-600 hover:text-black">Billing & Payments</a></li>
             <li><a href="/patient/visit" className="block py-2 text-center text-gray-600 hover:text-black">Visit Details</a></li>
             <li><a href="/patient/history" className="block py-2 text-center text-gray-600 hover:text-black">Medical History</a></li>
@@ -362,20 +362,7 @@ const MakeAppointment = () => {
                         ))}
                       </select>
                     </div>
-                    <div className="w-1/2 ml-2">
-                      <label className="block text-sm font-bold mb-2">End Time:</label>
-                      <select
-                        value={selectedEndTime}
-                        onChange={(e) => setSelectedEndTime(e.target.value)}
-                        className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                      >
-                        {generateTimeOptions(selectedBlock).map((time) => (
-                          <option key={time} value={time}>
-                            {time}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    
                   </div>
                 </div>
               ))}
