@@ -39,6 +39,8 @@ const DoctorLoginPage = (props) => {
                         console.log(staffData);
                         localStorage.setItem('token', staffData.token); 
                         localStorage.setItem('role', staffData.role);
+                        localStorage.setItem('firstName', staffData.firstName);
+                        localStorage.setItem('lastName', staffData.lastName);
                         navigateTo('/staff/home');
                     } else {
                         const staffError = await staffResponse.json();
@@ -55,6 +57,9 @@ const DoctorLoginPage = (props) => {
                         console.log(dentistData);
                         localStorage.setItem('token', dentistData.token); 
                         localStorage.setItem('role', dentistData.role);
+                        localStorage.setItem('firstName', dentistData.firstName);
+                        localStorage.setItem('lastName', dentistData.lastName);
+
                         navigateTo('/doctor/home');
                     } else {
                         const dentistError = await dentistResponse.json();

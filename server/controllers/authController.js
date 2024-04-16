@@ -214,7 +214,7 @@ function loginPatient(username, password, res, jwt) {
 
 function loginDoctor(username, password, res, jwt) {
     pool.query(
-        'SELECT * FROM login WHERE Username = ? AND User_role = "Dentist"',
+        'SELECT login.*, dentist.FName, dentist.LName FROM login JOIN dentist ON login.dentistID = dentist.dentistID WHERE login.Username = ?',
         [username],
         async (error, results) => {
             if (error) {
@@ -255,7 +255,7 @@ function loginDoctor(username, password, res, jwt) {
                         specialty: doctorSpecialty
                     }, process.env.JWT_SECRET, { expiresIn: '2h' });                
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ token, role: doctor.User_role, specialty: doctor.Specialty })); 
+                    res.end(JSON.stringify({token, role: doctor.User_role, specialty: doctor.Specialty, firstName: doctor.FName, lastName: doctor.LName})); 
                 } else {
                     res.writeHead(401, { 'Content-Type': 'text/plain' });
                     res.end('Incorrect password');
@@ -315,7 +315,7 @@ function loginAdmin(username, password, res, jwt) {
 
 function loginStaff(username, password, res, jwt) {
     pool.query(
-        'SELECT * FROM login WHERE Username = ? AND User_role = "Staff"',
+        'SELECT login.*, staff.FName, staff.LName FROM login JOIN staff ON login.staffID = staff.staffID WHERE login.Username = ?',
         [username],
         async (error, results) => {
             if (error) {
@@ -351,11 +351,13 @@ function loginStaff(username, password, res, jwt) {
                     const token = jwt.sign({ 
                         username: staff.Username, 
                         role: staff.User_role,
+                        firstName: staff.FName, 
+                        lastName: staff.LName,
                         staffID: staff.staffID
                     }, process.env.JWT_SECRET, { expiresIn: '2h' });
 
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ token, role: staff.User_role, staffID: staff.staffID }));
+                    res.end(JSON.stringify({ token, role: staff.User_role, staffID: staff.staffID, firstName: staff.FName, lastName: staff.LName }));
                 } else {
                     res.writeHead(401, { 'Content-Type': 'text/plain' });
                     res.end('Incorrect password');
@@ -773,58 +775,6 @@ function registerStaff(userData, res) {
                     });
             });
     });
-}
-
-function loginStaff(username, password, res, jwt) {
-    pool.query(
-        'SELECT * FROM login WHERE Username = ? AND User_role = "Staff"',
-        [username],
-        async (error, results) => {
-            if (error) {
-                console.error('Error retrieving staff:', error);
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
-                res.end('Internal Server Error');
-                return;
-            }
-
-            if (results.length === 0) {
-                res.writeHead(400, { 'Content-Type': 'text/plain' });
-                res.end('Staff not found');
-                return;
-            }
-
-            const staff = results[0];
-
-            bcrypt.compare(password, staff.Password, (err, result) => {
-                if (err) {
-                    console.error('Error comparing passwords:', err);
-                    res.writeHead(500, { 'Content-Type': 'text/plain' });
-                    res.end('Internal Server Error');
-                    return;
-                }
-
-                if (result) {
-                    if (staff.User_role !== 'Staff') {
-                        res.writeHead(403, { 'Content-Type': 'text/plain' });
-                        res.end('Forbidden');
-                        return;
-                    }
-                    
-                    const token = jwt.sign({ 
-                        username: staff.Username, 
-                        role: staff.User_role, 
-                        staffID: staff.StaffID
-                    }, process.env.JWT_SECRET, { expiresIn: '2h' });
-
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ token, role: staff.User_role, staffID: staff.StaffID }));
-                } else {
-                    res.writeHead(401, { 'Content-Type': 'text/plain' });
-                    res.end('Incorrect password');
-                }
-            });
-        }
-    );
 }
 
 function getUserRole(username, password, res) {
