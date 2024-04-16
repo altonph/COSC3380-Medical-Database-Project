@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin, handleRegisterStaff,
     handleLoginStaff, handleEditDentist, handleEditStaff, handleEditPatient, handleArchiveDentist, handleArchiveStaff, handleArchivePatient, handleGetUserRole } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
-const { handleGetPatient, handlePatientUpdate, handlePatientAppointment, handleGetInvoicesByPatientUsername, handleGetVisitDetailsByPatient } = require('./routes/patientRoutes');
+const { handleGetPatient, handlePatientUpdate, handlePatientAppointment, handleGetInvoicesByPatientUsername, handleGetVisitDetailsByPatient, handleGetMedicalHistoryByPatient, handleGetPrescriptionsByPatient, handleGetAppointmentsByPatient, handleGetPatientID, handleCancelAppointment } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
 const { staffRoutes, staffverifyToken } = require('./routes/staffRoutes');
 const { handleGenerateAppointmentReport, handleGetAllDentists, handleGetAllPatients, handleGetAllStaff, handleGetAllOfficeDentists, handleGetAllSchedules } = require('./routes/adminRoutes'); 
@@ -58,6 +58,16 @@ const server = http.createServer((req, res) => {
         handleGetInvoicesByPatientUsername(req, res, jwt);
     } else if (req.url === '/api/patient/visit-details' && req.method === 'GET') {
         handleGetVisitDetailsByPatient(req, res, jwt);
+    } else if (req.url === '/api/patient/medical-history' && req.method === 'GET') {
+        handleGetMedicalHistoryByPatient(req, res, jwt);
+    } else if (req.url === '/api/patient/prescriptions' && req.method === 'GET') {
+        handleGetPrescriptionsByPatient(req, res, jwt);
+    } else if (req.url === '/api/patient/appointments' && req.method === 'GET') {
+        handleGetAppointmentsByPatient(req, res, jwt);
+    } else if (req.url === '/api/patient/id' && req.method === 'GET') {
+        handleGetPatientID(req, res, jwt);
+    } else if (req.url === '/api/patient/cancel-appointment' && req.method === 'POST') {
+        handleCancelAppointment(req, res, jwt);
     } else if (req.url === '/api/office/assignDentist' && req.method === 'POST') {
         handleAssignDentistToOffice(req, res);
     } else if (req.url === '/api/dentist/assignSchedule' && req.method === 'POST') {
