@@ -95,9 +95,9 @@ const DoctorPatients = () => {
                     <aside className="w-1/6 bg-gray-200 text-black">
                         <nav className="p-4 text-xl">
                             <ul>
-                                <li><a href="/staff/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
-                                <li><a href="/staff/appointments" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
-                                <li><a href="/staff/patients" className="block py-2 text-center font-bold underline">Patients</a></li>
+                                <li><a href="/doctor/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
+                                <li><a href="/doctor/appointments" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
+                                <li><a href="/doctor/patients" className="block py-2 text-center font-bold underline">Patients</a></li>
                             </ul>
                         </nav>
                     </aside>
