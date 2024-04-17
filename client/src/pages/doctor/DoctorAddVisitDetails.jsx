@@ -53,11 +53,32 @@ const DoctorAddVisitDetails = () => {
     }
   }, []);
 
+  /*
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const isoDateString = date.toISOString(); 
     return isoDateString.split('T')[0]; 
   };
+*/
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+}
+
+function formatTime(timeString) {
+  const [hours, minutes] = timeString.split(':');
+  let hour = parseInt(hours, 10);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  if (hour > 12) {
+      hour -= 12;
+  } else if (hour === 0) {
+      hour = 12;
+  }
+  return `${hour}:${minutes} ${period}`;
+}
 
   const updateAppointmentStatus = async (appointmentStatus, cancellationReason) => {
     try {
@@ -350,7 +371,7 @@ const DoctorAddVisitDetails = () => {
   
                 <div>
                   <label className="block mb-2">Date:</label>
-                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? appointmentDetails.Date : ''}</div>
+                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? formatDate(appointmentDetails.Date) : ''}</div>
                 </div>
   
                 <div>
@@ -360,12 +381,12 @@ const DoctorAddVisitDetails = () => {
   
                 <div>
                   <label className="block mb-2">Start Time:</label>
-                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? appointmentDetails.Start_time : ''}</div>
+                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? formatTime(appointmentDetails.Start_time) : ''}</div>
                 </div>
   
                 <div>
                   <label className="block mb-2">End Time:</label>
-                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? appointmentDetails.End_time : ''}</div>
+                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? formatTime(appointmentDetails.End_time) : ''}</div>
                 </div>
               </div>
               
