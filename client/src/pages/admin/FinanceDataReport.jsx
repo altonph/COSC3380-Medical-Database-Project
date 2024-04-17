@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 function FinanceDataReport() {
     const [office, setOffice] = useState('');
+    const [type, setType] = useState('');
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [revenueReportData, setRevenueReportData] = useState([]);
@@ -13,8 +14,13 @@ function FinanceDataReport() {
     
     const handleGenerateReport2 = async () => {
         try {
-            const apiUrl = `http://localhost:5000/api/admin/finance-revenue-report?office=${office}`;
-            const dateParams = `&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+            const apiUrl = `http://localhost:5000/api/admin/finance-revenue-report?office=${office}&type=${type}`;
+            let dateParams = '';
+            
+            if (startDate && endDate) {
+                dateParams = `&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+            }
+    
             const response = await fetch(apiUrl + dateParams);
     
             if (!response.ok) {
@@ -135,6 +141,22 @@ function FinanceDataReport() {
                                 placeholderText="Select End Date"
                                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300 bg-gray-100"
                             />
+                        </div>
+                        <div className="flex items-center">
+                            <label htmlFor="type" className="block mb-1"></label>
+                                <select
+                                    id="type"
+                                    value={type}
+                                    onChange={(e) => setType(e.target.value)}
+                                    className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300 bg-gray-100"
+                                >
+                                    <option value="" disabled>Select Appointment Type</option>
+                                    <option value="All">All</option>
+                                    <option value="Cleaning">Cleaning</option>
+                                    <option value="Whitening">Whitening</option>
+                                    <option value="Extraction">Extraction</option>
+                                    <option value="Root Canal">Root Canal</option>
+                                </select>
                         </div>
                     </div>
                     <button onClick={handleGenerateReport2} className="bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300 hover:bg-blue-600 mt-4">Generate Report</button>
