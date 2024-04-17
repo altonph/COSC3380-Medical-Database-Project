@@ -10,22 +10,22 @@ const AdminPatients = () => {
     const [deletedIndex, setDeletedIndex] = useState(null);
 
     useEffect(() => {
-        const fetchPatients = async () => {
-            try {
-                const response = await fetch("http://localhost:5000/api/admin/getPatients");
-                if (response.ok) {
-                    const data = await response.json();
-                    setPatients(data);
-                } else {
-                    console.error("Failed to fetch patients");
-                }
-            } catch (error) {
-                console.error("Error fetching patients:", error);
-            }
-        };
-
         fetchPatients();
     }, []);
+
+    const fetchPatients = async () => {
+        try {
+            const response = await fetch("http://localhost:5000/api/admin/getPatients");
+            if (response.ok) {
+                const data = await response.json();
+                setPatients(data);
+            } else {
+                console.error("Failed to fetch patients");
+            }
+        } catch (error) {
+            console.error("Error fetching patients:", error);
+        }
+    };
 
     const handleEdit = (index) => {
         setEditedIndex(index);
@@ -43,14 +43,48 @@ const AdminPatients = () => {
         setDeletedIndex(null);
     };
 
-    const handleConfirmEdit = async () => {
-
-    }
-
-    const handleConfirmDelete = async () => {
-
+    const handleConfirmEdit = async (patientID, userData) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/dentist/editDentist/${patientID}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+            if (response.ok) {
+                // Handle success response
+                console.log('Patient profile updated successfully');
+            } else {
+                // Handle error response
+                console.error('Failed to update patient profile');
+            }
+        } catch (error) {
+            console.error('Error updating patient profile:', error);
+        }
     };
-
+    
+    const handleConfirmDelete = async (patientID) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/patient/archive/${patientID}`, {
+                method: 'PATCH'
+            });
+            if (response.ok) {
+                // Handle success response
+                console.log('Patient archived successfully');
+                // Refetch patients after successful deletion
+                fetchPatients();
+                // Reset deletedIndex to null
+                setDeletedIndex(null);
+            } else {
+                // Handle error response
+                console.error('Failed to archive patient');
+            }
+        } catch (error) {
+            console.error('Error archiving patient:', error);
+        }
+    };
+    
     const handleInputChange = (date, index) => {
         setPatients(prevPatients => {
             return prevPatients.map((patient, i) => {
@@ -165,13 +199,13 @@ const AdminPatients = () => {
                                                 )}
                                                 {editedIndex === index && (
                                                     <>
-                                                        <button onClick={handleConfirmEdit} className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-green-300">Confirm</button>
+                                                        <button onClick={handleConfirmEdit(patient.patientID, userData)} className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-green-300">Confirm</button>
                                                         <button onClick={handleCancelEdit} className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-red-300 ml-2">Cancel</button>
                                                     </>
                                                 )}
                                                 {deletedIndex === index && (
                                                     <>
-                                                        <button onClick={handleConfirmDelete} className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-red-300 ml-2">Confirm</button>
+                                                        <button onClick={() => handleConfirmDelete(patient.patientID)} className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-red-300 ml-2">Confirm</button>
                                                         <button onClick={handleCancelDelete} className="bg-gray-500 hover:bg-gray-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-gray-300 ml-2">Cancel</button>
                                                     </>
                                                 )}
