@@ -115,7 +115,7 @@ return (
                                 />
                             </div>
                             
-                            {/* Age Group */}
+                            {/* Age Group 
                             <div className="flex items-center">
                                 <label htmlFor="ageGroup" className="block mb-1"></label>
                                 <select 
@@ -132,7 +132,7 @@ return (
                                     <option value="51-65">51-65</option>
                                     <option value="66+">66+</option>
                                 </select>
-                            </div>
+                            </div>*/}
 
                             {/* Gender */}
                             <div className="flex items-center">
@@ -182,7 +182,7 @@ return (
                                                 <tr className="bg-gray-100 border-b border-gray-300">
                                                 <th className="py-2 px-4 border-r border-gray-300">Patient Name</th>
                                                 <th className="py-2 px-4 border-r border-gray-300">Gender</th>
-                                                <th className="py-2 px-4 border-r border-gray-300">Age</th>
+                                                {/*<th className="py-2 px-4 border-r border-gray-300">Age</th>*/}
                                                 <th className="py-2 px-4 border-r border-gray-300">Insurance Type</th>
                                                 <th className="py-2 px-4 border-r border-gray-300">Total Visits</th>
                                             </tr>
@@ -192,7 +192,7 @@ return (
                                                 <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : ""}>
                                                 <td className="py-2 px-4 border-r border-gray-300">{`${result.Patient_FirstName} ${result.Patient_LastName}`}</td>
                                                 <td className="py-2 px-4 border-r border-gray-300">{result.Gender}</td>
-                                                <td className="py-2 px-4 border-r border-gray-300">{result.Age}</td>
+                                                {/* <td className="py-2 px-4 border-r border-gray-300">{result.Age}</td> */}
                                                 <td className="py-2 px-4 border-r border-gray-300">{result.InsuranceType}</td>
                                                 <td className="py-2 px-4 border-r border-gray-300">{result.TotalVisits}</td>
                                                 </tr>
