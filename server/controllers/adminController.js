@@ -128,6 +128,85 @@ const generateRevenueReport = (req, res, office, startDate, endDate) => {
     });
 };
 
+const generateDemographicReport = (req, res, office, startDate, endDate, ageGroup, gender, insuranceType) => {
+    let sqlQuery = `
+        SELECT 
+            p.FName AS Patient_FirstName,
+            p.LName AS Patient_lastName,
+            p.Gender,
+            TIMESTAMPDIFF(YEAR, p.DOB, CURDATE()) AS Age,
+            p.Insurance_Company_Name AS InsuranceType,
+            COUNT(*) AS TotalVisits,
+        FROM patient p
+        LEFT JOIN (
+            SELECT 
+                patientID,
+            FROM visit_details
+            GROUP BY patientID
+        ) vd ON p.patientID = vd.patientID
+        LEFT JOIN appointment a ON p.patientID = a.patientID
+        LEFT JOIN invoice i ON vd.visitID = i.visitID`;
+
+    const queryParams = [];
+
+    if (office && office !== 'All') {
+        sqlQuery += ` AND a.officeID = ?`;
+        queryParams.push(office);
+    }
+
+    if (startDate && endDate) {
+        sqlQuery += ` AND a.Date BETWEEN ? AND ?`;
+        queryParams.push(startDate, endDate);
+    }
+
+    if (ageGroup && ageGroup !== 'All') {
+        // Logic to filter patients by age group
+        switch (ageGroup) {
+            case '0-17':
+                sqlQuery += ` AND TIMESTAMPDIFF(YEAR, p.DOB, CURDATE()) BETWEEN 0 AND 17`;
+                break;
+            case '18-35':
+                sqlQuery += ` AND TIMESTAMPDIFF(YEAR, p.DOB, CURDATE()) BETWEEN 18 AND 35`;
+                break;
+            case '36-50':
+                sqlQuery += ` AND TIMESTAMPDIFF(YEAR, p.DOB, CURDATE()) BETWEEN 36 AND 50`;
+                break;
+            case '51-65':
+                sqlQuery += ` AND TIMESTAMPDIFF(YEAR, p.DOB, CURDATE()) BETWEEN 51 AND 65`;
+                break;
+            case '66+':
+                sqlQuery += ` AND TIMESTAMPDIFF(YEAR, p.DOB, CURDATE()) >= 66`;
+                break;
+        }
+    }
+    
+
+    if (gender && gender !== 'All') {
+        sqlQuery += ` AND p.Gender = ?`;
+        queryParams.push(gender);
+    }
+
+    if (insuranceType && insuranceType !== 'All') {
+        sqlQuery += ` AND p.Insurance_Company_Name = ?`;
+        queryParams.push(insuranceType);
+    }
+
+    sqlQuery += ` GROUP BY p.Patient_FirstName, p.Patient_LastName, p.Gender, Age, InsuranceType`;
+
+    pool.query(sqlQuery, queryParams, (error, rows) => {
+        if (error) {
+            console.error('Error generating demographic report:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            return;
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(rows));
+
+    });
+};
+
 function getAllDentists(res) {
     pool.query(
         'SELECT * FROM dentist',
@@ -184,6 +263,7 @@ function getAllStaff(res) {
 module.exports = {
     generateRevenueReport,
     generateAppointmentDataReport,
+    generateDemographicReport,
     getAllDentists,
     getAllPatients,
     getAllStaff

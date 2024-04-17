@@ -8,7 +8,7 @@ const { handleProtectedRoute } = require('./controllers/authController');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
 const { staffRoutes, staffverifyToken } = require('./routes/staffRoutes');
-const { handleGenerateAppointmentReport, handleGetAllDentists, handleGetAllPatients, handleGetAllStaff } = require('./routes/adminRoutes'); 
+const { handleGenerateAppointmentReport, handleGetAllDentists, handleGetAllPatients, handleGetAllStaff, handleGenerateDemographicReport } = require('./routes/adminRoutes'); 
 const { handleAssignDentistToOffice } = require('./routes/officeRoutes');
 const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff, handleGetAvailableTimeBlocks } = require('./routes/dentistRoutes');
 const { handleGenerateRevenueReport } = require('./routes/adminRoutes');    
@@ -88,7 +88,9 @@ const server = http.createServer((req, res) => {
         handleGetAllPatients(req, res);
     }  else if (req.url.startsWith('/api/admin/getStaff') && req.method === 'GET') {
         handleGetAllStaff(req, res);
-    }  
+    }  else if (req.url.startsWith('api/admin/demographics-data-report') && req.method === 'GET') {
+        handleGenerateDemographicReport(req,res);
+    }
     
     
     

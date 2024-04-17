@@ -52,7 +52,7 @@ function FinanceDataReport() {
             }
             if (a[fieldName] > b[fieldName]) {
                 return 1;
-            }
+            }   
             return 0;
         }
     }

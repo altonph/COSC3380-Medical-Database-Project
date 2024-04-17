@@ -1,4 +1,5 @@
 // adminRoutes.js
+const { query } = require('express');
 const { generateAppointmentDataReport, generateRevenueReport, getAllDentists, getAllPatients, getAllStaff } = require('../controllers/adminController');
 const url = require('url');
 
@@ -42,6 +43,28 @@ const handleGenerateRevenueReport = (req, res) => {
     
 };
 
+const handleGenerateDemographicReport = (req, res) => {
+    const {url, method} = req;
+
+    if (url.startsWith('/api/admin/demographics-data-report') && method === 'GET') {
+        const queryParamss  = url.split('?');
+        const queryParams   = new URLSearchParams(queryParamss[1]);
+
+        const office        = queryParams.get('office');
+        const startDate     = queryParams.get('startDate');
+        const endDate       = queryParams.get('endDate');
+        const ageGroup      = queryParams.get('ageGroup');
+        const gender        = queryParams.get('gender');
+        const insuranceType = queryParams.get('insuranceType');
+        
+        handleGenerateDemographicReport(req, res, office, startDate, endDate, ageGroup, gender, insuranceType);
+        
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
 const handleGetAllDentists = (req, res) => {
     if (req.url === '/api/admin/getDentists' && req.method === 'GET') {
         getAllDentists(res);
@@ -73,6 +96,7 @@ const handleGetAllStaff = (req, res) => {
 module.exports = {
     handleGenerateRevenueReport,
     handleGenerateAppointmentReport,
+    handleGenerateDemographicReport,
     handleGetAllDentists,
     handleGetAllPatients,
     handleGetAllStaff
