@@ -1,358 +1,164 @@
 import React, { useState, useEffect } from "react";
 import HeaderPortalAdmin from "../../components/HeaderPortalAdmin";
 import Footer from "../../components/Footer";
-import DatePicker from "react-datepicker"; // Import React Datepicker library
-import "react-datepicker/dist/react-datepicker.css"; // Import React Datepicker styles
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const AdminStaff = () => {
-    // State variables to hold dentist and staff data
-    const [dentists, setDentists] = useState([]);
     const [staff, setStaff] = useState([]);
+    const [editedIndex, setEditedIndex] = useState(null);
+    const [deletedIndex, setDeletedIndex] = useState(null);
+    const [userData, setUserData] = useState({
+        officeID: "",
+        Fname: "",
+        Lname: "",
+        Email: "",
+        Phone_num: "",
+        DOB: new Date(),
+        Address: "",
+        Position: "",
+        Start_date: new Date(),
+        End_date: null,
+        Salary: ""
+    });
 
     useEffect(() => {
-        // Fetch dentist and staff data when component mounts
-        fetchDentists();
         fetchStaff();
     }, []);
 
-    const fetchDentists = async () => {
-        try {
-            const response = await fetch("http://localhost:5000/api/admin/getDentists");
-            if (response.ok) {
-                const data = await response.json();
-                setDentists(data);
-            } else {
-                console.error("Failed to fetch dentists:", response.statusText);
-            }
-        } catch (error) {
-            console.error("Error fetching dentists:", error);
-        }
-    };
-
     const fetchStaff = async () => {
         try {
-            // Fetch staff data here
-            // Replace the URL with your actual backend endpoint
             const response = await fetch("http://localhost:5000/api/admin/getStaff");
             if (response.ok) {
                 const data = await response.json();
                 setStaff(data);
             } else {
-                console.error("Failed to fetch staff:", response.statusText);
+                console.error("Failed to fetch staff");
             }
         } catch (error) {
             console.error("Error fetching staff:", error);
         }
     };
 
-    const [editMode, setEditMode] = useState(false);
-    const [editedDentist, setEditedDentist] = useState(null);
-    const [selectedDentistID, setSelectedDentistID] = useState(null);
-
-    const [editedDentistProfile, setEditedDentistProfile] = useState({
-        dentistID: "",
-        FName: "",
-        LName: "",
-        Specialty: "",
-        Email: "",
-        Phone_num: "",
-        Address: "",
-        DOB: "",
-        Start_date: "",
-        End_date: "",
-        Is_active: true,
-        Salary: ""
-    });
-
-    const [editModeStaff, setEditModeStaff] = useState(false);
-    const [editedStaff, setEditedStaff] = useState(null);
-    const [selectedStaffID, setSelectedStaffID] = useState(null);
-
-    const [editedStaffProfile, setEditedStaffProfile] = useState({
-        staffID: "",
-        officeID: "",
-        FName: "",
-        LName: "",
-        Email: "",
-        Position: "",
-        Phone_num: "",
-        Address: "",
-        DOB: "",
-        Start_date: "",
-        End_date: "",
-        Is_active: true,
-        Salary: ""
-    });
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setEditedDentistProfile({ ...editedDentistProfile, [name]: value });
+    const handleEdit = (index) => {
+        setEditedIndex(index);
+        const editedStaff = staff[index];
+        editedStaff.DOB = new Date(editedStaff.DOB);
+        editedStaff.Start_date = new Date(editedStaff.Start_date);
+        setUserData(editedStaff);
+    };
+    
+    const handleDelete = (index) => {
+        setDeletedIndex(index);
+        // Populate End_date with today's date in the correct format
+        const today = new Date().toLocaleDateString('en-US');
+        setUserData(prevState => ({
+            ...prevState,
+            End_date: today
+        }));
     };
 
-    const formatDateForBackend = (dateString) => {
-        const date = new Date(dateString);
-        const year = date.getUTCFullYear();
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); 
-        const day = String(date.getUTCDate()).padStart(2, '0'); 
+    const handleCancelEdit = () => {
+        setEditedIndex(null);
+    };
+
+    const handleCancelDelete = () => {
+        setDeletedIndex(null);
+        // Reset End_date to null
+        setUserData(prevState => ({
+            ...prevState,
+            End_date: null
+        }));
+    };
+
+    const parseDateToSQLFormat = (date) => {
+        if (!(date instanceof Date)) {
+            throw new Error("Invalid date format");
+        }
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     };
-    
-    const handleEditClick = (dentistID) => {
-        // Set edit mode to true and populate selectedDentistID
-        setEditMode(true);
-        setSelectedDentistID(dentistID);
-        
-        // Find the dentist being edited
-        const dentistToEdit = dentists.find(dentist => dentist.dentistID === dentistID);
-        
-        // Format the date of birth (DOB) into YYYY-MM-DD format
-        const formattedDOB = formatDateForBackend(dentistToEdit.DOB);
-        
-        // Set the editedDentistProfile state with the current values of the dentist
-        setEditedDentistProfile({
-            dentistID: dentistToEdit.dentistID,
-            FName: dentistToEdit.FName,
-            LName: dentistToEdit.LName,
-            Specialty: dentistToEdit.Specialty,
-            Email: dentistToEdit.Email,
-            Phone_num: dentistToEdit.Phone_num,
-            Address: dentistToEdit.Address,
-            DOB: formattedDOB, // Set the formatted date of birth
-            Start_date: dentistToEdit.Start_date,
-            End_date: dentistToEdit.End_date,
-            Is_active: dentistToEdit.Is_active,
-            Salary: dentistToEdit.Salary
-        });
-    };
-    
-    const handleCancelEdit = () => {
-        // Reset edit mode, clear editedDentist state, and deselect dentist
-        setEditMode(false);
-        setEditedDentist(null);
-        setSelectedDentistID(null);
-    };
 
-    const handleConfirmEdit = async () => {
+    const handleConfirmEdit = async (staffID) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/dentist/editDentist/${selectedDentistID}`, {
+            const dobSQLFormat = parseDateToSQLFormat(userData.DOB);
+            const startDateSQLFormat = parseDateToSQLFormat(userData.Start_date);
+            const updatedUserData = {
+                ...userData,
+                DOB: dobSQLFormat,
+                Start_date: startDateSQLFormat
+            };
+            console.log("Sending userData to server:", updatedUserData);
+            const response = await fetch(`http://localhost:5000/api/staff/editStaff/${staffID}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(editedDentistProfile) // Send the entire edited profile
+                body: JSON.stringify(updatedUserData)
             });
-    
             if (response.ok) {
-                // Data successfully updated
-                // Reset edit mode, clear editedDentistProfile state, and deselect dentist
-                setEditMode(false);
-                setEditedDentistProfile(null);
-                setSelectedDentistID(null);
-                window.location.reload();
+                console.log('Staff information updated successfully');
+                fetchStaff();
+                setEditedIndex(null);
             } else {
-                console.error('Failed to update dentist information:', response.statusText);
-                // Handle error case here
-            }
-        } catch (error) {
-            console.error('Error updating dentist information:', error);
-            // Handle error case here
-        }
-    };
-
-    const handleStaffInputChange = (e) => {
-        const { name, value } = e.target;
-        setEditedStaffProfile({ ...editedStaffProfile, [name]: value });
-    };
-
-    const handleEditStaffClick = (staffID) => {
-        // Set edit mode to true and populate selectedStaffID
-        setEditModeStaff(true);
-        setSelectedStaffID(staffID);
-        
-        // Find the staff member being edited
-        const staffToEdit = staff.find(member => member.staffID === staffID);
-        
-        // Format the date of birth (DOB) into YYYY-MM-DD format (if needed)
-        const formattedDOB = formatDateForBackend(staffToEdit.DOB);
-        const formattedStartDate = formatDateForBackend(staffToEdit.Start_date);
-        const formattedEndDate = formatDateForBackend(staffToEdit.End_date);
-        
-        // Set the editedStaffProfile state with the current values of the staff member
-        setEditedStaffProfile({
-            staffID: staffToEdit.staffID,
-            officeID: staffToEdit.officeID,
-            Fname: staffToEdit.Fname,
-            Lname: staffToEdit.Lname,
-            Email: staffToEdit.Email,
-            Position: staffToEdit.Position,
-            Phone_num: staffToEdit.Phone_num,
-            Address: staffToEdit.Address,
-            DOB: formattedDOB, // Set the formatted date of birth
-            Start_date: formattedStartDate,
-            End_date: formattedEndDate,
-            Is_active: staffToEdit.Is_active,
-            Salary: staffToEdit.Salary
-        });
-    };    
-
-    const handleCancelEditStaff = () => {
-        // Reset edit mode, clear editedStaff state, and deselect staff
-        setEditModeStaff(false);
-        setEditedStaff(null);
-        setSelectedStaffID(null);
-    };
-
-    const handleConfirmEditStaff = async () => {
-        try {
-            const response = await fetch(`http://localhost:5000/api/staff/editStaff/${selectedStaffID}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(editedStaffProfile) // Send the entire edited profile
-            });
-    
-            if (response.ok) {
-                // Data successfully updated
-                // Reset edit mode, clear editedStaffProfile state, and deselect staff
-                setEditModeStaff(false);
-                setEditedStaffProfile(null);
-                setSelectedStaffID(null);
-                window.location.reload();
-            } else {
-                console.error('Failed to update staff information:', response.statusText);
-                // Handle error case here
+                console.error('Failed to update staff information');
             }
         } catch (error) {
             console.error('Error updating staff information:', error);
-            // Handle error case here
         }
     };
 
-    const formatActiveStatus = (isActive) => {
-        return isActive ? "Active" : "Inactive";
-    };
-
-    const formatOfficeLocation = (officeID) => {
-        switch (officeID) {
-            case 1:
-                return "Austin";
-            case 2:
-                return "Phoenix";
-            default:
-                return "Unknown";
-        }
-    };
-
-    // Add state variables for delete mode, deleted staff, and deleted staff profile
-const [deleteModeStaff, setDeleteModeStaff] = useState(false);
-const [deletedStaff, setDeletedStaff] = useState(null);
-const [deletedStaffProfile, setDeletedStaffProfile] = useState({
-    staffID: "",
-    End_date: "", // Only End date will be editable for deletion
-    Is_active: false // Set Is_active to false for deletion
-});
-
-// Handle delete click for staff
-const handleDeleteStaffClick = (staffID) => {
-    // Set delete mode to true and populate selectedStaffID
-    setDeleteModeStaff(true);
-    setSelectedStaffID(staffID);
+    const handleConfirmDelete = async (staffID) => {
+        try {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const End_date = `${year}-${month}-${day}`;
     
-    // Find the staff member being deleted
-    const staffToDelete = staff.find(member => member.staffID === staffID);
-    
-    // Set the deletedStaffProfile state with the current values of the staff member
-    setDeletedStaffProfile({
-        staffID: staffToDelete.staffID,
-        End_date: staffToDelete.End_date || "", // Set End date (if available)
-        Is_active: false // Set Is_active to false for deletion
-    });
-};
-
-// Handle cancel delete for staff
-const handleCancelDeleteStaff = () => {
-    // Reset delete mode and deselect staff
-    setDeleteModeStaff(false);
-    setSelectedStaffID(null);
-};
-
-// Handle input change for deletion
-const handleDeleteStaffInputChange = (e, staffID) => {
-    const { name, value } = e.target;
-    setEditedStaffProfile({ ...editedStaffProfile, [name]: value });
-};
-
-
-// Handle confirm delete for staff
-const handleConfirmDeleteStaff = async () => {
-    // Check if End date is entered
-    if (!deletedStaffProfile.End_date) {
-        // Display an error message or alert indicating that End date is required
-        return;
-    }
-
-    try {
-        const response = await fetch(`http://localhost:5000/api/staff/deleteStaff/${selectedStaffID}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(deletedStaffProfile)
-        });
-
-        if (response.ok) {
-            // Data successfully updated
-            setDeleteModeStaff(false);
-            setSelectedStaffID(null);
-            window.location.reload();
-        } else {
-            console.error('Failed to delete staff member:', response.statusText);
-            // Handle error case here
+            const response = await fetch(`http://localhost:5000/api/staff/archive/${staffID}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ End_date })
+            });
+            if (response.ok) {
+                console.log('Staff archived successfully');
+                fetchStaff();
+                setDeletedIndex(null);
+            } else {
+                console.error('Failed to archive staff');
+            }
+        } catch (error) {
+            console.error('Error archiving staff:', error);
         }
-    } catch (error) {
-        console.error('Error deleting staff member:', error);
-        // Handle error case here
-    }
-};
+    };
 
-
-
-    // const [dob, setDob] = useState(null);
-    // const [startDate, setStartDate] = useState(null);
-
-    // // Handle date change for date pickers
-    // const handleDobChange = (date) => {
-    //     setDob(date);
-    //     setEditedDentistProfile({ ...editedDentistProfile, DOB: date });
-    // };
-
-    // const handleStartDateChange = (date) => {
-    //     setStartDate(date);
-    //     setEditedDentistProfile({ ...editedDentistProfile, Start_date: date });
-    // };
-
-    // // Modify the dropdown selection to update the office ID
-    // const handleOfficeChange = (e) => {
-    //     const { value } = e.target;
-    //     setEditedStaffProfile({ ...editedStaffProfile, officeID: value });
-    // };
+    const handleInputChange = (value, field) => {
+        setUserData(prevUserData => ({
+            ...prevUserData,
+            [field]: field === 'DOB' || field === 'Start_date' ? value : value.target.value
+        }));
+    };
 
     return (
         <>
-            <div className="flex h-screen flex-col">
+            <div className="flex w-screen h-screen flex-col">
                 <nav>
                     <HeaderPortalAdmin />
                 </nav>
 
                 <div className="flex flex-1">
-                    {/* Sidebar */}
                     <aside className="w-1/6 bg-gray-200 text-black">
                         <nav className="p-4 text-xl">
                             <ul>
                                 <li><a href="/admin/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
                                 <li><a href="/admin/appointments" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
                                 <li><a href="/admin/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
+                                <li><a href="/admin/dentists" className="block py-2 text-center text-gray-600 hover:text-black">Dentists</a></li>
                                 <li><a href="/admin/staff" className="block py-2 text-center font-bold underline">Staff</a></li>
                                 <li><a href="/admin/appointment-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Appointment Data Report</a></li>
                                 <li><a href="/admin/finance-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Finance Data Report</a></li>
@@ -361,389 +167,126 @@ const handleConfirmDeleteStaff = async () => {
                         </nav>
                     </aside>
                     
-                    {/* Main Section */}
-                    <main className="flex-1 p-4">
-                        {/* Dentist Profiles */}
-                        <div>
-                            <div className="flex items-center gap-4 mb-4">
-                                <h1 className="text-2xl font-bold">Dentist Profiles</h1>
-                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"><a href= "/admin/register-dentist">+ Register Dentist</a></button>
-                            </div>
-                            <div className="overflow-x-auto">
-                                <table className="table-auto bg-white border border-gray-300 rounded-lg shadow-md">
-                                    <thead>
-                                        <tr className="bg-gray-200">
-                                            <th className="px-2 py-1">DentistID</th>
-                                            <th className="px-2 py-1">First Name</th>
-                                            <th className="px-2 py-1">Last Name</th>
-                                            <th className="px-2 py-1">Email</th>
-                                            <th className="px-2 py-1">Specialty</th>
-                                            <th className="px-2 py-1">Phone</th>
-                                            <th className="px-2 py-1">Address</th>
-                                            <th className="px-2 py-1">DOB</th>
-                                            <th className="px-2 py-1">Start Date</th>
-                                            <th className="px-2 py-1">End Date</th>
-                                            <th className="px-2 py-1">Salary</th>
-                                            <th className="px-2 py-1">Active</th>
-                                            <th className="px-2 py-1">Actions</th>
-                                            {/* Add other header columns as needed */}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {dentists.map(dentist => (
-                                            <tr key={dentist.dentistID} className="hover:bg-gray-100">
-                                                <td className="border px-2 py-1">{dentist.dentistID}</td>
-                                                <td className="border px-2 py-1">
-                                                    {editMode && selectedDentistID === dentist.dentistID ? (
-                                                        <input
-                                                            type="text"
-                                                            name="FName"
-                                                            value={editedDentistProfile.FName || dentist.FName}
-                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
-                                                            style={{ width: "90%" }}
-                                                        />
-                                                    ) : (
-                                                        dentist.FName
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editMode && selectedDentistID === dentist.dentistID ? (
-                                                        <input
-                                                            type="text"
-                                                            name="LName"
-                                                            value={editedDentistProfile.LName || dentist.LName}
-                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
-                                                            style={{ width: "90%" }}
-                                                        />
-                                                    ) : (
-                                                        dentist.LName
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editMode && selectedDentistID === dentist.dentistID ? (
-                                                        <input
-                                                            type="text"
-                                                            name="Email"
-                                                            value={editedDentistProfile.Email || dentist.Email}
-                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
-                                                            style={{ width: "90%" }}
-                                                        />
-                                                    ) : (
-                                                        dentist.Email
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editMode && selectedDentistID === dentist.dentistID ? (
-                                                        <select
-                                                            name="Specialty"
-                                                            value={editedDentistProfile.Specialty || dentist.Specialty}
-                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
-                                                            style={{ width: "90%" }}
-                                                        >
-                                                        <option value="General Dentistry">General Dentistry</option>
-                                                        <option value="Endodontist">Endodontist</option>
-                                                        </select>
-                                                    ) : (
-                                                        dentist.Specialty
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editMode && selectedDentistID === dentist.dentistID ? (
-                                                        <input
-                                                            type="text"
-                                                            name="Phone_num"
-                                                            value={editedDentistProfile.Phone_num || dentist.Phone_num}
-                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
-                                                            style={{ width: "90%" }}
-                                                        />
-                                                    ) : (
-                                                        dentist.Phone_num
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editMode && selectedDentistID === dentist.dentistID ? (
-                                                        <input
-                                                            type="text"
-                                                            name="Address"
-                                                            value={editedDentistProfile.Address || dentist.Address}
-                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
-                                                            style={{ width: "90%" }}
-                                                        />
-                                                    ) : (
-                                                        dentist.Address
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editMode && selectedDentistID === dentist.dentistID ? (
-                                                        <input
-                                                            type="date"
-                                                            name="DOB"
-                                                            value={editedDentistProfile.DOB || new Date(dentist.DOB).toISOString().substr(0, 10)}
-                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
-                                                        />
-                                                    ) : (
-                                                        new Date(dentist.DOB).toLocaleDateString()
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editMode && selectedDentistID === dentist.dentistID ? (
-                                                        <input
-                                                            type="date"
-                                                            name="Start_date"
-                                                            value={editedDentistProfile.Start_date || new Date(dentist.Start_date).toISOString().substr(0, 10)}
-                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
-                                                        />
-                                                    ) : (
-                                                        new Date(dentist.Start_date).toLocaleDateString()
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">{dentist.End_date ? new Date(dentist.End_date).toLocaleDateString() : "N/A"}</td>
-                                                <td className="border px-2 py-1">
-                                                    {editMode && selectedDentistID === dentist.dentistID ? (
-                                                        <input
-                                                            type="text"
-                                                            name="Salary"
-                                                            value={editedDentistProfile.Salary || dentist.Salary}
-                                                            onChange={(e) => handleInputChange(e, dentist.dentistID)}
-                                                        />
-                                                    ) : (
-                                                        dentist.Salary
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">{formatActiveStatus(dentist.Is_active)}</td>
-                                                <td className="border px-2 py-1 space-x-2">
-                                                    {editMode && selectedDentistID === dentist.dentistID ? (
-                                                        <>
-                                                            <button onClick={handleConfirmEdit} className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded">Confirm</button>
-                                                            <button onClick={handleCancelEdit} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Cancel</button>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-                                                                onClick={() => handleEditClick(dentist.dentistID)}>
-                                                                Edit
-                                                            </button>
-                                                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Delete</button>
-                                                        </>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                    <main className="flex-1 p-4 overflow-x-auto">
+                        <div className="flex gap-4 mb-8">
+                            <h1 className="text-3xl font-bold">Staff Overview</h1>
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white text-lg py-1 px-4 rounded focus:outline-none focus:ring focus:border-green-300"><a href= "/admin/register-staff">+ Add Staff</a></button>
                         </div>
-                        
-                        {/* Staff Profiles */}
-                        <div className="mt-8">
-                            <div className="flex items-center gap-4 mb-4">
-                                <h1 className="text-2xl font-bold">Staff Profiles</h1>
-                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"><a href="/admin/register-staff">+ Register Staff</a></button>
-                            </div>
-                            <div className="overflow-x-auto">
-                                <table className="table-auto bg-white border border-gray-300 rounded-lg shadow-md">
-                                    <thead>
-                                        <tr className="bg-gray-200">
-                                            <th className="px-2 py-1">StaffID</th>
-                                            <th className="px-2 py-1">Office</th>
-                                            <th className="px-2 py-1">First Name</th>
-                                            <th className="px-2 py-1">Last Name</th>
-                                            <th className="px-2 py-1">Email</th>
-                                            <th className="px-2 py-1">Position</th>
-                                            <th className="px-2 py-1">Phone</th>
-                                            <th className="px-2 py-1">Address</th>
-                                            <th className="px-2 py-1">DOB</th>
-                                            <th className="px-2 py-1">Start Date</th>
-                                            <th className="px-2 py-1">End Date</th>
-                                            <th className="px-2 py-1">Salary</th>
-                                            <th className="px-2 py-1">Active</th>
-                                            <th className="px-2 py-1">Actions</th>
+                        <div className="overflow-x-auto">
+                            <table className="table-auto w-full border-collapse overflow-x-auto">
+                                <thead>
+                                    <tr className="bg-gray-200">
+                                        <th className="px-4 py-2 text-sm">StaffID</th>
+                                        <th className="px-4 py-2 text-sm">Office</th>
+                                        <th className="px-4 py-2 text-sm">First Name</th>
+                                        <th className="px-4 py-2 text-sm">Last Name</th>
+                                        <th className="px-4 py-2 text-sm">Email</th>
+                                        <th className="px-4 py-2 text-sm">Phone Number</th>
+                                        <th className="px-4 py-2 text-sm">DOB</th>
+                                        <th className="px-4 py-2 text-sm">Address</th>
+                                        <th className="px-4 py-2 text-sm">Position</th>
+                                        <th className="px-4 py-2 text-sm">Start Date</th>
+                                        <th className="px-4 py-2 text-sm">End Date</th>
+                                        <th className="px-4 py-2 text-sm">Is Active</th>
+                                        <th className="px-4 py-2 text-sm">Salary</th>
+                                        <th className="px-4 py-2 text-sm">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {staff.map((staffMember, index) => (
+                                        <tr key={staffMember.staffID}>
+                                            <td className="border px-4 py-2">{staffMember.staffID}</td>
+                                            <td className="border px-4 py-2">
+                                                {editedIndex === index ? (
+                                                    <select name="officeID" value={userData.officeID} onChange={(e) => handleInputChange(e, 'officeID')}>
+                                                        <option value="">Select</option>
+                                                        <option value="1">Austin</option>
+                                                        <option value="2">Phoenix</option>
+                                                    </select>
+                                                ) : (
+                                                    staffMember.officeID === 1 ? 'Austin' : 'Phoenix'
+                                                )}
+                                            </td>
+                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Fname" value={userData.Fname} onChange={(e) => handleInputChange(e, 'Fname')} /> : staffMember.Fname}</td>
+                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Lname" value={userData.Lname} onChange={(e) => handleInputChange(e, 'Lname')} /> : staffMember.Lname}</td>
+                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Email" value={userData.Email} onChange={(e) => handleInputChange(e, 'Email')} /> : staffMember.Email}</td>
+                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Phone_num" value={userData.Phone_num} onChange={(e) => handleInputChange(e, 'Phone_num')} /> : staffMember.Phone_num}</td>
+                                            <td className="border px-4 py-2">
+                                                {editedIndex === index ? (
+                                                    <DatePicker
+                                                        selected={userData.DOB}
+                                                        onChange={(date) => handleInputChange(date, 'DOB')}
+                                                        dateFormat="MM/dd/yyyy"
+                                                    />
+                                                ) : (
+                                                    new Date(staffMember.DOB).toLocaleDateString()
+                                                )}
+                                            </td>
+                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Address" value={userData.Address} onChange={(e) => handleInputChange(e, 'Address')} /> : staffMember.Address}</td>
+                                            <td className="border px-4 py-2">
+                                                {editedIndex === index ? (
+                                                    <select name="Position" value={userData.Position} onChange={(e) => handleInputChange(e, 'Position')}>
+                                                        <option value="">Select</option>
+                                                        <option value="Receptionist">Receptionist</option>
+                                                        <option value="Hygienist">Hygienist</option>
+                                                    </select>
+                                                ) : (
+                                                    staffMember.Position
+                                                )}
+                                            </td>
+                                            <td className="border px-4 py-2">
+                                                {editedIndex === index ? (
+                                                    <DatePicker
+                                                        selected={userData.Start_date}
+                                                        onChange={(date) => handleInputChange(date, 'Start_date')}
+                                                        dateFormat="MM/dd/yyyy"
+                                                    />
+                                                ) : (
+                                                    new Date(staffMember.Start_date).toLocaleDateString()
+                                                )}
+                                            </td>
+                                            <td className="border px-4 py-2">
+                                                {editedIndex === index ? 
+                                                    (userData.End_date ? userData.End_date : 'N/A') :
+                                                    (deletedIndex === index ? 
+                                                        (userData.End_date ? userData.End_date : new Date().toLocaleDateString('en-US')) : 
+                                                        (staffMember.End_date ? new Date(staffMember.End_date).toLocaleDateString('en-US') : 'N/A')
+                                                    )
+                                                }
+                                            </td>
+                                            <td className="border px-4 py-2">{staffMember.Is_active ? "Active" : "Inactive"}</td>
+                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Salary" value={userData.Salary} onChange={(e) => handleInputChange(e, 'Salary')} /> : staffMember.Salary}</td>
+                                            <td className="border px-4 py-2">
+                                                {(editedIndex !== index && deletedIndex !== index) && (
+                                                    <>
+                                                        <button onClick={() => handleEdit(index)} className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-blue-300">Edit</button>
+                                                        <button onClick={() => handleDelete(index)} className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-red-300 ml-2">Delete</button>
+                                                    </>
+                                                )}
+                                                {editedIndex === index && (
+                                                    <>
+                                                        <button onClick={() => handleConfirmEdit(staffMember.staffID)} className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-green-300">Confirm</button>
+                                                        <button onClick={handleCancelEdit} className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-red-300 ml-2">Cancel</button>
+                                                    </>
+                                                )}
+                                                {deletedIndex === index && (
+                                                    <>
+                                                        <button onClick={() => handleConfirmDelete(staffMember.staffID)} className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-red-300 ml-2">Confirm</button>
+                                                        <button onClick={handleCancelDelete} className="bg-gray-500 hover:bg-gray-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-gray-300 ml-2">Cancel</button>
+                                                    </>
+                                                )}
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {staff.map(staffMember => (
-                                            <tr key={staffMember.staffID} className="hover:bg-gray-100">
-                                                <td className="border px-2 py-1">{staffMember.staffID}</td>
-                                                <td className="border px-2 py-1">
-                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                        <select
-                                                            name="officeID"
-                                                            value={editedStaffProfile.officeID}
-                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
-                                                            style={{ width: "90%" }}
-                                                        >
-                                                            <option value="1">Austin</option>
-                                                            <option value="2">Phoenix</option>
-                                                        </select>
-                                                    ) : (
-                                                        formatOfficeLocation(staffMember.officeID)
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                        <input
-                                                            type="text"
-                                                            name="FName"
-                                                            value={editedStaffProfile.Fname || staffMember.Fname}
-                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
-                                                            style={{ width: "90%" }}
-                                                        />
-                                                    ) : (
-                                                        staffMember.Fname
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                        <input
-                                                            type="text"
-                                                            name="LName"
-                                                            value={editedStaffProfile.Lname || staffMember.Lname}
-                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
-                                                            style={{ width: "90%" }}
-                                                        />
-                                                    ) : (
-                                                        staffMember.Lname
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                        <input
-                                                            type="text"
-                                                            name="Email"
-                                                            value={editedStaffProfile.Email || staffMember.Email}
-                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
-                                                            style={{ width: "90%" }}
-                                                        />
-                                                    ) : (
-                                                        staffMember.Email
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                        <select
-                                                            name="Position"
-                                                            value={editedStaffProfile.Position || staffMember.Position}
-                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
-                                                            style={{ width: "90%" }}
-                                                        >
-                                                            <option value="Receptionist">Receptionist</option>
-                                                            <option value="Hygienist">Hygienist</option>
-                                                        </select>
-                                                    ) : (
-                                                        staffMember.Position
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                        <input
-                                                            type="text"
-                                                            name="Phone_num"
-                                                            value={editedStaffProfile.Phone_num || staffMember.Phone_num}
-                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
-                                                            style={{ width: "90%" }}
-                                                        />
-                                                    ) : (
-                                                        staffMember.Phone_num
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                        <input
-                                                            type="text"
-                                                            name="Address"
-                                                            value={editedStaffProfile.Address || staffMember.Address}
-                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
-                                                            style={{ width: "90%" }}
-                                                        />
-                                                    ) : (
-                                                        staffMember.Address
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                        <input
-                                                            type="date"
-                                                            name="DOB"
-                                                            value={editedStaffProfile.DOB || new Date(staffMember.DOB).toISOString().substr(0, 10)}
-                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
-                                                        />
-                                                    ) : (
-                                                        new Date(staffMember.DOB).toLocaleDateString()
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                        <input
-                                                            type="date"
-                                                            name="Start_date"
-                                                            value={editedStaffProfile.Start_date || new Date(staffMember.Start_date).toISOString().substr(0, 10)}
-                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
-                                                        />
-                                                    ) : (
-                                                        new Date(staffMember.Start_date).toLocaleDateString()
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {deleteModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                        <input
-                                                            type="date"
-                                                            name="End_date"
-                                                            value={editedStaffProfile.End_date || new Date().toISOString().substr(0, 10)}
-                                                            onChange={(e) => handleDeleteStaffInputChange(e, staffMember.staffID)}
-                                                        />
-                                                    ) : (
-                                                        staffMember.End_date ? new Date(staffMember.End_date).toLocaleDateString() : "N/A"
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">
-                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                        <input
-                                                            type="text"
-                                                            name="Salary"
-                                                            value={editedStaffProfile.Salary || staffMember.Salary}
-                                                            onChange={(e) => handleStaffInputChange(e, staffMember.staffID)}
-                                                        />
-                                                    ) : (
-                                                        staffMember.Salary
-                                                    )}
-                                                </td>
-                                                <td className="border px-2 py-1">{formatActiveStatus(staffMember.Is_active)}</td>
-                                                <td className="border px-2 py-1 space-x-2">
-                                                    {editModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                        <>
-                                                            <button onClick={handleConfirmEditStaff} className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded">Confirm</button>
-                                                            <button onClick={handleCancelEditStaff} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Cancel</button>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-                                                                onClick={() => handleEditStaffClick(staffMember.staffID)}>
-                                                                Edit
-                                                            </button>
-                                                            {deleteModeStaff && selectedStaffID === staffMember.staffID ? (
-                                                                <>
-                                                                    <button onClick={handleConfirmDeleteStaff} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Confirm Delete</button>
-                                                                    <button onClick={handleCancelDeleteStaff} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded">Cancel Delete</button>
-                                                                </>
-                                                            ) : (
-                                                                <button onClick={() => handleDeleteStaffClick(staffMember.staffID)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Delete</button>
-                                                            )}
-                                                        </>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-
-
-                                </table>
-                            </div>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </main>
+
                 </div>
 
                 <nav>
-                    <Footer />
+                    <Footer/>
                 </nav>
             </div>
         </>
