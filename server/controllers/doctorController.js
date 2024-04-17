@@ -576,7 +576,7 @@ const generateInvoice = (req, res) => {
         try {
             const requestData = JSON.parse(body);
             const { visitID, dentistID, patientID, visitDate, Start_time } = requestData;
-            
+
             pool.query(
                 'SELECT * FROM visit_details WHERE visitID = ?',
                 [visitID],
@@ -658,9 +658,11 @@ const generateInvoice = (req, res) => {
                                     grossAmount = grossAmount + 20.00;
 
                                     const currentDate = new Date().toISOString().split('T')[0];
+                                    const query = 'INSERT INTO invoice (Policy_number, patientID, visitID, Date, Description, Gross_Amount, Insurance_coverage, Net_Amount, Paid_Amount, Is_paid, cleaning_discount_applied) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
                                     pool.query(
-                                        'INSERT INTO invoice (Policy_number, patientID, visitID, Date, Gross_Amount, Insurance_coverage, Net_Amount, Paid_Amount, Is_paid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                                        [patientPolicyNumber, patientID, visitID, currentDate, grossAmount, insuranceCoverage, netAmount, 0, false],
+                                        query,
+                                        [patientPolicyNumber, patientID, visitID, currentDate, appointmentType, grossAmount, insuranceCoverage, netAmount, 0, false, 0], 
                                         (error, results) => {
                                             if (error) {
                                                 console.error('Error generating invoice:', error);
@@ -669,8 +671,28 @@ const generateInvoice = (req, res) => {
                                                 return;
                                             }
 
-                                            res.writeHead(201, { 'Content-Type': 'application/json' });
-                                            res.end(JSON.stringify({ message: 'Invoice generated successfully', invoiceID: results.insertId }));
+                                            const insertedInvoiceId = results.insertId;
+
+                                            pool.query(
+                                                'SELECT * FROM invoice WHERE invoiceID = ?',
+                                                [insertedInvoiceId],
+                                                (error, results) => {
+                                                    if (error) {
+                                                        console.error('Error retrieving inserted invoice:', error);
+                                                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                                                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                                        return;
+                                                    }
+
+                                                    const insertedInvoice = results[0];
+                                                    let message = 'Invoice generated successfully';
+                                                    if (requestData.cleaning_discount_applied) {
+                                                        message += ' with cleaning discount';
+                                                    }
+                                                    res.writeHead(201, { 'Content-Type': 'application/json' });
+                                                    res.end(JSON.stringify({ message: message, invoice: insertedInvoice, cleaning_discount_applied: requestData.cleaning_discount_applied }));
+                                                }
+                                            );
                                         }
                                     );
                                 }

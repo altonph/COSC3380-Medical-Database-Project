@@ -197,6 +197,12 @@ DELETE FROM visit_details;
 DELETE FROM appointment;
 
 -- @block
+DELETE FROM invoice;
+
+-- @block
+SELECT * FROM invoice;
+
+-- @block
 SELECT dentistID FROM login WHERE Username = 'jane_doe';
 
 -- @block

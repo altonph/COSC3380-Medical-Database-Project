@@ -17,6 +17,7 @@ const DoctorAddVisitDetails = () => {
   const [scheduleFollowUp, setScheduleFollowUp] = useState(false);
   const [approveForSpecialist, setApproveForSpecialist] = useState(false);
   const [doctorSpecialty, setDoctorSpecialty] = useState(null);
+  const [discountMessage, setDiscountMessage] = useState("");
 
     useEffect(() => {
       const fetchDoctorSpecialty = async () => {
@@ -126,24 +127,24 @@ const DoctorAddVisitDetails = () => {
         }
 
         if (approveForSpecialist) {
-          const patchRequestBody = {
-              dentistID: appointmentDetails.dentistID,
-              patientID: appointmentDetails.patientID,
-              Date: formatDate(appointmentDetails.Date),
-              Start_time: appointmentDetails.Start_time
-          };
-          const patchResponse = await fetch('http://localhost:5000/api/doctor/appointments/update-primary-approval', {
-              method: 'PATCH',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify(patchRequestBody)
-          });
-          if (!patchResponse.ok) {
-              throw new Error('Failed to update primary approval');
-          }
-      }
+            const patchRequestBody = {
+                dentistID: appointmentDetails.dentistID,
+                patientID: appointmentDetails.patientID,
+                Date: formatDate(appointmentDetails.Date),
+                Start_time: appointmentDetails.Start_time
+            };
+            const patchResponse = await fetch('http://localhost:5000/api/doctor/appointments/update-primary-approval', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(patchRequestBody)
+            });
+            if (!patchResponse.ok) {
+                throw new Error('Failed to update primary approval');
+            }
+        }
 
         const invoiceRequestData = {
             visitID: visitID,
@@ -169,11 +170,15 @@ const DoctorAddVisitDetails = () => {
         const invoiceData = await invoiceResponse.json();
         console.log('Invoice generated successfully:', invoiceData);
 
+        if (invoiceData.invoice.cleaning_discount_applied) {
+          setDiscountMessage(`Patient ${appointmentDetails.patientID} just received a 20% discount on their first cleaning!`);
+      } 
+
         setIsInsertSuccess(true);
     } catch (error) {
         console.error('Error confirming visit details:', error);
     }
-  };
+};
 
   const handleConfirmPrescriptions = () => {
     const { visitID } = appointmentDetails;
@@ -312,6 +317,12 @@ const DoctorAddVisitDetails = () => {
               </ul>
             </nav>
           </aside>
+
+          {discountMessage && (
+        <div className="fixed top-0 left-0 w-full bg-green-200 text-green-800 p-4 shadow-md z-50">
+          {discountMessage}
+        </div>
+          )}
           
           <main className="flex-1 p-4">
             <div className="max-w-4xl mx-auto mt-8 p-4">
