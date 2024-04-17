@@ -35,6 +35,8 @@ import PatientMedicalHistory from "./pages/patient/PatientMedicalHistory";
 import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
 import AdminPortal from "./pages/admin/AdminPortal";
 import AdminAppointment from "./pages/admin/AdminAppointments";
+import AdminMakeAppointment from "./pages/admin/AdminMakeAppointment";
+import AdminAppointments from "./pages/admin/AdminAppointments";
 import AdminPatients from "./pages/admin/AdminPatients";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AppointmentDataReport from "./pages/admin/AppointmentDataReport";
@@ -49,6 +51,7 @@ import AdminRegisterStaff from "./pages/admin/AdminRegisterStaff";
 import DemographicDataReport from "./pages/admin/DemographicDataReport";
 import AdminRegisterPatient from "./pages/admin/AdminRegisterPatient";
 import AdminDentist from "./pages/admin/AdminDentist";
+import AdminAddVisitDetails from "./pages/admin/AdminAddVisitDetails";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -97,6 +100,8 @@ function App() {
             <Route path="/staff/appointments/add-visit-details" element={<StaffAddVisitDetails />} />
             <Route path="/admin/home" element= {<AdminPortal/>} />
             <Route path="/admin/appointments" element={<AdminAppointment/>}/>
+            <Route path="/admin/appointments/make-appointment" element={<AdminMakeAppointment />} />
+            <Route path="/admin/appointments/add-visit-details" element={<AdminAddVisitDetails />} />
             <Route path="/admin/patients" element={<AdminPatients/>}/>
             <Route path="/admin/login" element={<AdminLogin/>}/>
             <Route path="/admin/appointment-data-report" element={<AppointmentDataReport/>}/>
