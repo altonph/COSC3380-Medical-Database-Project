@@ -3,8 +3,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import HeaderPortalStaff from "../../components/HeaderPortalStaff";
 import Footer from "../../components/Footer";
-import { Link } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const StaffMakeAppointment = () => {
 
@@ -21,7 +20,33 @@ const StaffMakeAppointment = () => {
   const [selectedStartTime, setSelectedStartTime] = useState('');
   const [selectedEndTime, setSelectedEndTime] = useState('');
   const [availableStaff, setAvailableStaff] = useState([]);
-  const [selectedAssistingHygienist, setSelectedAssistingHygienist] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [selectedAssistingHygienist, setSelectedAssistingHygienist] = useState(availableStaff.length > 0 ? availableStaff[0] : '');
+
+  useEffect(() => {
+    fetchPatientID();
+  }, []);
+
+  const fetchPatientID = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/patient/id', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPatientID(data.patientID);
+        console.log(data.patientID);
+      } else {
+        console.error('Failed to fetch patient ID:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching patient ID:', error);
+    }
+  };
 
   useEffect(() => {
     if (location && preferredDate) {
@@ -39,6 +64,12 @@ const StaffMakeAppointment = () => {
     if (location && preferredDate && selectedStartTime && selectedEndTime) {
       fetchAvailableStaff(location, preferredDate, selectedStartTime, selectedEndTime);
     }
+    if (availableStaff.length > 0) {
+      setSelectedAssistingHygienist(availableStaff[0]);
+    } else {
+      setSelectedAssistingHygienist(null);
+    }
+    console.log(selectedAssistingHygienist);
   }, [location, preferredDate, selectedStartTime, selectedEndTime]);
 
   const fetchDentistsByOfficeAndDay = async (officeID, dayOfWeek) => {
@@ -152,88 +183,67 @@ const StaffMakeAppointment = () => {
     const startMinute = parseInt(startTimeParts[0].split(':')[1]);
     const startPeriod = startTimeParts[1];
 
-    const endTimeParts = selectedEndTime.split(' ');
-    const endHour = parseInt(endTimeParts[0].split(':')[0]);
-    const endMinute = parseInt(endTimeParts[0].split(':')[1]);
-    const endPeriod = endTimeParts[1];
-
     const startHour24 = (startPeriod === 'PM' && startHour !== 12) ? startHour + 12 : startHour;
-    const endHour24 = (endPeriod === 'PM' && endHour !== 12) ? endHour + 12 : endHour;
 
     const startTimeInMinutes = startHour24 * 60 + startMinute;
-    const endTimeInMinutes = endHour24 * 60 + endMinute;
 
-    if (endTimeInMinutes <= startTimeInMinutes) {
-        console.log('End time must be after start time');
-        return;
-    }
+    const endTimeInMinutes = startTimeInMinutes + 60; 
+
+    const endHour24 = Math.floor(endTimeInMinutes / 60) % 24;
+    const endMinute = endTimeInMinutes % 60;
+
+    const formattedStartTime = `${startHour24}:${startMinute}:00`;
+    const formattedEndTime = `${endHour24}:${endMinute}:00`;
+
+    console.log("Formatted start time is ", formattedStartTime);
+    console.log("Formatted end time is ", formattedEndTime);
+
+    const sqlFormattedDate = preferredDate.toISOString().split('T')[0];
 
     const patientExists = await checkPatientExistence();
     if (!patientExists) {
         console.log('Insertion failed, patient does not exist');
+        setErrorMessage("This patient does not exist");
         return;
     }
 
-    const timePartsStart = selectedStartTime.split(' ');
-    let timeStart = parseInt(timePartsStart[0]);
-    if (timePartsStart[1] === 'PM' && timeStart !== 12) {
-        timeStart += 12;
-    }
-    const formattedStartTime = `${timeStart}:00:00`;
-
-    const timePartsEnd = selectedEndTime.split(' ');
-    let timeEnd = parseInt(timePartsEnd[0]);
-    if (timePartsEnd[1] === 'PM' && timeEnd !== 12) {
-        timeEnd += 12;
-    }
-    const formattedEndTime = `${timeEnd}:00:00`;
-
-    console.log("Formatted start time is ", formattedStartTime);
-    console.log("Formatted end time is ", formattedEndTime);
-    const sqlFormattedDate = preferredDate.toISOString().split('T')[0];
-
     try {
-      const response = await fetch('http://localhost:5000/api/doctor/appointments', {
-          method: 'POST',
-          headers: {
-              "Authorization": `Bearer ${localStorage.getItem('token')}`,
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-              officeID: location,
-              dentistID: practitioner,
-              staffID: staffID, 
-              patientID: patientID,
-              Date: sqlFormattedDate,
-              Start_time: formattedStartTime,
-              End_time: formattedEndTime,
-              Appointment_Type: reasonForAppointment,
-              Appointment_Status: "Scheduled",
-              Primary_Approval: false,
-              Is_active: true
-          }),
-      });
+        const response = await fetch('http://localhost:5000/api/doctor/appointments', {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                officeID: location,
+                dentistID: practitioner,
+                staffID: staffID, 
+                patientID: patientID,
+                Date: sqlFormattedDate,
+                Start_time: formattedStartTime,
+                End_time: formattedEndTime,
+                Appointment_Type: reasonForAppointment,
+                Appointment_Status: "Scheduled",
+                Primary_Approval: false,
+                Is_active: true
+            }),
+        });
 
-      if (response.ok) {
-          console.log('Appointment successfully scheduled!');
-          setNotification('Appointment scheduled successfully!');
-          setTimeout(() => {
-              setNotification('');
-              navigateTo('/staff/appointments');
-          }, 1000);
+        if (response.ok) {
+            console.log('Appointment successfully scheduled!');
+            setNotification('Appointment scheduled successfully!');
+            setTimeout(() => {
+                setNotification('');
+                navigateTo('/staff/appointments');
+            }, 1000);
 
-      } else {
-          const responseData = await response.json();
-          if (responseData.error === 'Overlapping appointments detected. Please choose another time slot.') {
-              alert(responseData.error);
-          } else {
-              console.error('Failed to make appointment:', responseData.error || response.statusText);
-          }
-      }
+        } else {
+            console.error('Failed to make appointment:', response.statusText);
+        }
 
-  } catch (error) {
-      console.error('Error making appointment:', error);
-  }
+    } catch (error) {
+        console.error('Error making appointment:', error);
+    }
   };
 
 
@@ -273,9 +283,9 @@ const StaffMakeAppointment = () => {
         <aside className="w-1/6 bg-gray-200 text-black">
           <nav className="p-4 text-xl">
             <ul>
-              <li><a href="/staff/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
-              <li><a href="/staff/appointments" className="block py-2 text-center font-bold underline">Appointments</a></li>
-              <li><a href="/staff/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
+            <li><a href="/staff/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
+            <li><a href="/staff/appointments" className="block py-2 text-center font-bold underline">Appointments</a></li>
+            <li><a href="/staff/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
             </ul>
           </nav>
         </aside>
@@ -283,8 +293,9 @@ const StaffMakeAppointment = () => {
           <h1 className="text-3xl font-bold p-2 ml-8 mb-4">Make an Appointment</h1>
   
           <div className="container mx-auto mt-4">
-            <form onSubmit={handleSubmit} className="px-4 py-8">
-              <div className="mb-4">
+            <form onSubmit={handleSubmit} className="px-4 py-8">  
+
+            <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Patient ID:</label>
                 <input
                   type="text"
@@ -293,8 +304,11 @@ const StaffMakeAppointment = () => {
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                   placeholder="Enter Patient ID"
                 />
+                {errorMessage === "This patient does not exist" && (
+                <span className="text-red-600">This patient doesn't exist</span>
+              )}
               </div>
-  
+
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Location:</label>
                 <select
@@ -367,39 +381,10 @@ const StaffMakeAppointment = () => {
                         ))}
                       </select>
                     </div>
-                    <div className="w-1/2 ml-2">
-                      <label className="block text-sm font-bold mb-2">End Time:</label>
-                      <select
-                        value={selectedEndTime}
-                        onChange={(e) => setSelectedEndTime(e.target.value)}
-                        className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                      >
-                        {generateTimeOptions(selectedBlock).map((time) => (
-                          <option key={time} value={time}>
-                            {time}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    
                   </div>
                 </div>
               ))}
-
-              <div className="mb-4">
-                <label className="block text-sm font-bold mb-2">Assisting Hygienist:</label>
-                <select
-                  value={selectedAssistingHygienist}
-                  onChange={(e) => setSelectedAssistingHygienist(e.target.value)}
-                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                >
-                <option value="">None</option>
-                {availableStaff.map((staffID) => (
-                  <option key={staffID} value={staffID}>
-                    {`Staff ID: ${staffID}`}
-                  </option>
-                ))}
-                </select>
-              </div>
   
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Reason for Appointment:</label>
@@ -412,7 +397,6 @@ const StaffMakeAppointment = () => {
                   <option value="Cleaning">Cleaning</option>
                   <option value="Whitening">Whitening</option>
                   <option value="Extraction">Extraction</option>
-                  <option value="Root Canal">Root Canal</option>
                 </select>
               </div>
   
@@ -429,7 +413,7 @@ const StaffMakeAppointment = () => {
         <Footer />
       </nav>
     </div>
-  );    
+  );
 };
 
 export default StaffMakeAppointment;

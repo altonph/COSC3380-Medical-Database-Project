@@ -8,6 +8,7 @@ import HomePortal from "./pages/patient/HomePortal";
 import PaymentPortal from "./pages/patient/PaymentPortal";
 import PatientProfile from "./pages/patient/PatientProfile";
 import PatientProfileSettings from "./pages/patient/PatientProfileSettings";
+import DoctorSettings from "./pages/doctor/DoctorSettings";
 import DoctorLoginPage from "./pages/doctor/doctorLoginPage";
 import DoctorAppointment from "./pages/doctor/DoctorAppointments";
 import DoctorMakeAppointment from "./pages/doctor/DoctorMakeAppointment";
@@ -36,7 +37,6 @@ import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
 import AdminPortal from "./pages/admin/AdminPortal";
 import AdminAppointment from "./pages/admin/AdminAppointments";
 import AdminMakeAppointment from "./pages/admin/AdminMakeAppointment";
-import AdminAppointments from "./pages/admin/AdminAppointments";
 import AdminPatients from "./pages/admin/AdminPatients";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AppointmentDataReport from "./pages/admin/AppointmentDataReport";
@@ -75,6 +75,7 @@ function App() {
             <Route path="/patient/visit" element= {<PatientVisitDetails/>} />
             <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
+            <Route path="/doctor/settings" element={<DoctorSettings/>} />
             <Route path="/doctor/appointments" element={<DoctorAppointment/>}/>
             <Route path="/doctor/appointments/make-appointment" element={<DoctorMakeAppointment />} />
             <Route path="doctor/appointments/add-visit-details" element={<DoctorAddVisitDetails />} />
