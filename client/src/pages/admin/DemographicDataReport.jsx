@@ -23,7 +23,6 @@ function DemographicDataReport() {
                            `office=${office}&` +
                            `startDate=${startDate}&` +
                            `endDate=${endDate}&` +
-                           `ageGroup=${ageGroup}&` +
                            `gender=${gender}&` +
                            `insuranceType=${insuranceType}`;
     
