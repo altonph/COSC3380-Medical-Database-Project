@@ -30,8 +30,8 @@ const AdminRegisterPatient = () => {
                 Password: Password,
                 Phone_num: Phone_num,
                 Address: Address,
-                Policy_number: Policy_number,
-                Insurance_Company_Name: Insurance_Company_Name,
+                Policy_number: Policy_number || null, // Set to null if empty
+                Insurance_Company_Name: Insurance_Company_Name || null, // Set to null if empty
                 Is_active: true,
                 User_role: "Patient"
             }
