@@ -2,7 +2,7 @@ const {
         registerPatient, loginPatient, registerAdmin, loginAdmin, 
         registerDoctor, loginDoctor, registerStaff, loginStaff, 
         editDentist, editStaff,  editPatient, archiveDentist,
-        archivePatient, archiveStaff, getUserRole
+        archivePatient, archiveStaff, getUserRole, getStaffProfile, updateStaffProfile
 } = require('../controllers/authController');
 const url = require('url');
 
@@ -294,6 +294,76 @@ function handleArchivePatient(req, res) {
     });
 }
 
+const handleGetStaffProfile = (req, res, jwt) => {
+    const { url, method } = req;
+    
+    if (method === 'GET' && url === '/api/staff/profile') {
+        const decodedToken = verifyToken(req.headers.authorization, jwt);
+        if (!decodedToken) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Unauthorized' }));
+            return;
+        }
+
+        const { staffID } = decodedToken;
+        getStaffProfile(req, res, staffID);
+
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
+const handleUpdateStaffProfile = (req, res, jwt) => {
+    const { url, method } = req;
+    
+    if (method === 'PATCH' && url === '/api/staff/profile/update') {
+        const decodedToken = verifyToken(req.headers.authorization, jwt);
+        if (!decodedToken) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Unauthorized' }));
+            return;
+        }
+
+        const { staffID } = decodedToken;
+        
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString(); 
+        });
+
+        req.on('end', () => {
+            try {
+                const updatedProfile = JSON.parse(body);
+                updateStaffProfile(req, res, staffID, updatedProfile);
+            } catch (error) {
+                console.error('Error parsing JSON data:', error);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid JSON data' }));
+            }
+        });
+
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
+const verifyToken = (authHeader, jwt) => {
+
+    const token = authHeader && authHeader.split(' ')[1];
+    if (!token) return null;
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        return decoded;
+    } catch (err) {
+        console.error('Error verifying token:', err);
+        return null;
+    }
+
+};
+
 module.exports = {
     handleRegisterPatient,
     handleLoginPatient,
@@ -309,5 +379,7 @@ module.exports = {
     handleArchiveDentist,
     handleArchiveStaff,
     handleArchivePatient,
-    handleGetUserRole
+    handleGetUserRole,
+    handleGetStaffProfile,
+    handleUpdateStaffProfile
 };

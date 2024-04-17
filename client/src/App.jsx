@@ -52,6 +52,7 @@ import DemographicDataReport from "./pages/admin/DemographicDataReport";
 import AdminRegisterPatient from "./pages/admin/AdminRegisterPatient";
 import AdminDentist from "./pages/admin/AdminDentist";
 import AdminAddVisitDetails from "./pages/admin/AdminAddVisitDetails";
+import StaffProfile from "./pages/staff/StaffProfile";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -114,6 +115,7 @@ function App() {
             <Route path="/admin/register-staff" element={<AdminRegisterStaff/>}/>
             <Route path="/admin/register-patient" element={<AdminRegisterPatient/>}/>
             <Route path="/admin/dentists" element={<AdminDentist/>}/>
+            <Route path="/staff/profile" element={<StaffProfile/>}/>
           </Routes>
         </Router>
   );

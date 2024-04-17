@@ -3,16 +3,17 @@ const http = require('http');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin, handleRegisterStaff,
-    handleLoginStaff, handleEditDentist, handleEditStaff, handleEditPatient, handleArchiveDentist, handleArchiveStaff, handleArchivePatient, handleGetUserRole } = require('./routes/authRoutes');
+    handleLoginStaff, handleEditDentist, handleEditStaff, handleEditPatient, handleArchiveDentist, handleArchiveStaff, handleArchivePatient, handleGetUserRole, handleGetStaffProfile, handleUpdateStaffProfile } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment, handleGetInvoicesByPatientUsername, handleGetVisitDetailsByPatient, handleGetMedicalHistoryByPatient, handleGetPrescriptionsByPatient, handleGetAppointmentsByPatient, handleGetPatientID, handleCancelAppointment, handlePayInvoice } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
 const { staffRoutes, staffverifyToken } = require('./routes/staffRoutes');
-const { handleGenerateAppointmentReport, handleGetAllDentists, handleGetAllPatients, handleGetAllStaff, handleGetAllOfficeDentists, handleGetAllSchedules } = require('./routes/adminRoutes'); 
+const { handleGenerateAppointmentReport, handleGetAllDentists, handleGetAllPatients, handleGetAllStaff, handleGetAllOfficeDentists, handleGetAllSchedules} = require('./routes/adminRoutes'); 
 const { handleAssignDentistToOffice , handleUpdateDentistOffice} = require('./routes/officeRoutes');
 const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff, handleGetAvailableTimeBlocks, handleGetAllDentistsByOfficeAndDay, handleEditDentistSchedule } = require('./routes/dentistRoutes');
 const { handleGenerateRevenueReport } = require('./routes/adminRoutes');    
 const { getSpecialtyByDoctorUsername } = require('./controllers/doctorController');
+const { handleGenerateDemographicReport } = require('./routes/adminRoutes');
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, UPDATE, PATCH, OPTIONS');
@@ -116,12 +117,13 @@ const server = http.createServer((req, res) => {
         handleUpdateDentistOffice(req, res);
     } else if (req.url === '/api/admin/updateSchedule' && req.method === 'POST') {
         handleEditDentistSchedule(req, res);
-    }  else if (req.url.startsWith('api/admin/demographics-data-report') && req.method === 'GET') {
+    }  else if (req.url.startsWith('/api/admin/demographics-data-report') && req.method === 'GET') {
         handleGenerateDemographicReport(req,res);
+    }  else if (req.url === '/api/staff/profile' && req.method === 'GET') {
+        handleGetStaffProfile(req, res, jwt);
+    } else if (req.url === '/api/staff/profile/update' && req.method === 'PATCH') {
+        handleUpdateStaffProfile(req, res, jwt);
     }
-    
-    
-    
     //handleUpdateAppointmentWithStaff
     // doctor pages
     else if (req.url === '/api/doctor/patients' || req.url.startsWith('/api/doctor/patients/') || req.url.startsWith('/api/doctor/appointments/') || req.url === ('/api/doctor/appointments') || req.url === ('/api/doctor/profile') || req.url === ('/api/doctor/visit-details')) {

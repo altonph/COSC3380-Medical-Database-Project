@@ -665,25 +665,54 @@ function archiveDentist(dentistID, End_date, res) {
                 return;
             }
 
-            // Invalidate login credentials
+            // Invalidate login credentials by updating password only
             pool.query(
-                'UPDATE login SET Password = NULL, User_role = NULL WHERE dentistID = ?',
-                [dentistID],
+                'UPDATE login SET Password = ? WHERE dentistID = ?',
+                [null, dentistID],
                 (error, results) => {
                     if (error) {
-                        console.error('Error invalidating login credentials for dentist:', error);
+                        console.error('Error updating password for dentist:', error);
                         res.writeHead(500);
-                        res.end('Error invalidating login credentials for dentist');
+                        res.end('Error updating password for dentist');
                         return;
                     }
 
-                    res.writeHead(200);
-                    res.end('Dentist archived successfully');
+                    // Delete associated office_dentist entries
+                    pool.query(
+                        'DELETE FROM office_dentist WHERE dentistID = ?',
+                        [dentistID],
+                        (error, results) => {
+                            if (error) {
+                                console.error('Error deleting associated office_dentist entries:', error);
+                                res.writeHead(500);
+                                res.end('Error deleting associated office_dentist entries');
+                                return;
+                            }
+
+                            // Delete associated schedule entries
+                            pool.query(
+                                'DELETE FROM schedule WHERE dentistID = ?',
+                                [dentistID],
+                                (error, results) => {
+                                    if (error) {
+                                        console.error('Error deleting associated schedule entries:', error);
+                                        res.writeHead(500);
+                                        res.end('Error deleting associated schedule entries');
+                                        return;
+                                    }
+
+                                    res.writeHead(200);
+                                    res.end('Dentist archived successfully');
+                                }
+                            );
+                        }
+                    );
                 }
             );
         }
     );
 }
+
 
 function archivePatient(patientID, res) {
     pool.query(
@@ -829,6 +858,82 @@ function getUserRole(username, password, res) {
     );
 }
 
+const getStaffProfile = (req, res, staffID) => {
+    pool.query('SELECT * FROM staff WHERE staffID = ?', [staffID], (error, results) => {
+        if (error) {
+            console.error('Error retrieving staff profile:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            return;
+        }
+
+        if (results.length === 0) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Staff member not found' }));
+            return;
+        }
+
+        const staffProfile = results[0];
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(staffProfile));
+    });
+};
+
+const updateStaffProfile = (req, res, staffID, updatedProfile) => {
+    const { officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, End_date, Is_active, Salary } = updatedProfile;
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error getting database connection:', err);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            return;
+        }
+
+        connection.beginTransaction(err => {
+            if (err) {
+                console.error('Error starting transaction:', err);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                connection.release();
+                return;
+            }
+
+            connection.query(
+                'UPDATE staff SET officeID = ?, Fname = ?, Lname = ?, Email = ?, Phone_num = ?, DOB = ?, Address = ?, Position = ?, Start_date = ?, End_date = ?, Is_active = ?, Salary = ? WHERE staffID = ?',
+                [officeID, Fname, Lname, Email, Phone_num, DOB, Address, Position, Start_date, End_date, Is_active, Salary, staffID],
+                (error, staffResults) => {
+                    if (error) {
+                        console.error('Error updating staff profile:', error);
+                        connection.rollback(() => {
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                            connection.release();
+                        });
+                        return;
+                    }
+
+                    connection.commit(err => {
+                        if (err) {
+                            console.error('Error committing transaction:', err);
+                            connection.rollback(() => {
+                                res.writeHead(500, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                connection.release();
+                            });
+                            return;
+                        }
+
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ message: 'Staff profile updated successfully' }));
+                        connection.release();
+                    });
+                }
+            );
+        });
+    });
+};
+
 module.exports = {
     registerPatient,
     loginPatient,
@@ -845,5 +950,7 @@ module.exports = {
     archiveDentist,
     archivePatient,
     archiveStaff,
-    getUserRole
+    getUserRole,
+    getStaffProfile,
+    updateStaffProfile
 };
