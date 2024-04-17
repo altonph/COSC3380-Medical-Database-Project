@@ -28,6 +28,8 @@ const AdminLogin = () => {
         const data = await response.json();
         localStorage.setItem('token', data.token);
         localStorage.setItem('role', data.role);
+        localStorage.setItem('firstName', data.firstName);
+        localStorage.setItem('lastName', data.lastName);
         navigateTo('/admin/home');
         console.log('Login Successful');
       } else {

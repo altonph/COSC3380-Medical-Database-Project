@@ -281,7 +281,7 @@ function loginDoctor(username, password, res, jwt) {
 
 function loginAdmin(username, password, res, jwt) {
 
-    pool.query('SELECT * FROM login WHERE Username = ?', [username], async (error, results) => {
+    pool.query('SELECT login.*, dentist.FName, dentist.LName FROM login JOIN dentist ON login.dentistID = dentist.dentistID WHERE login.Username = ?', [username], async (error, results) => {
         if (error) {
             console.error('Error retrieving admin:', error);
             res.writeHead(500, { 'Content-Type': 'text/plain' });
@@ -316,7 +316,7 @@ function loginAdmin(username, password, res, jwt) {
                     isAdmin: admin.User_role === 'Admin' // Check if the user is an admin
                 }, process.env.JWT_SECRET, { expiresIn: '2h' });                
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ token, role: admin.User_role })); // Include the role in the response
+                res.end(JSON.stringify({ token, role: admin.User_role, firstName: admin.FName, lastName: admin.LName })); // Include the role in the response
             } else {
                 res.writeHead(401, { 'Content-Type': 'text/plain' });
                 res.end('Incorrect password');
