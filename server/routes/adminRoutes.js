@@ -1,5 +1,5 @@
 // adminRoutes.js
-const { generateAppointmentDataReport, generateRevenueReport, getAllDentists, getAllPatients, getAllStaff, getAllOfficeDentists, getAllSchedules, getAllDentistsExceptAdmin } = require('../controllers/adminController');
+const { generateAppointmentDataReport, generateRevenueReport, getAllDentists, getAllPatients, getAllStaff, getAllOfficeDentists, getAllSchedules, getAllDentistsExceptAdmin, generateDemographicReport } = require('../controllers/adminController');
 const url = require('url');
 
 const handleGenerateAppointmentReport = (req, res) => {
@@ -53,7 +53,7 @@ const handleGenerateDemographicReport = (req, res) => {
         const office        = queryParams.get('office');
         const startDate     = queryParams.get('startDate');
         const endDate       = queryParams.get('endDate');
-        const ageGroup      = queryParams.get('ageGroup');
+        //const ageGroup      = queryParams.get('ageGroup');
         const gender        = queryParams.get('gender');
         const insuranceType = queryParams.get('insuranceType');
         
