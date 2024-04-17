@@ -7,6 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 const AdminPatients = () => {
     const [patients, setPatients] = useState([]);
     const [editedIndex, setEditedIndex] = useState(null);
+    const [deletedIndex, setDeletedIndex] = useState(null);
 
     useEffect(() => {
         const fetchPatients = async () => {
@@ -30,20 +31,24 @@ const AdminPatients = () => {
         setEditedIndex(index);
     };
 
-    const handleCancelEdit = async () => {
+    const handleDelete = (index) => {
+        setDeletedIndex(index);
+    };
+
+    const handleCancelEdit = () => {
         setEditedIndex(null);
-    // Refetch patient data
-        try {
-            const response = await fetch("http://localhost:5000/api/admin/getPatients");
-            if (response.ok) {
-                const data = await response.json();
-                setPatients(data);
-            } else {
-                console.error("Failed to fetch patients");
-            }
-        } catch (error) {
-            console.error("Error fetching patients:", error);
-        }
+    };
+
+    const handleCancelDelete = () => {
+        setDeletedIndex(null);
+    };
+
+    const handleConfirmEdit = async () => {
+
+    }
+
+    const handleConfirmDelete = async () => {
+
     };
 
     const handleInputChange = (date, index) => {
@@ -152,15 +157,26 @@ const AdminPatients = () => {
                                             <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Address" value={patient.Address} onChange={(e) => handleInputChange(e, index)} /> : patient.Address}</td>
                                             <td className="border px-4 py-2">{patient.is_active === 1 ? "Active" : "Inactive"}</td>
                                             <td className="border px-4 py-2">
-                                                {editedIndex === index ? (
+                                                {(editedIndex !== index && deletedIndex !== index) && (
                                                     <>
-                                                        <button onClick={() => handleEdit(null)} className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-green-300">Confirm</button>
+                                                        <button onClick={() => handleEdit(index)} className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-blue-300">Edit</button>
+                                                        <button onClick={() => handleDelete(index)} className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-red-300 ml-2">Delete</button>
+                                                    </>
+                                                )}
+                                                {editedIndex === index && (
+                                                    <>
+                                                        <button onClick={handleConfirmEdit} className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-green-300">Confirm</button>
                                                         <button onClick={handleCancelEdit} className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-red-300 ml-2">Cancel</button>
                                                     </>
-                                                ) : (
-                                                    <button onClick={() => handleEdit(index)} className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-blue-300">Edit</button>
+                                                )}
+                                                {deletedIndex === index && (
+                                                    <>
+                                                        <button onClick={handleConfirmDelete} className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-red-300 ml-2">Confirm</button>
+                                                        <button onClick={handleCancelDelete} className="bg-gray-500 hover:bg-gray-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-gray-300 ml-2">Cancel</button>
+                                                    </>
                                                 )}
                                             </td>
+
                                         </tr>
                                     ))}
                                 </tbody>
