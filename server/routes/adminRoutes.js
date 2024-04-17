@@ -1,5 +1,5 @@
 // adminRoutes.js
-const { generateAppointmentDataReport, generateRevenueReport, getAllDentists, getAllPatients, getAllStaff, getAllOfficeDentists, getAllSchedules, getAllDentistsExceptAdmin } = require('../controllers/adminController');
+const { generateAppointmentDataReport, generateRevenueReport, getAllDentists, getAllPatients, getAllStaff, getAllOfficeDentists, getAllSchedules, generateDemographicDataReport } = require('../controllers/adminController');
 const url = require('url');
 
 const handleGenerateAppointmentReport = (req, res) => {
@@ -43,27 +43,33 @@ const handleGenerateRevenueReport = (req, res) => {
     
 };
 
+
+
 const handleGenerateDemographicReport = (req, res) => {
-    const {url, method} = req;
+    const { url, method } = req;
+    
+    if (url.startsWith('/api/admin/demographic-data-report') && method === 'POST'){
+        let body = '';
+        req.on('data', (chunk) => {
+            body += chunk.toString(); // convert Buffer to string
+        });
 
-    if (url.startsWith('/api/admin/demographics-data-report') && method === 'GET') {
-        const queryParamss  = url.split('?');
-        const queryParams   = new URLSearchParams(queryParamss[1]);
-
-        const office        = queryParams.get('office');
-        const startDate     = queryParams.get('startDate');
-        const endDate       = queryParams.get('endDate');
-        const ageGroup      = queryParams.get('ageGroup');
-        const gender        = queryParams.get('gender');
-        const insuranceType = queryParams.get('insuranceType');
-        
-        handleGenerateDemographicReport(req, res, office, startDate, endDate, ageGroup, gender, insuranceType);
-        
+        req.on('end', () => {
+            try {
+                const filters = JSON.parse(body);
+                generateDemographicDataReport(req, res, filters);
+            } catch (error) {
+                console.error('Error parsing request body:', error);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid JSON format in request body' }));
+            }
+        });
     } else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Route not found' }));
     }
 };
+
 
 const handleGetAllDentists = (req, res) => {
     if (req.url === '/api/admin/getDentists' && req.method === 'GET') {
@@ -119,5 +125,6 @@ module.exports = {
     handleGetAllPatients,
     handleGetAllStaff,
     handleGetAllOfficeDentists,
-    handleGetAllSchedules
+    handleGetAllSchedules,
+    handleGenerateDemographicReport
 };
