@@ -399,9 +399,14 @@ const insertAppointment = (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         pool.query(query, [officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status, Cancellation_Reason, Specialist_Approval, Is_active], (error, results) => {
             if (error) {
-                console.error('Error inserting appointment:', error);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                if (error.sqlState === '45000') { // Check if the SQLSTATE code indicates an exception
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Overlapping appointments detected. Please choose another time slot.' }));
+                } else {
+                    console.error('Error inserting appointment:', error);
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                }
                 return;
             }
             res.writeHead(201, { 'Content-Type': 'application/json' });
@@ -409,6 +414,7 @@ const insertAppointment = (req, res) => {
         });
     });
 };
+
 
 const checkVisitDetailsCount = (req, res) => {
     let body = '';

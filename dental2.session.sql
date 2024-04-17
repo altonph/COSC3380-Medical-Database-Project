@@ -215,3 +215,9 @@ DELETE FROM prescription WHERE patientID = 2;
 
 -- @block
 SELECT * FROM APPOINTMENT WHERE patientID = 2;
+
+-- @block
+DELETE FROM staff;
+
+-- @block
+DELETE FROM login WHERE Username = 'randomstaff';
