@@ -29,19 +29,21 @@ const updateDentistOffice = (dentistID, newOfficeIDs, res) => {
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error getting database connection:', err);
-            res.status(500).json({ error: 'Internal Server Error' });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
             return;
         }
 
         connection.beginTransaction(err => {
             if (err) {
                 console.error('Error starting transaction:', err);
-                res.status(500).json({ error: 'Internal Server Error' });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
                 connection.release();
                 return;
             }
 
-            // Update the dentist's office locations
+            // Delete existing office_dentist entries associated with the dentist
             connection.query(
                 'DELETE FROM office_dentist WHERE dentistID = ?',
                 [dentistID],
@@ -56,14 +58,13 @@ const updateDentistOffice = (dentistID, newOfficeIDs, res) => {
                         return;
                     }
 
-                    // Insert new office assignments
-                    const values = newOfficeIDs.map(officeID => [officeID, dentistID]);
+                    // Delete existing schedule entries associated with the dentist
                     connection.query(
-                        'INSERT INTO office_dentist (officeID, dentistID) VALUES ?',
-                        [values],
+                        'DELETE FROM schedule WHERE dentistID = ?',
+                        [dentistID],
                         (error, results) => {
                             if (error) {
-                                console.error('Error assigning dentist to office:', error);
+                                console.error('Error deleting previous schedules:', error);
                                 connection.rollback(() => {
                                     res.writeHead(500, { 'Content-Type': 'application/json' });
                                     res.end(JSON.stringify({ error: 'Internal Server Error' }));
@@ -72,25 +73,110 @@ const updateDentistOffice = (dentistID, newOfficeIDs, res) => {
                                 return;
                             }
 
-                            // Commit transaction if successful
-                            connection.commit(err => {
-                                if (err) {
-                                    console.error('Error committing transaction:', err);
-                                    connection.rollback(() => {
-                                        res.writeHead(500, { 'Content-Type': 'application/json' });
-                                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
-                                        connection.release();
-                                    });
-                                    return;
+                            // Insert new office_dentist assignments
+                            const values = newOfficeIDs.map(officeID => [officeID, dentistID]);
+                            connection.query(
+                                'INSERT INTO office_dentist (officeID, dentistID) VALUES ?',
+                                [values],
+                                (error, results) => {
+                                    if (error) {
+                                        console.error('Error assigning dentist to office:', error);
+                                        connection.rollback(() => {
+                                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                                            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                            connection.release();
+                                        });
+                                        return;
+                                    }
+
+                                    // If new offices include both, insert schedule for both offices
+                                    if (newOfficeIDs.includes(1) && newOfficeIDs.includes(2)) {
+                                        // Insert schedule for office 1 (Austin)
+                                        connection.query(
+                                            'INSERT INTO schedule (dentistID, officeID, Monday, Tuesday, Wednesday, Thursday, Friday) VALUES (?, ?, 0, 0, 0, 0, 0)',
+                                            [dentistID, 1],
+                                            (error, results) => {
+                                                if (error) {
+                                                    console.error('Error inserting schedule for office 1:', error);
+                                                    connection.rollback(() => {
+                                                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                                                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                                        connection.release();
+                                                    });
+                                                    return;
+                                                }
+                                                // Insert schedule for office 2 (Phoenix)
+                                                connection.query(
+                                                    'INSERT INTO schedule (dentistID, officeID, Monday, Tuesday, Wednesday, Thursday, Friday) VALUES (?, ?, 0, 0, 0, 0, 0)',
+                                                    [dentistID, 2],
+                                                    (error, results) => {
+                                                        if (error) {
+                                                            console.error('Error inserting schedule for office 2:', error);
+                                                            connection.rollback(() => {
+                                                                res.writeHead(500, { 'Content-Type': 'application/json' });
+                                                                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                                                connection.release();
+                                                            });
+                                                            return;
+                                                        }
+                                                        // Commit transaction if successful
+                                                        connection.commit(err => {
+                                                            if (err) {
+                                                                console.error('Error committing transaction:', err);
+                                                                connection.rollback(() => {
+                                                                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                                                                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                                                    connection.release();
+                                                                });
+                                                                return;
+                                                            }
+                                                            console.log('Dentist office updated successfully');
+                                                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                                                            res.end(JSON.stringify({ message: 'Dentist assigned to office successfully' }));
+                                                            // Release connection back to the pool
+                                                            connection.release();
+                                                        });
+                                                    }
+                                                );
+                                            }
+                                        );
+                                    } else {
+                                        // Insert schedule for the single selected office
+                                        connection.query(
+                                            'INSERT INTO schedule (dentistID, officeID, Monday, Tuesday, Wednesday, Thursday, Friday) VALUES (?, ?, 0, 0, 0, 0, 0)',
+                                            [dentistID, newOfficeIDs[0]], // Assuming newOfficeIDs only contains one officeID
+                                            (error, results) => {
+                                                if (error) {
+                                                    console.error('Error inserting schedule for the single office:', error);
+                                                    connection.rollback(() => {
+                                                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                                                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                                        connection.release();
+                                                    });
+                                                    return;
+                                                }
+                                                // Commit transaction if successful
+                                                connection.commit(err => {
+                                                    if (err) {
+                                                        console.error('Error committing transaction:', err);
+                                                        connection.rollback(() => {
+                                                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                                                            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                                            connection.release();
+                                                        });
+                                                        return;
+                                                    }
+                                                    console.log('Dentist office updated successfully');
+                                                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                                                    res.end(JSON.stringify({ message: 'Dentist assigned to office successfully' }));
+                                                    // Release connection back to the pool
+                                                    connection.release();
+                                                });
+                                            }
+                                        );
+                                    }
                                 }
-
-                                //console.log('Dentist office updated successfully');
-                                res.writeHead(200, { 'Content-Type': 'application/json' });
-                                res.end(JSON.stringify({ message: 'Dentist assigned to office successfully' }));
-
-                                // Release connection back to the pool
-                                connection.release();
-                            });
+                            );
                         }
                     );
                 }
@@ -98,6 +184,7 @@ const updateDentistOffice = (dentistID, newOfficeIDs, res) => {
         });
     });
 };
+
 
 module.exports = { 
     assignDentistToOffice,

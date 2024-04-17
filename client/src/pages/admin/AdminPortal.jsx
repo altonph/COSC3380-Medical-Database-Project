@@ -87,6 +87,7 @@ const AdminPortal = () => {
                 console.log("Offices updated successfully!");
                 // Refresh the page to reflect the changes
                 fetchDentistsAndOffices();
+                fetchSchedules();
             } else {
                 console.error("Failed to update offices");
             }
@@ -99,6 +100,7 @@ const AdminPortal = () => {
 
     const handleAssignOffice = async (dentistID, officeID) => {
         try {
+            // Make a POST request to assign the dentist to the office
             const response = await fetch("http://localhost:5000/api/office/assignDentist", {
                 method: "POST",
                 headers: {
@@ -109,11 +111,36 @@ const AdminPortal = () => {
                     dentistID: dentistID
                 })
             });
-
+    
             if (response.ok) {
                 console.log("Dentist assigned to office successfully!");
-                // Refresh the page to reflect the changes
-                fetchDentistsAndOffices();
+    
+                // Assign schedule with all days set to false
+                const scheduleResponse = await fetch("http://localhost:5000/api/dentist/assignSchedule", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        officeID: officeID,
+                        dentistID: dentistID,
+                        schedule: {
+                            Monday: false,
+                            Tuesday: false,
+                            Wednesday: false,
+                            Thursday: false,
+                            Friday: false
+                        }
+                    })
+                });
+    
+                if (scheduleResponse.ok) {
+                    console.log("Schedule assigned successfully!");
+                    fetchDentistsAndOffices();
+                    fetchSchedules();
+                } else {
+                    console.error("Failed to assign schedule");
+                }
             } else {
                 console.error("Failed to assign dentist to office");
             }
@@ -121,9 +148,10 @@ const AdminPortal = () => {
             console.error("Error assigning dentist to office:", error);
         }
     };
-
+    
     const handleAssignBothOffices = async (dentistID) => {
         try {
+            // Make two POST requests to assign the dentist to both offices
             const response1 = await fetch("http://localhost:5000/api/office/assignDentist", {
                 method: "POST",
                 headers: {
@@ -148,8 +176,51 @@ const AdminPortal = () => {
     
             if (response1.ok && response2.ok) {
                 console.log("Dentist assigned to both offices successfully!");
-                // Refresh the page to reflect the changes
-                fetchDentistsAndOffices();
+    
+                // Assign schedules for both offices
+                const scheduleResponse1 = await fetch("http://localhost:5000/api/dentist/assignSchedule", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        officeID: 1, // Austin
+                        dentistID: dentistID,
+                        schedule: {
+                            Monday: false,
+                            Tuesday: false,
+                            Wednesday: false,
+                            Thursday: false,
+                            Friday: false
+                        }
+                    })
+                });
+    
+                const scheduleResponse2 = await fetch("http://localhost:5000/api/dentist/assignSchedule", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        officeID: 2, // Phoenix
+                        dentistID: dentistID,
+                        schedule: {
+                            Monday: 0,
+                            Tuesday: 0,
+                            Wednesday: 0,
+                            Thursday: 0,
+                            Friday: 0
+                        }
+                    })
+                });
+    
+                if (scheduleResponse1.ok && scheduleResponse2.ok) {
+                    console.log("Schedules assigned successfully!");
+                    fetchDentistsAndOffices();
+                    fetchSchedules();
+                } else {
+                    console.error("Failed to assign schedules");
+                }
             } else {
                 console.error("Failed to assign dentist to both offices");
             }
@@ -257,6 +328,7 @@ const AdminPortal = () => {
         }
     };
     
+
     return (
         <>
             <div className="flex h-screen flex-col">
