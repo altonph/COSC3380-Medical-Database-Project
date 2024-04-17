@@ -23,6 +23,22 @@ const DoctorMakeAppointment = () => {
   const [availableStaff, setAvailableStaff] = useState([]);
   const [selectedAssistingHygienist, setSelectedAssistingHygienist] = useState('');
   const [specialty, setSpecialty] = useState('');
+  const [appointmentTypes, setAppointmentTypes] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const appointmentTypesBySpecialty = {
+    'General Dentistry': ['Cleaning', 'Whitening', 'Extraction'],
+    'Endodontist': ['Root Canal']
+  };
+
+  useEffect(() => {
+    if (practitioner && dentists.length > 0) {
+      const selectedDentist = dentists.find(dentist => dentist.dentistID === parseInt(practitioner));
+      if (selectedDentist) {
+        setSpecialty(selectedDentist.Specialty);
+        setAppointmentTypes(appointmentTypesBySpecialty[selectedDentist.Specialty] || []);
+      }
+    }
+  }, [practitioner, dentists]);
 
   useEffect(() => {
     console.log(dentists);
@@ -184,6 +200,7 @@ const DoctorMakeAppointment = () => {
                   const verificationResult = await response.json();
                   if (!verificationResult.verified) {
                       console.log('Primary approval not verified or required. Appointment cannot be scheduled.');
+                      setErrorMessage("This patient requires approval from their general dentist");
                       return;
                   }
               } else {
@@ -222,6 +239,7 @@ const DoctorMakeAppointment = () => {
     const patientExists = await checkPatientExistence();
     if (!patientExists) {
         console.log('Insertion failed, patient does not exist');
+        setErrorMessage("This patient does not exist");
         return;
     }
 
@@ -344,6 +362,9 @@ const DoctorMakeAppointment = () => {
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                   placeholder="Enter Patient ID"
                 />
+                {errorMessage === "This patient does not exist" && (
+                <span className="text-red-600">This patient doesn't exist</span>
+              )}
               </div>
   
               <div className="mb-4">
@@ -462,22 +483,26 @@ const DoctorMakeAppointment = () => {
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Reason for Appointment:</label>
                 <select
-                  value={reasonForAppointment}
-                  onChange={(e) => setReasonForAppointment(e.target.value)}
-                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                    value={reasonForAppointment}
+                    onChange={(e) => setReasonForAppointment(e.target.value)}
+                    className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                 >
-                  <option value="" disabled>Select Reason</option>
-                  <option value="Cleaning">Cleaning</option>
-                  <option value="Whitening">Whitening</option>
-                  <option value="Extraction">Extraction</option>
-                  <option value="Root Canal">Root Canal</option>
+                    <option value="" disabled>Select Reason</option>
+                    {appointmentTypes.map(appointmentType => (
+                    <option key={appointmentType} value={appointmentType}>
+                        {appointmentType}
+                    </option>
+                    ))}
                 </select>
-              </div>
+                </div>
   
               <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Submit</button>
               <Link to="/doctor/appointments" type="cancel" className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Cancel</Link>
               {notification && (
                 <span className="text-green-600 ml-2">{notification}</span>
+              )}
+                {errorMessage === "This patient requires approval from their general dentist" && (
+                <span className="text-red-600">This patient requires approval from their general dentist</span>
               )}
             </form>
           </div>

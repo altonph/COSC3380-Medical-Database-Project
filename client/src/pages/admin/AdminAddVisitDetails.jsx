@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import HeaderPortalDoctor from "../../components/HeaderPortalDoctor";
+import HeaderPortalAdmin from "../../components/HeaderPortalAdmin";
 import Footer from "../../components/Footer";
 
-const DoctorAddVisitDetails = () => {
+const AdminAddVisitDetails = () => {
   const [appointmentDetails, setAppointmentDetails] = useState(null);
   const [diagnosis, setDiagnosis] = useState('');
   const [treatment, setTreatment] = useState('');
@@ -53,32 +53,11 @@ const DoctorAddVisitDetails = () => {
     }
   }, []);
 
-  /*
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const isoDateString = date.toISOString(); 
     return isoDateString.split('T')[0]; 
   };
-*/
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${month}/${day}/${year}`;
-}
-
-function formatTime(timeString) {
-  const [hours, minutes] = timeString.split(':');
-  let hour = parseInt(hours, 10);
-  const period = hour >= 12 ? 'PM' : 'AM';
-  if (hour > 12) {
-      hour -= 12;
-  } else if (hour === 0) {
-      hour = 12;
-  }
-  return `${hour}:${minutes} ${period}`;
-}
 
   const updateAppointmentStatus = async (appointmentStatus, cancellationReason) => {
     try {
@@ -325,16 +304,21 @@ function formatTime(timeString) {
     <>
       <div className="flex h-screen flex-col">
         <nav>
-          <HeaderPortalDoctor />
+          <HeaderPortalAdmin />
         </nav>
   
         <div className="flex flex-1">
           <aside className="w-1/6 bg-gray-200 text-black">
             <nav className="p-4 text-xl">
               <ul>
-                <li><a href="#" className="block py-2 text-center font-bold underline">Home</a></li>
-                <li><a href="/doctor/appointments" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
-                <li><a href="/doctor/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
+              <li><a href="/admin/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
+            <li><a href="/admin/appointments" className="block py-2 text-center font-bold underline">Appointments</a></li>
+            <li><a href="/admin/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
+            <li><a href="/admin/dentists" className="block py-2 text-center text-gray-600 hover:text-black">Dentists</a></li>
+            <li><a href="/admin/staff" className="block py-2 text-center text-gray-600 hover:text-black">Staff</a></li>
+            <li><a href="/admin/appointment-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Appointment Data Report</a></li>
+            <li><a href="/admin/finance-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Finance Data Report</a></li>
+            <li><a href="/admin/demographic-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Demographic Data Report</a></li>
               </ul>
             </nav>
           </aside>
@@ -371,7 +355,7 @@ function formatTime(timeString) {
   
                 <div>
                   <label className="block mb-2">Date:</label>
-                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? formatDate(appointmentDetails.Date) : ''}</div>
+                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? appointmentDetails.Date : ''}</div>
                 </div>
   
                 <div>
@@ -381,12 +365,12 @@ function formatTime(timeString) {
   
                 <div>
                   <label className="block mb-2">Start Time:</label>
-                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? formatTime(appointmentDetails.Start_time) : ''}</div>
+                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? appointmentDetails.Start_time : ''}</div>
                 </div>
   
                 <div>
                   <label className="block mb-2">End Time:</label>
-                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? formatTime(appointmentDetails.End_time) : ''}</div>
+                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? appointmentDetails.End_time : ''}</div>
                 </div>
               </div>
               
@@ -466,7 +450,7 @@ function formatTime(timeString) {
                 <button onClick={handleConfirmPrescriptions} className={`bg-${isInsertSuccessPrescriptions ? 'gray' : 'blue'}-500 text-white px-4 py-2 mr-2 mt-4 mb-4`} disabled={isInsertSuccessPrescriptions} >Confirm Prescriptions</button>
               )}
             </div>
-            <Link to="/doctor/appointments" className="bg-blue-500 text-white px-4 py-2 mt-4">Return to Appointments Page</Link>
+            <Link to="/admin/appointments" className="bg-blue-500 text-white px-4 py-2 mt-4">Return to Appointments Page</Link>
             </div>
           </main>
         </div>
@@ -479,4 +463,4 @@ function formatTime(timeString) {
   );    
 };
 
-export default DoctorAddVisitDetails;
+export default AdminAddVisitDetails;

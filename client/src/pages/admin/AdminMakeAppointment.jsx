@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import HeaderPortalStaff from "../../components/HeaderPortalStaff";
+import HeaderPortalAdmin from "../../components/HeaderPortalAdmin";
 import Footer from "../../components/Footer";
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
-const StaffMakeAppointment = () => {
+const AdminMakeAppointment = () => {
 
   const navigateTo = useNavigate();
   const [preferredDate, setPreferredDate] = useState(null);
@@ -20,33 +21,38 @@ const StaffMakeAppointment = () => {
   const [selectedStartTime, setSelectedStartTime] = useState('');
   const [selectedEndTime, setSelectedEndTime] = useState('');
   const [availableStaff, setAvailableStaff] = useState([]);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [selectedAssistingHygienist, setSelectedAssistingHygienist] = useState(availableStaff.length > 0 ? availableStaff[0] : '');
+  const [selectedAssistingHygienist, setSelectedAssistingHygienist] = useState('');
+  const [specialty, setSpecialty] = useState('');
+  const [appointmentTypes, setAppointmentTypes] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null);
+  // Define appointment types for each specialty
+  const appointmentTypesBySpecialty = {
+    'General Dentistry': ['Cleaning', 'Whitening', 'Extraction'],
+    'Endodontist': ['Root Canal']
+  };
 
   useEffect(() => {
-    fetchPatientID();
-  }, []);
-
-  const fetchPatientID = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/patient/id', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPatientID(data.patientID);
-        console.log(data.patientID);
-      } else {
-        console.error('Failed to fetch patient ID:', response.statusText);
+    if (practitioner && dentists.length > 0) {
+      const selectedDentist = dentists.find(dentist => dentist.dentistID === parseInt(practitioner));
+      if (selectedDentist) {
+        setSpecialty(selectedDentist.Specialty);
+        setAppointmentTypes(appointmentTypesBySpecialty[selectedDentist.Specialty] || []);
       }
-    } catch (error) {
-      console.error('Error fetching patient ID:', error);
     }
-  };
+  }, [practitioner, dentists]);
+
+  useEffect(() => {
+    console.log(dentists);
+    console.log(practitioner);
+    if (practitioner && dentists.length > 0) {
+      const selectedDentist = dentists.find(dentist => dentist.dentistID === parseInt(practitioner));
+      console.log(selectedDentist);
+      if (selectedDentist) {
+        setSpecialty(selectedDentist.Specialty);
+        console.log("Specialty:", selectedDentist.Specialty);
+      }
+    }
+  }, [practitioner, dentists]);
 
   useEffect(() => {
     if (location && preferredDate) {
@@ -64,18 +70,12 @@ const StaffMakeAppointment = () => {
     if (location && preferredDate && selectedStartTime && selectedEndTime) {
       fetchAvailableStaff(location, preferredDate, selectedStartTime, selectedEndTime);
     }
-    if (availableStaff.length > 0) {
-      setSelectedAssistingHygienist(availableStaff[0]);
-    } else {
-      setSelectedAssistingHygienist(null);
-    }
-    console.log(selectedAssistingHygienist);
   }, [location, preferredDate, selectedStartTime, selectedEndTime]);
 
   const fetchDentistsByOfficeAndDay = async (officeID, dayOfWeek) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/dentist/getDentist?officeID=${officeID}&dayOfWeek=${dayOfWeek}`);
-
+      const response = await fetch(`http://localhost:5000/api/dentist/getAllDentistsByOfficeAndDay?officeID=${officeID}&dayOfWeek=${dayOfWeek}`);
+  
       if (response.ok) {
         const data = await response.json();
         setDentists(data);
@@ -86,6 +86,7 @@ const StaffMakeAppointment = () => {
       console.error('Error fetching dentists:', error);
     }
   };
+  
 
   const fetchDentistAvailability = async (dentistID, date) => {
     try {
@@ -176,6 +177,43 @@ const StaffMakeAppointment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log(specialty);
+
+    if (practitioner !== "" && practitioner !== null) {
+      if (specialty === "Endodontist") {
+          try {
+              const response = await fetch('http://localhost:5000/api/doctor/appointments/verify-primary-approval', {
+                  method: 'POST',
+                  headers: {
+                      "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                      patientID: patientID,
+                      dentistID: practitioner
+                  }),
+              });
+
+              console.log(patientID);
+              console.log(practitioner);
+
+              if (response.ok) {
+                  const verificationResult = await response.json();
+                  if (!verificationResult.verified) {
+                      console.log('Primary approval not verified or required. Appointment cannot be scheduled.');
+                      setErrorMessage("This patient requires approval from their general dentist");
+                      return;
+                  }
+              } else {
+                  console.error('Failed to verify primary approval:', response.statusText);
+                  return;
+              }
+          } catch (error) {
+              console.error('Error verifying primary approval:', error);
+              return;
+          }
+      }
+  }
     const staffID = selectedAssistingHygienist !== "" ? selectedAssistingHygienist : null;
 
     const startTimeParts = selectedStartTime.split(' ');
@@ -183,22 +221,21 @@ const StaffMakeAppointment = () => {
     const startMinute = parseInt(startTimeParts[0].split(':')[1]);
     const startPeriod = startTimeParts[1];
 
+    const endTimeParts = selectedEndTime.split(' ');
+    const endHour = parseInt(endTimeParts[0].split(':')[0]);
+    const endMinute = parseInt(endTimeParts[0].split(':')[1]);
+    const endPeriod = endTimeParts[1];
+
     const startHour24 = (startPeriod === 'PM' && startHour !== 12) ? startHour + 12 : startHour;
+    const endHour24 = (endPeriod === 'PM' && endHour !== 12) ? endHour + 12 : endHour;
 
     const startTimeInMinutes = startHour24 * 60 + startMinute;
+    const endTimeInMinutes = endHour24 * 60 + endMinute;
 
-    const endTimeInMinutes = startTimeInMinutes + 60; 
-
-    const endHour24 = Math.floor(endTimeInMinutes / 60) % 24;
-    const endMinute = endTimeInMinutes % 60;
-
-    const formattedStartTime = `${startHour24}:${startMinute}:00`;
-    const formattedEndTime = `${endHour24}:${endMinute}:00`;
-
-    console.log("Formatted start time is ", formattedStartTime);
-    console.log("Formatted end time is ", formattedEndTime);
-
-    const sqlFormattedDate = preferredDate.toISOString().split('T')[0];
+    if (endTimeInMinutes <= startTimeInMinutes) {
+        console.log('End time must be after start time');
+        return;
+    }
 
     const patientExists = await checkPatientExistence();
     if (!patientExists) {
@@ -207,43 +244,66 @@ const StaffMakeAppointment = () => {
         return;
     }
 
-    try {
-        const response = await fetch('http://localhost:5000/api/doctor/appointments', {
-            method: 'POST',
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                officeID: location,
-                dentistID: practitioner,
-                staffID: staffID, 
-                patientID: patientID,
-                Date: sqlFormattedDate,
-                Start_time: formattedStartTime,
-                End_time: formattedEndTime,
-                Appointment_Type: reasonForAppointment,
-                Appointment_Status: "Scheduled",
-                Primary_Approval: false,
-                Is_active: true
-            }),
-        });
-
-        if (response.ok) {
-            console.log('Appointment successfully scheduled!');
-            setNotification('Appointment scheduled successfully!');
-            setTimeout(() => {
-                setNotification('');
-                navigateTo('/staff/appointments');
-            }, 1000);
-
-        } else {
-            console.error('Failed to make appointment:', response.statusText);
-        }
-
-    } catch (error) {
-        console.error('Error making appointment:', error);
+    const timePartsStart = selectedStartTime.split(' ');
+    let timeStart = parseInt(timePartsStart[0]);
+    if (timePartsStart[1] === 'PM' && timeStart !== 12) {
+        timeStart += 12;
     }
+    const formattedStartTime = `${timeStart}:00:00`;
+
+    const timePartsEnd = selectedEndTime.split(' ');
+    let timeEnd = parseInt(timePartsEnd[0]);
+    if (timePartsEnd[1] === 'PM' && timeEnd !== 12) {
+        timeEnd += 12;
+    }
+    const formattedEndTime = `${timeEnd}:00:00`;
+
+    console.log("Formatted start time is ", formattedStartTime);
+    console.log("Formatted end time is ", formattedEndTime);
+    const sqlFormattedDate = preferredDate.toISOString().split('T')[0];
+
+    try {
+      const response = await fetch('http://localhost:5000/api/doctor/appointments', {
+          method: 'POST',
+          headers: {
+              "Authorization": `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              officeID: location,
+              dentistID: practitioner,
+              staffID: staffID, 
+              patientID: patientID,
+              Date: sqlFormattedDate,
+              Start_time: formattedStartTime,
+              End_time: formattedEndTime,
+              Appointment_Type: reasonForAppointment,
+              Appointment_Status: "Scheduled",
+              Primary_Approval: false,
+              Is_active: true
+          }),
+      });
+
+      if (response.ok) {
+          console.log('Appointment successfully scheduled!');
+          setNotification('Appointment scheduled successfully!');
+          setTimeout(() => {
+              setNotification('');
+              navigateTo('/admin/appointments');
+          }, 1000);
+
+      } else {
+          const responseData = await response.json();
+          if (responseData.error === 'Overlapping appointments detected. Please choose another time slot.') {
+              alert(responseData.error);
+          } else {
+              console.error('Failed to make appointment:', responseData.error || response.statusText);
+          }
+      }
+
+  } catch (error) {
+      console.error('Error making appointment:', error);
+  }
   };
 
 
@@ -277,15 +337,20 @@ const StaffMakeAppointment = () => {
   return (
     <div className="flex h-screen flex-col">
       <nav>
-        <HeaderPortalStaff />
+        <HeaderPortalAdmin />
       </nav>
       <div className="flex flex-1">
         <aside className="w-1/6 bg-gray-200 text-black">
           <nav className="p-4 text-xl">
             <ul>
-            <li><a href="/staff/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
-            <li><a href="/staff/appointments" className="block py-2 text-center font-bold underline">Appointments</a></li>
-            <li><a href="/staff/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
+            <li><a href="/admin/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
+            <li><a href="/admin/appointments" className="block py-2 text-center font-bold underline">Appointments</a></li>
+            <li><a href="/admin/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
+            <li><a href="/admin/dentists" className="block py-2 text-center text-gray-600 hover:text-black">Dentists</a></li>
+            <li><a href="/admin/staff" className="block py-2 text-center text-gray-600 hover:text-black">Staff</a></li>
+            <li><a href="/admin/appointment-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Appointment Data Report</a></li>
+            <li><a href="/admin/finance-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Finance Data Report</a></li>
+            <li><a href="/admin/demographic-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Demographic Data Report</a></li>
             </ul>
           </nav>
         </aside>
@@ -293,9 +358,8 @@ const StaffMakeAppointment = () => {
           <h1 className="text-3xl font-bold p-2 ml-8 mb-4">Make an Appointment</h1>
   
           <div className="container mx-auto mt-4">
-            <form onSubmit={handleSubmit} className="px-4 py-8">  
-
-            <div className="mb-4">
+            <form onSubmit={handleSubmit} className="px-4 py-8">
+              <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Patient ID:</label>
                 <input
                   type="text"
@@ -308,7 +372,7 @@ const StaffMakeAppointment = () => {
                 <span className="text-red-600">This patient doesn't exist</span>
               )}
               </div>
-
+  
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Location:</label>
                 <select
@@ -334,16 +398,23 @@ const StaffMakeAppointment = () => {
               </div>
   
               <div className="mb-4">
-                <label className="block text-sm font-bold mb-2">Primary Practitioner:</label>
+                <label className="block text-sm font-bold mb-2">Dentist:</label>
                 <select
                   value={practitioner}
-                  onChange={(e) => setPractitioner(e.target.value)}
+                  onChange={(e) => {
+                    setPractitioner(e.target.value);
+                    const selectedDentist = dentists.find(dentist => dentist.dentistID === e.target.value);
+                    if (selectedDentist) {
+                      setSpecialty(selectedDentist.Specialty);
+                      console.log("Specialty:", selectedDentist.Specialty);
+                    }
+                  }}
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                 >
                   <option value="" disabled>Select Practitioner</option>
                   {dentists.map(dentist => (
                     <option key={dentist.dentistID} value={dentist.dentistID}>
-                      {`Dr. ${dentist.FName} ${dentist.LName}`}
+                      {`Dr. ${dentist.FName} ${dentist.LName} - ${dentist.Specialty}`}
                     </option>
                   ))}
                 </select>
@@ -381,29 +452,63 @@ const StaffMakeAppointment = () => {
                         ))}
                       </select>
                     </div>
-                    
+                    <div className="w-1/2 ml-2">
+                      <label className="block text-sm font-bold mb-2">End Time:</label>
+                      <select
+                        value={selectedEndTime}
+                        onChange={(e) => setSelectedEndTime(e.target.value)}
+                        className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                      >
+                        {generateTimeOptions(selectedBlock).map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
               ))}
+
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Assisting Hygienist:</label>
+                <select
+                  value={selectedAssistingHygienist}
+                  onChange={(e) => setSelectedAssistingHygienist(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                >
+                <option value="">None</option>
+                {availableStaff.map((staffID) => (
+                  <option key={staffID} value={staffID}>
+                    {`Staff ID: ${staffID}`}
+                  </option>
+                ))}
+                </select>
+              </div>
   
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Reason for Appointment:</label>
                 <select
-                  value={reasonForAppointment}
-                  onChange={(e) => setReasonForAppointment(e.target.value)}
-                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                    value={reasonForAppointment}
+                    onChange={(e) => setReasonForAppointment(e.target.value)}
+                    className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                 >
-                  <option value="" disabled>Select Reason</option>
-                  <option value="Cleaning">Cleaning</option>
-                  <option value="Whitening">Whitening</option>
-                  <option value="Extraction">Extraction</option>
+                    <option value="" disabled>Select Reason</option>
+                    {appointmentTypes.map(appointmentType => (
+                    <option key={appointmentType} value={appointmentType}>
+                        {appointmentType}
+                    </option>
+                    ))}
                 </select>
-              </div>
+                </div>
   
               <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Submit</button>
-              <Link to="/staff/appointments" type="cancel" className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Cancel</Link>
+              <Link to="/admin/appointments" type="cancel" className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Cancel</Link>
               {notification && (
                 <span className="text-green-600 ml-2">{notification}</span>
+              )}
+                {errorMessage === "This patient requires approval from their general dentist" && (
+                <span className="text-red-600">This patient requires approval from their general dentist</span>
               )}
             </form>
           </div>
@@ -413,7 +518,7 @@ const StaffMakeAppointment = () => {
         <Footer />
       </nav>
     </div>
-  );
+  );    
 };
 
-export default StaffMakeAppointment;
+export default AdminMakeAppointment;

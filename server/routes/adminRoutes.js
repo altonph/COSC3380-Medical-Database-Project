@@ -1,5 +1,5 @@
 // adminRoutes.js
-const { generateAppointmentDataReport, generateRevenueReport, getAllDentists, getAllPatients, getAllStaff, getAllOfficeDentists, getAllSchedules } = require('../controllers/adminController');
+const { generateAppointmentDataReport, generateRevenueReport, getAllDentists, getAllPatients, getAllStaff, getAllOfficeDentists, getAllSchedules, getAllDentistsExceptAdmin } = require('../controllers/adminController');
 const url = require('url');
 
 const handleGenerateAppointmentReport = (req, res) => {
@@ -109,8 +109,6 @@ const handleGetAllSchedules = (req, res) => {
         res.end(JSON.stringify({ message: 'Route not found' }));
     }
 };
-
-
 
 
 module.exports = {

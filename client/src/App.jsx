@@ -8,6 +8,7 @@ import HomePortal from "./pages/patient/HomePortal";
 import PaymentPortal from "./pages/patient/PaymentPortal";
 import PatientProfile from "./pages/patient/PatientProfile";
 import PatientProfileSettings from "./pages/patient/PatientProfileSettings";
+import DoctorSettings from "./pages/doctor/DoctorSettings";
 import DoctorLoginPage from "./pages/doctor/doctorLoginPage";
 import DoctorAppointment from "./pages/doctor/DoctorAppointments";
 import DoctorMakeAppointment from "./pages/doctor/DoctorMakeAppointment";
@@ -35,6 +36,7 @@ import PatientMedicalHistory from "./pages/patient/PatientMedicalHistory";
 import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
 import AdminPortal from "./pages/admin/AdminPortal";
 import AdminAppointment from "./pages/admin/AdminAppointments";
+import AdminMakeAppointment from "./pages/admin/AdminMakeAppointment";
 import AdminPatients from "./pages/admin/AdminPatients";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AppointmentDataReport from "./pages/admin/AppointmentDataReport";
@@ -49,6 +51,7 @@ import AdminRegisterStaff from "./pages/admin/AdminRegisterStaff";
 import DemographicDataReport from "./pages/admin/DemographicDataReport";
 import AdminRegisterPatient from "./pages/admin/AdminRegisterPatient";
 import AdminDentist from "./pages/admin/AdminDentist";
+import AdminAddVisitDetails from "./pages/admin/AdminAddVisitDetails";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -72,6 +75,7 @@ function App() {
             <Route path="/patient/visit" element= {<PatientVisitDetails/>} />
             <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
+            <Route path="/doctor/settings" element={<DoctorSettings/>} />
             <Route path="/doctor/appointments" element={<DoctorAppointment/>}/>
             <Route path="/doctor/appointments/make-appointment" element={<DoctorMakeAppointment />} />
             <Route path="doctor/appointments/add-visit-details" element={<DoctorAddVisitDetails />} />
@@ -97,6 +101,8 @@ function App() {
             <Route path="/staff/appointments/add-visit-details" element={<StaffAddVisitDetails />} />
             <Route path="/admin/home" element= {<AdminPortal/>} />
             <Route path="/admin/appointments" element={<AdminAppointment/>}/>
+            <Route path="/admin/appointments/make-appointment" element={<AdminMakeAppointment />} />
+            <Route path="/admin/appointments/add-visit-details" element={<AdminAddVisitDetails />} />
             <Route path="/admin/patients" element={<AdminPatients/>}/>
             <Route path="/admin/login" element={<AdminLogin/>}/>
             <Route path="/admin/appointment-data-report" element={<AppointmentDataReport/>}/>

@@ -44,7 +44,7 @@ const AdminRegisterDentist = () => {
                 body: JSON.stringify(body)
             });
             if (response.ok) {
-                navigateTo('/admin/staff');
+                navigateTo('/admin/dentists');
                 console.log("Registration Successful");
             }
             else {

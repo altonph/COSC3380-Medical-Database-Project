@@ -291,6 +291,8 @@ const getAllSchedules = (res) => {
     });
 };
 
+
+
 module.exports = {
     generateRevenueReport,
     generateAppointmentDataReport,

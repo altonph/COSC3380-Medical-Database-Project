@@ -167,7 +167,7 @@ const AdminDentist = () => {
                         </nav>
                     </aside>
                     
-                    <main className="flex-1 p-4">
+                    <main className="flex-1 p-4 overflow-x-auto">
                         <div className="flex gap-4 mb-8">
                             <h1 className="text-3xl font-bold">Dentists Overview</h1>
                             <button className="bg-blue-500 hover:bg-blue-700 text-white text-lg py-1 px-4 rounded focus:outline-none focus:ring focus:border-green-300"><a href= "/admin/register-dentist">+ Add Dentist</a></button>
@@ -248,7 +248,9 @@ const AdminDentist = () => {
                                                 {(editedIndex !== index && deletedIndex !== index) && (
                                                     <>
                                                         <button onClick={() => handleEdit(index)} className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-blue-300">Edit</button>
-                                                        <button onClick={() => handleDelete(index)} className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-red-300 ml-2">Delete</button>
+                                                        {dentist.dentistID !== 1 && ( // Only render delete button if dentist ID is not 1
+                                                            <button onClick={() => handleDelete(index)} className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-red-300 ml-2">Delete</button>
+                                                        )}
                                                     </>
                                                 )}
                                                 {editedIndex === index && (
@@ -264,6 +266,8 @@ const AdminDentist = () => {
                                                     </>
                                                 )}
                                             </td>
+
+                                            
                                         </tr>
                                     ))}
                                 </tbody>
