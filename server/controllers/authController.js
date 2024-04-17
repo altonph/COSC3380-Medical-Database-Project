@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 function registerPatient(userData, res) {
-
     bcrypt.hash(userData.Password, 10, (err, hashedPassword) => {
         if (err) {
             console.error('Error hashing password:', err);
@@ -13,8 +12,19 @@ function registerPatient(userData, res) {
             return;
         }
 
-        pool.query('INSERT INTO patient (Gender, FName, LName, DOB, Email, Phone_num, Address) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [userData.Gender, userData.FName, userData.LName, userData.DOB, userData.Email, userData.Phone_num, userData.Address],
+        pool.query(
+            'INSERT INTO patient (Policy_number, Insurance_Company_Name, Gender, FName, LName, DOB, Email, Phone_num, Address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                userData.Policy_number,
+                userData.Insurance_Company_Name,
+                userData.Gender,
+                userData.FName,
+                userData.LName,
+                userData.DOB,
+                userData.Email,
+                userData.Phone_num,
+                userData.Address
+            ],
             (error, patientResults) => {
                 if (error) {
                     console.error('Error creating patient:', error);
@@ -22,10 +32,11 @@ function registerPatient(userData, res) {
                     res.end('Error creating patient');
                     return;
                 }
-                
+
                 const patientID = patientResults.insertId;
 
-                pool.query('INSERT INTO login (Username, Password, User_role, Email, PatientID) VALUES (?, ?, ?, ?, ?)',
+                pool.query(
+                    'INSERT INTO login (Username, Password, User_role, Email, PatientID) VALUES (?, ?, ?, ?, ?)',
                     [userData.Username, hashedPassword, userData.User_role, userData.Email, patientID],
                     (error, loginResults) => {
                         if (error) {
@@ -36,11 +47,13 @@ function registerPatient(userData, res) {
                             res.writeHead(200);
                             res.end('User registered successfully');
                         }
-                    });
-            });
+                    }
+                );
+            }
+        );
     });
-
 }
+
 
 function registerDoctor(userData, res) {
     bcrypt.hash(userData.Password, 10, (err, hashedPassword) => {
