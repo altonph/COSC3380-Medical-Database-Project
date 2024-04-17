@@ -234,15 +234,15 @@ const AdminPortal = () => {
         if (dentist.offices.length > 0) {
             return (
                 <>
-                    <button onClick={() => handleEditOffice(dentist.dentistID, dentist.offices)}>Edit</button>
+                    <button className= 'mr-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-4 rounded' onClick={() => handleEditOffice(dentist.dentistID, dentist.offices)}>Edit</button>
                 </>
             );
         } else {
             return (
                 <>
-                    <button onClick={() => handleAssignOffice(dentist.dentistID, 1)}>Assign Austin</button>
-                    <button onClick={() => handleAssignOffice(dentist.dentistID, 2)}>Assign Phoenix</button>
-                    <button onClick={() => handleAssignBothOffices(dentist.dentistID)}>Assign Both</button>
+                    <button className="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleAssignOffice(dentist.dentistID, 1)}>Assign Austin</button>
+                    <button className="mr-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleAssignOffice(dentist.dentistID, 2)}>Assign Phoenix</button>
+                    <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleAssignBothOffices(dentist.dentistID)}>Assign Both</button>
                 </>
             );
         }
@@ -353,7 +353,7 @@ const AdminPortal = () => {
                     </aside>
                     
                     <main className="flex-1 p-4">
-                        <h1 className="text-3xl font-bold mb-4 p-8">Dentist Office and Schedules</h1>
+                        <h1 className="text-2xl font-bold mb-4 p-8">Dentist Offices Management</h1>
                         
                         {/* Dentist table */}
                         <table className="w-full border-collapse border border-gray-400 mb-8">
@@ -399,8 +399,8 @@ const AdminPortal = () => {
                                         {/* Render actions based on dentist's offices */}
                                         {editedDentist.dentistID === dentist.dentistID ? (
                                             <>
-                                                <button onClick={handleConfirmEdit}>Confirm</button>
-                                                <button onClick={handleCancelEdit}>Cancel</button>
+                                                <button className="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" onClick={handleConfirmEdit}>Confirm</button>
+                                                <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded" onClick={handleCancelEdit}>Cancel</button>
                                             </>
                                         ) : (
                                             renderActions(dentist)
@@ -410,7 +410,7 @@ const AdminPortal = () => {
                             ))}
                             </tbody>
                         </table>
-
+                        <h1 className="text-2xl font-bold mb-4 p-8">Dentist Schedule Management</h1>
                         {/* Schedule table */}
                         <table className="w-full border-collapse border border-gray-400">
                             <thead>
@@ -434,61 +434,61 @@ const AdminPortal = () => {
                                 <td className="border border-gray-400 px-4 py-2">
                                     {editedSchedule === schedule.scheduleID ? (
                                         <select value={schedule.Monday ? '1' : '0'} onChange={(e) => handleScheduleChange(e, 'Monday')}>
-                                            <option value="1">Yes</option>
-                                            <option value="0">No</option>
+                                            <option value="1" style={{ color: schedule.Monday ? 'green' : 'red' }}>Yes</option>
+                                            <option value="0" style={{ color: schedule.Monday ? 'red' : 'green' }}>No</option>
                                         </select>
                                     ) : (
-                                        schedule.Monday ? 'Yes' : 'No'
+                                        <span style={{ color: schedule.Monday ? 'green' : 'red' }}>{schedule.Monday ? 'Yes' : 'No'}</span>
                                     )}
                                 </td>
                                 <td className="border border-gray-400 px-4 py-2">
                                     {editedSchedule === schedule.scheduleID ? (
                                             <select value={schedule.Tuesday ? '1' : '0'} onChange={(e) => handleScheduleChange(e, 'Tuesday')}>
-                                                <option value="1">Yes</option>
-                                                <option value="0">No</option>
+                                                <option value="1" style={{ color: schedule.Tuesday ? 'green' : 'red' }}>Yes</option>
+                                                <option value="0" style={{ color: schedule.Tuesday ? 'red' : 'green' }}>No</option>
                                             </select>
                                         ) : (
-                                            schedule.Tuesday ? 'Yes' : 'No'
+                                            <span style={{ color: schedule.Tuesday ? 'green' : 'red' }}>{schedule.Tuesday ? 'Yes' : 'No'}</span>
                                         )}
                                 </td>
                                 <td className="border border-gray-400 px-4 py-2">
                                     {editedSchedule === schedule.scheduleID ? (
                                             <select value={schedule.Wednesday ? '1' : '0'} onChange={(e) => handleScheduleChange(e, 'Wednesday')}>
-                                                <option value="1">Yes</option>
-                                                <option value="0">No</option>
+                                                <option value="1" style={{ color: schedule.Wednesday ? 'green' : 'red' }}>Yes</option>
+                                                <option value="0" style={{ color: schedule.Wednesday ? 'red' : 'green' }}>No</option>
                                             </select>
                                         ) : (
-                                            schedule.Wednesday ? 'Yes' : 'No'
+                                            <span style={{ color: schedule.Wednesday ? 'green' : 'red' }}>{schedule.Wednesday ? 'Yes' : 'No'}</span>
                                         )}
                                 </td>
                                 <td className="border border-gray-400 px-4 py-2">
                                     {editedSchedule === schedule.scheduleID ? (
                                             <select value={schedule.Thursday ? '1' : '0'} onChange={(e) => handleScheduleChange(e, 'Thursday')}>
-                                                <option value="1">Yes</option>
-                                                <option value="0">No</option>
+                                                <option value="1" style={{ color: schedule.Thursday ? 'green' : 'red' }}>Yes</option>
+                                                <option value="0" style={{ color: schedule.Thursday ? 'red' : 'green' }}>No</option>
                                             </select>
                                         ) : (
-                                            schedule.Thursday ? 'Yes' : 'No'
+                                            <span style={{ color: schedule.Thursday ? 'green' : 'red' }}>{schedule.Thursday ? 'Yes' : 'No'}</span>
                                         )}
                                 </td>
                                 <td className="border border-gray-400 px-4 py-2">
                                     {editedSchedule === schedule.scheduleID ? (
                                             <select value={schedule.Friday ? '1' : '0'} onChange={(e) => handleScheduleChange(e, 'Friday')}>
-                                                <option value="1">Yes</option>
-                                                <option value="0">No</option>
+                                                <option value="1" style={{ color: schedule.Friday ? 'green' : 'red' }}>Yes</option>
+                                                <option value="0" style={{ color: schedule.Friday ? 'red' : 'green' }}>No</option>
                                             </select>
                                         ) : (
-                                            schedule.Friday ? 'Yes' : 'No'
+                                            <span style={{ color: schedule.Friday ? 'green' : 'red' }}>{schedule.Friday ? 'Yes' : 'No'}</span>
                                         )}
                                 </td>
                                 <td className="border border-gray-400 px-4 py-2">
                                     {editedSchedule === schedule.scheduleID ? (
                                         <>
-                                            <button onClick={() => handleConfirmEditSchedule(schedule.scheduleID, schedule)}>Confirm</button>
-                                            <button onClick={handleCancelEditSchedule}>Cancel</button>
+                                            <button className="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" onClick={() => handleConfirmEditSchedule(schedule.scheduleID, schedule)}>Confirm</button>
+                                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded" onClick={handleCancelEditSchedule}>Cancel</button>
                                         </>
                                     ) : (
-                                        <button onClick={() => handleEditSchedule(schedule.scheduleID)}>Edit</button>
+                                        <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-4 rounded" onClick={() => handleEditSchedule(schedule.scheduleID)}>Edit</button>
                                     )}
                                 </td>
                             </tr>
@@ -496,6 +496,7 @@ const AdminPortal = () => {
                             </tbody>
                         </table>
                     </main>
+
                 </div>
 
                 <nav>
