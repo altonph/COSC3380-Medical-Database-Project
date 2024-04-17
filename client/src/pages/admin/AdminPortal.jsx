@@ -32,19 +32,22 @@ const AdminPortal = () => {
         try {
             const dentistsResponse = await fetch("http://localhost:5000/api/admin/getDentists");
             const officesResponse = await fetch("http://localhost:5000/api/admin/getOfficeDentists");
-
+    
             if (dentistsResponse.ok && officesResponse.ok) {
                 const dentistsData = await dentistsResponse.json();
                 const officesData = await officesResponse.json();
-
+    
+                // Filter out inactive dentists
+                const activeDentists = dentistsData.filter(dentist => dentist.Is_active);
+    
                 // Merge data based on dentistID
-                const mergedData = dentistsData.map(dentist => {
+                const mergedData = activeDentists.map(dentist => {
                     const dentistOffices = officesData
                         .filter(office => office.dentistID === dentist.dentistID)
                         .map(office => office.officeID);
                     return { ...dentist, offices: dentistOffices };
                 });
-
+    
                 setDentists(mergedData);
             } else {
                 console.error("Failed to fetch dentists or offices");
@@ -53,6 +56,8 @@ const AdminPortal = () => {
             console.error("Error fetching data:", error);
         }
     };
+    
+    
 
     const handleEditOffice = (dentistID, originalOffices) => {
         // Set the edited dentist ID and original offices
