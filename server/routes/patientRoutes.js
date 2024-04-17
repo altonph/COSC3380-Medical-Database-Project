@@ -1,6 +1,6 @@
 // patientRoutes.js
 const jwt = require('jsonwebtoken');
-const { getPatientProfile, updatePatientProfile, schedulePatientAppointment, getInvoicesByPatientUsername, getVisitDetailsByPatientUsername, getMedicalHistoryByPatientUsername, getPrescriptionsByPatientUsername, getAppointmentsByPatientUsername, cancelAppointment, getPatientID } = require('../controllers/patientController');
+const { getPatientProfile, updatePatientProfile, schedulePatientAppointment, getInvoicesByPatientUsername, getVisitDetailsByPatientUsername, getMedicalHistoryByPatientUsername, getPrescriptionsByPatientUsername, getAppointmentsByPatientUsername, cancelAppointment, getPatientID, payInvoice } = require('../controllers/patientController');
 
 const handleGetPatient = (req, res, jwt) => {
 
@@ -254,6 +254,31 @@ const handleGetPatientID = (req, res, jwt) => {
     }
 };
 
+const handlePayInvoice = (req, res, jwt) => {
+    const { url, method } = req;
+
+    if (method === 'PATCH' && url === '/api/patient/pay-invoice') { 
+        const decodedToken = verifyToken(req.headers.authorization, jwt);
+        if (!decodedToken) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Unauthorized' }));
+            return;
+        }
+
+        try {
+            payInvoice(req, res);
+        } catch (error) {
+            console.error('Error paying invoice:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+        }
+
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
 module.exports = {
     handleGetPatient,
     handlePatientUpdate,
@@ -264,5 +289,6 @@ module.exports = {
     handleGetPrescriptionsByPatient,
     handleGetAppointmentsByPatient,
     handleCancelAppointment,
-    handleGetPatientID
+    handleGetPatientID,
+    handlePayInvoice
 };

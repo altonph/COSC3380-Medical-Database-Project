@@ -654,12 +654,20 @@ const generateInvoice = (req, res) => {
                                             break;
                                     }
 
-                                    netAmount = grossAmount - insuranceCoverage + 20.00;
-                                    grossAmount = grossAmount + 20.00;
+                                    netAmount = grossAmount - insuranceCoverage;
+                                    console.log("Gross amount is ", grossAmount);
+                                    console.log("Insurance amount is ", insuranceCoverage);
+                                    console.log("Net amount is ", netAmount);
+                                    grossAmount = parseFloat(grossAmount.toFixed(2));
+                                    insuranceCoverage = parseFloat(insuranceCoverage.toFixed(2));
+                                    netAmount = parseFloat(netAmount.toFixed(2));
+                                    console.log("Gross amount is ", grossAmount);
+                                    console.log("Insurance amount is ", insuranceCoverage);
+                                    console.log("Net amount is ", netAmount);
 
                                     const currentDate = new Date().toISOString().split('T')[0];
                                     const query = 'INSERT INTO invoice (Policy_number, patientID, visitID, Date, Description, Gross_Amount, Insurance_coverage, Net_Amount, Paid_Amount, Is_paid, cleaning_discount_applied) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-
+                                    console.log("Net amount is ", netAmount);
                                     pool.query(
                                         query,
                                         [patientPolicyNumber, patientID, visitID, currentDate, appointmentType, grossAmount, insuranceCoverage, netAmount, 0, false, 0], 
@@ -672,6 +680,7 @@ const generateInvoice = (req, res) => {
                                             }
 
                                             const insertedInvoiceId = results.insertId;
+                                            console.log("Net amount is ", netAmount);
 
                                             pool.query(
                                                 'SELECT * FROM invoice WHERE invoiceID = ?',
@@ -683,14 +692,16 @@ const generateInvoice = (req, res) => {
                                                         res.end(JSON.stringify({ error: 'Internal Server Error' }));
                                                         return;
                                                     }
-
+                                                    console.log("Net amount is ", netAmount);
                                                     const insertedInvoice = results[0];
                                                     let message = 'Invoice generated successfully';
                                                     if (requestData.cleaning_discount_applied) {
                                                         message += ' with cleaning discount';
+                                                        console.log("Net amount is ", netAmount);
                                                     }
                                                     res.writeHead(201, { 'Content-Type': 'application/json' });
                                                     res.end(JSON.stringify({ message: message, invoice: insertedInvoice, cleaning_discount_applied: requestData.cleaning_discount_applied }));
+                                                    console.log("Net amount is ", netAmount);
                                                 }
                                             );
                                         }

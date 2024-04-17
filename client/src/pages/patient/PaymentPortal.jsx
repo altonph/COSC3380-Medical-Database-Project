@@ -4,6 +4,18 @@ import Footer from "../../components/Footer";
 
 const PaymentPortal= () => {
     const [invoices, setInvoices] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [formData, setFormData] = useState({
+        amount: "",
+        email: "",
+        cardNumber: "",
+        expiration: "",
+        cvc: "",
+        country: "",
+        zipcode: ""
+    });
+    const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         const fetchInvoices = async () => {
@@ -30,6 +42,76 @@ const PaymentPortal= () => {
 
         fetchInvoices();
     }, []); 
+
+    const handlePayNow = (invoiceId) => {
+        setSelectedInvoiceId(invoiceId);
+        console.log(invoiceId);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setFormData({
+            amount: "",
+            email: "",
+            cardNumber: "",
+            expiration: "",
+            cvc: "",
+            country: "",
+            zipcode: ""
+        });
+        setIsModalOpen(false);
+        setErrorMessage("");
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const token = localStorage.getItem('token'); 
+            const selectedInvoice = invoices.find(invoice => invoice.invoiceID === selectedInvoiceId);
+            
+            if (!selectedInvoice) {
+                console.error('Invoice not found.');
+                return;
+            }
+    
+            const remainingAmount = selectedInvoice.Net_Amount - selectedInvoice.Paid_Amount;
+            
+            if (parseFloat(formData.amount) > remainingAmount) {
+                setErrorMessage("Payment amount exceeds remaining amount.");
+                return; 
+            }
+    
+            const response = await fetch('http://localhost:5000/api/patient/pay-invoice', {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    invoiceID: selectedInvoiceId,
+                    paymentAmount: parseFloat(formData.amount)
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+                setIsModalOpen(false);
+                fetchInvoices();
+            } else {
+                console.error('Failed to pay invoice:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error paying invoice:', error);
+        }
+    };        
 
     function formatDate(dateString) {
         const date = new Date(dateString);
@@ -89,18 +171,35 @@ const PaymentPortal= () => {
                                         <th className="border border-gray-400 px-5 py-2">Insurance Coverage</th>
                                         <th className="border border-gray-400 px-5 py-2">Net Amount</th>
                                         <th className="border border-gray-400 px-5 py-2">Paid Amount</th>
+                                        <th className="border border-gray-400 px-5 py-2">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {invoices.map(invoice => (
                                         <tr key={invoice.id}>
                                             <td className="border border-gray-400 px-5 py-4">{formatDate(invoice.Date)}</td>
-                                            <td className="border border-gray-400 px-5 py-4">{invoice.Appointment_type}</td>
+                                            <td className="border border-gray-400 px-5 py-4">
+                                            {invoice.Appointment_type}
+                                            {invoice.cleaning_discount_applied === 1 && (
+                                                <div className="text-sm">
+                                                    You were discounted 20% for your first cleaning appointment with us.
+                                                </div>
+                                            )}
+                                            </td>
+
                                             <td className="border border-gray-400 px-5 py-4">{invoice.Policy_number}</td>
                                             <td className="border border-gray-400 px-5 py-4">{invoice.Gross_Amount}</td>
                                             <td className="border border-gray-400 px-5 py-4">{invoice.Insurance_coverage}</td>
                                             <td className="border border-gray-400 px-5 py-4">{invoice.Net_Amount}</td>
                                             <td className="border border-gray-400 px-5 py-4">{invoice.Paid_Amount}</td>
+                                            <td className="border border-gray-400 px-5 py-4">
+                                                <button 
+                                                    onClick={() => handlePayNow(invoice.invoiceID)} 
+                                                    className="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600"
+                                                >
+                                                    Pay Now
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -120,7 +219,29 @@ const PaymentPortal= () => {
                 </nav>
     
             </div>
-    
+            {isModalOpen && (
+            <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50">
+                <div className="bg-white p-8 rounded-lg">
+                    <h2 className="text-xl font-bold mb-4">Payment Information</h2>
+                    <form onSubmit={handleSubmit} className="flex flex-col">
+                        <input type="text" name="amount" value={formData.amount} onChange={handleInputChange} placeholder="Amount" className="mb-2" />
+                        <input type="text" name="email" value={formData.email} onChange={handleInputChange} placeholder="Email" className="mb-2" />
+                        <input type="text" name="cardNumber" value={formData.cardNumber} onChange={handleInputChange} placeholder="Card Number" className="mb-2" />
+                        <div className="flex mb-2">
+                            <input type="text" name="expiration" value={formData.expiration} onChange={handleInputChange} placeholder="Expiration" className="flex-1 mr-2" />
+                            <input type="text" name="cvc" value={formData.cvc} onChange={handleInputChange} placeholder="CVC" className="flex-1 ml-2" />
+                        </div>
+                        <input type="text" name="country" value={formData.country} onChange={handleInputChange} placeholder="Country" className="mb-2" />
+                        <input type="text" name="zipcode" value={formData.zipcode} onChange={handleInputChange} placeholder="Zipcode" className="mb-2" />
+                        {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
+                        <div className="flex">
+                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Submit</button>
+                            <button type="button" onClick={handleCloseModal} className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 ml-2">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        )}
         </>
     );    
 };

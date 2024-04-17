@@ -64,7 +64,13 @@ const PatientProfileSetting = () => {
     });
   };
 
-  
+  const handleInsuranceCompanyNameChange = (e) => {
+    const value = e.target.value;
+    setEditedProfile({
+      ...editedProfile,
+      Insurance_Company_Name: value
+    });
+  };
 
   const handleProfileUpdate = async () => {
     // Format Date of Birth
@@ -221,14 +227,14 @@ const PatientProfileSetting = () => {
             )}
           </div>
 
-          {/* Insurance Name */}
+         {/* Insurance Name */}
           <div>
             <label className="block mb-2">Insurance Name:</label>
             {isEditing ? (
               <select
                 name="Insurance_Company_Name"
                 value={editedProfile.Insurance_Company_Name}
-                onChange={handleInputChange}
+                onChange={handleInsuranceCompanyNameChange} 
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
               >
                 <option value="Anthem">Anthem</option>

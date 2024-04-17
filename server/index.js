@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin, handleRegisterStaff,
     handleLoginStaff, handleEditDentist, handleEditStaff, handleEditPatient, handleArchiveDentist, handleArchiveStaff, handleArchivePatient, handleGetUserRole } = require('./routes/authRoutes');
 const { handleProtectedRoute } = require('./controllers/authController');
-const { handleGetPatient, handlePatientUpdate, handlePatientAppointment, handleGetInvoicesByPatientUsername, handleGetVisitDetailsByPatient, handleGetMedicalHistoryByPatient, handleGetPrescriptionsByPatient, handleGetAppointmentsByPatient, handleGetPatientID, handleCancelAppointment } = require('./routes/patientRoutes');
+const { handleGetPatient, handlePatientUpdate, handlePatientAppointment, handleGetInvoicesByPatientUsername, handleGetVisitDetailsByPatient, handleGetMedicalHistoryByPatient, handleGetPrescriptionsByPatient, handleGetAppointmentsByPatient, handleGetPatientID, handleCancelAppointment, handlePayInvoice } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
 const { staffRoutes, staffverifyToken } = require('./routes/staffRoutes');
 const { handleGenerateAppointmentReport, handleGetAllDentists, handleGetAllPatients, handleGetAllStaff, handleGetAllOfficeDentists, handleGetAllSchedules } = require('./routes/adminRoutes'); 
@@ -68,6 +68,8 @@ const server = http.createServer((req, res) => {
         handleGetPatientID(req, res, jwt);
     } else if (req.url === '/api/patient/cancel-appointment' && req.method === 'POST') {
         handleCancelAppointment(req, res, jwt);
+    } else if (req.url === '/api/patient/pay-invoice' && req.method === 'PATCH') {
+        handlePayInvoice(req, res, jwt);
     } else if (req.url === '/api/office/assignDentist' && req.method === 'POST') {
         handleAssignDentistToOffice(req, res);
     } else if (req.url === '/api/dentist/assignSchedule' && req.method === 'POST') {

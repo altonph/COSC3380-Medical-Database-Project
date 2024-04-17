@@ -134,6 +134,7 @@ const getInvoicesByPatientUsername = (req, res) => {
         i.Net_Amount,
         i.Paid_Amount,
         i.Is_paid,
+        i.cleaning_discount_applied,
         v.visitID,
         v.Date AS Visit_Date,
         v.Start_time AS Visit_Start_time,
@@ -457,6 +458,71 @@ const getPatientID = (token, callback) => {
     });
 };
 
+const payInvoice = (req, res) => {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        try {
+            const requestData = JSON.parse(body);
+            const { invoiceID, paymentAmount } = requestData;
+
+            pool.query(
+                'SELECT Paid_Amount, Net_Amount FROM invoice WHERE invoiceID = ?',
+                [invoiceID],
+                (error, results) => {
+                    if (error) {
+                        console.error('Error retrieving invoice details:', error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                        return;
+                    }
+
+                    if (results.length === 0) {
+                        res.writeHead(404, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Invoice not found' }));
+                        return;
+                    }
+
+                    const currentPaidAmount = parseFloat(results[0].Paid_Amount);
+                    const paymentAmount = parseFloat(requestData.paymentAmount);
+
+                    const netAmount = results[0].Net_Amount;
+
+                    const newPaidAmount = currentPaidAmount + paymentAmount;
+
+                    pool.query(
+                        'UPDATE invoice SET Paid_Amount = ?, Is_paid = ? WHERE invoiceID = ?',
+                        [newPaidAmount, newPaidAmount >= netAmount, invoiceID],
+                        (error, updateResults) => {
+                            if (error) {
+                                console.error('Error updating invoice:', error);
+                                res.writeHead(500, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                return;
+                            }
+
+                            if (updateResults.affectedRows === 0) {
+                                res.writeHead(404, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ error: 'Invoice not found' }));
+                                return;
+                            }
+
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ message: 'Invoice payment updated successfully' }));
+                        }
+                    );
+                }
+            );
+        } catch (error) {
+            console.error('Error parsing request body:', error);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Bad Request' }));
+        }
+    });
+};
+
 module.exports = {
     getPatientProfile,
     updatePatientProfile,
@@ -467,5 +533,6 @@ module.exports = {
     getPrescriptionsByPatientUsername,
     getAppointmentsByPatientUsername,
     cancelAppointment,
-    getPatientID
+    getPatientID,
+    payInvoice
 };
