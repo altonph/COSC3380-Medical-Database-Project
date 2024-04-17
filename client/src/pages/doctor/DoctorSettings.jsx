@@ -1,41 +1,84 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HeaderPortalDoctor from "../../components/HeaderPortalDoctor";
 import { Link } from 'react-router-dom'; 
 
 const DoctorSettings = () => {
   const [editable, setEditable] = useState(false);
   const [doctorInfo, setDoctorInfo] = useState({
-    firstName: 'DoctorFirstName',
-    lastName: 'DoctorLastName',
-    gender: 'DoctorGender',
-    dob: '00/00/0000',
-    email: 'doctoremail@gmail.com',
-    phoneNumber: '000-000-0000',
-    address: 'DoctorAddress',
-    specialty: 'DoctorSpecialty'
+    firstName: '',
+    lastName: '',
+    dob: '',
+    email: '',
+    phoneNumber: '',
+    address: '',
+    specialty: ''
   });
+
+  useEffect(() => {
+    fetchDoctorInfo();
+  }, []); 
+
+  const formatDOB = (dob) => {
+    const date = new Date(dob);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0'); 
+    return `${year}-${month}-${day}`;
+  };
+
+  const fetchDoctorInfo = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/doctor/profile', {
+        method: 'GET',
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('token')}`,
+        }
+      });
+      const data = await response.json();
+    
+      setDoctorInfo({
+        firstName: data.FName,
+        lastName: data.LName,
+        dob: formatDOB(data.DOB),
+        email: data.Email,
+        phoneNumber: data.Phone_num,
+        address: data.Address,
+        specialty: data.Specialty
+      });
+    } catch (error) {
+      console.error('Error fetching doctor information:', error);
+    }
+  };
 
   const handleEdit = () => {
     setEditable(true);
   };
 
-  const handleSave = () => {
-    // Handle save logic here
-    setEditable(false);
+  const handleSave = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/doctor/profile', {
+        method: 'PATCH',
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('token')}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(doctorInfo)
+      });
+
+      if (response.ok) {
+        setEditable(false);
+        // Optionally, you can fetch updated information after save
+        // fetchDoctorInfo();
+      } else {
+        console.error('Failed to update doctor profile');
+      }
+    } catch (error) {
+      console.error('Error updating doctor profile:', error);
+    }
   };
 
   const handleCancel = () => {
-    // Reset the form values if cancelled
-    setDoctorInfo({
-      firstName: 'DoctorFirstName',
-      lastName: 'DoctorLastName',
-      gender: 'DoctorGender',
-      dob: '00/00/0000',
-      email: 'doctoremail@gmail.com',
-      phoneNumber: '000-000-0000',
-      address: 'DoctorAddress',
-      specialty: 'DoctorSpecialty'
-    });
+    fetchDoctorInfo(); 
     setEditable(false);
   };
 
@@ -54,123 +97,38 @@ const DoctorSettings = () => {
         <h1 className="text-3xl font-bold mb-4">Doctor Settings</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block mb-2">First Name:</label>
-            {editable ? (
-              <input
-                type="text"
-                name="firstName"
-                value={doctorInfo.firstName}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              />
-            ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{doctorInfo.firstName}</div>
-            )}
-          </div>
-
-          <div>
-            <label className="block mb-2">Last Name:</label>
-            {editable ? (
-              <input
-                type="text"
-                name="lastName"
-                value={doctorInfo.lastName}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              />
-            ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{doctorInfo.lastName}</div>
-            )}
-          </div>
-
-          <div>
-            <label className="block mb-2">Gender:</label>
-            {editable ? (
-              <select
-                name="gender"
-                value={doctorInfo.gender}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              >
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
-            ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{doctorInfo.gender}</div>
-            )}
-          </div>
-
-          <div>
-            <label className="block mb-2">Date of Birth:</label>
-            {editable ? (
-              <input
-                type="date"
-                name="dob"
-                value={doctorInfo.dob}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              />
-            ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{doctorInfo.dob}</div>
-            )}
-          </div>
-
-          <div>
-            <label className="block mb-2">Email:</label>
-            {editable ? (
-              <input
-                type="email"
-                name="email"
-                value={doctorInfo.email}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              />
-            ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{doctorInfo.email}</div>
-            )}
-          </div>
-
-          <div>
-            <label className="block mb-2">Phone Number:</label>
-            {editable ? (
-              <input
-                type="text"
-                name="phoneNumber"
-                value={doctorInfo.phoneNumber}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              />
-            ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{doctorInfo.phoneNumber}</div>
-            )}
-          </div>
-
-          <div>
-            <label className="block mb-2">Address:</label>
-            {editable ? (
-              <input
-                type="text"
-                name="address"
-                value={doctorInfo.address}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              />
-            ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{doctorInfo.address}</div>
-            )}
-          </div>
-
-          <div>
-            <label className="block mb-2">Specialty:</label>
-            <div className="border border-gray-300 rounded-md py-2 px-3">{doctorInfo.specialty}</div>
-          </div>
+          {Object.entries(doctorInfo).map(([key, value]) => (
+            <div key={key}>
+              <label className="block mb-2">{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
+              {editable ? (
+                key === 'dob' ? (
+                  <input
+                    type="date"
+                    name={key}
+                    value={value}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    name={key}
+                    value={value}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                  />
+                )
+              ) : (
+                <div className="border border-gray-300 rounded-md py-2 px-3">{value}</div>
+              )}
+            </div>
+          ))}
         </div>
 
         {!editable && (
           <button
             onClick={handleEdit}
-            className="mt-4 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 mr-2"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 block mb-2 mt-4 mr-2"
           >
             Edit
           </button>
@@ -179,13 +137,13 @@ const DoctorSettings = () => {
           <div>
             <button
               onClick={handleSave}
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 mr-2"
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 block mb-2 mt-4 mr-2"
             >
               Save
             </button>
             <button
               onClick={handleCancel}
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+              className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 block mb-2 mt-4"
             >
               Cancel
             </button>
@@ -193,7 +151,7 @@ const DoctorSettings = () => {
         )}
 
         <Link to="/doctor/home">
-          <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 ml-2">
+          <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
             Back to Home
           </button>
         </Link>

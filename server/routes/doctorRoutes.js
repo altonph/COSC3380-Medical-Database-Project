@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { getAllPatients, getPatientById, getMedicalHistoryByPatientId, insertMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePatientInformationByPatientId,getInformationByPatientId, updatePrescriptionsByPatientId, updateVisitDetailsByPatientId, getAppointmentsByDoctorUsername, insertVisitDetails, insertPrescription, insertAppointment, checkVisitDetailsCount, updateAppointmentStatus, checkPatientExistence, generateInvoice, updatePrimaryApproval, getAvailableStaff, verifyPrimaryApproval, getSpecialtyByDoctorUsername } = require('../controllers/doctorController');
+const { getAllPatients, getPatientById, getMedicalHistoryByPatientId, insertMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePatientInformationByPatientId,getInformationByPatientId, updatePrescriptionsByPatientId, updateVisitDetailsByPatientId, getAppointmentsByDoctorUsername, insertVisitDetails, insertPrescription, insertAppointment, checkVisitDetailsCount, updateAppointmentStatus, checkPatientExistence, generateInvoice, updatePrimaryApproval, getAvailableStaff, verifyPrimaryApproval, getSpecialtyByDoctorUsername, getProfileByDoctorUsername, updateProfileByDoctorUsername } = require('../controllers/doctorController');
 
 const doctorRoutes = (req, res) => {
     const { url, method } = req;
@@ -271,6 +271,26 @@ const doctorRoutes = (req, res) => {
             return forbiddenResponse(res);
         }
         verifyPrimaryApproval(req, res); 
+    } else if (method === 'GET' && url === '/api/doctor/profile') {
+        const decodedToken = verifyToken(authHeader);
+        if (!decodedToken) {
+            return unauthorizedResponse(res);
+        }
+        const userRole = decodedToken.role;
+        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff') {
+            return forbiddenResponse(res);
+        }
+        getProfileByDoctorUsername(req, res); 
+    } else if (method === 'PATCH' && url === '/api/doctor/profile') {
+        const decodedToken = verifyToken(authHeader);
+        if (!decodedToken) {
+            return unauthorizedResponse(res);
+        }
+        const userRole = decodedToken.role;
+        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff') {
+            return forbiddenResponse(res);
+        }
+        updateProfileByDoctorUsername(req, res);
     }
     else {
         return notFoundResponse(res);

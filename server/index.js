@@ -124,7 +124,7 @@ const server = http.createServer((req, res) => {
     
     //handleUpdateAppointmentWithStaff
     // doctor pages
-    else if (req.url === '/api/doctor/patients' || req.url.startsWith('/api/doctor/patients/') || req.url.startsWith('/api/doctor/appointments/') || req.url === ('/api/doctor/appointments') || req.url === ('/api/doctor/visit-details')) {
+    else if (req.url === '/api/doctor/patients' || req.url.startsWith('/api/doctor/patients/') || req.url.startsWith('/api/doctor/appointments/') || req.url === ('/api/doctor/appointments') || req.url === ('/api/doctor/profile') || req.url === ('/api/doctor/visit-details')) {
         doctorRoutes(req, res); 
     }
     else if (req.url === '/api/staff/patients' || req.url.startsWith('/api/staff/patients/') || req.url.startsWith('/api/staff/appointments/') || req.url === ('/api/staff/appointments')) {

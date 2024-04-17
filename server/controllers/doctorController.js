@@ -886,6 +886,103 @@ const getSpecialtyByDoctorUsername = (req, res) => {
     });
 };
 
+const getProfileByDoctorUsername = (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const { username } = decodedToken;
+
+    pool.query('SELECT dentistID FROM login WHERE Username = ?', [username], (error, results) => {
+        if (error) {
+            console.error('Error retrieving doctor ID:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            return;
+        }
+
+        if (results.length === 0) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Doctor not found' }));
+            return;
+        }
+
+        const doctorId = results[0].dentistID;
+        pool.query('SELECT * FROM dentist WHERE dentistID = ?', [doctorId], (error, results) => {
+            if (error) {
+                console.error('Error retrieving dentist profile:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            }
+
+            if (results.length === 0) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Dentist profile not found' }));
+                return;
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(results[0]));
+        });
+    });
+};
+
+const updateProfileByDoctorUsername = (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const { username } = decodedToken;
+
+    pool.query('SELECT dentistID FROM login WHERE Username = ?', [username], (error, results) => {
+        if (error) {
+            console.error('Error retrieving doctor ID:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            return;
+        }
+
+        if (results.length === 0) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Doctor not found' }));
+            return;
+        }
+
+        const dentistId = results[0].dentistID;
+
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        req.on('end', () => {
+            const profileData = JSON.parse(body);
+            const { FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary } = profileData;
+            
+            const query = `
+                UPDATE dentist 
+                SET FName = ?, LName = ?, Specialty = ?, Email = ?, Phone_num = ?, Address = ?, DOB = ?, Start_date = ?, End_date = ?, Is_active = ?, Salary = ? 
+                WHERE dentistID = ?`;
+
+            pool.query(query, [FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary, dentistId], (error, results) => {
+                if (error) {
+                    console.error('Error updating dentist profile:', error);
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                    return;
+                }
+                if (results.affectedRows === 0) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Dentist profile not found' }));
+                    return;
+                }
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Dentist profile updated successfully' }));
+            });
+        });
+    });
+};
+
+
 module.exports = {
     getAllPatients,
     getPatientById,
@@ -911,5 +1008,7 @@ module.exports = {
     updatePrimaryApproval,
     getAvailableStaff,
     verifyPrimaryApproval,
-    getSpecialtyByDoctorUsername
+    getSpecialtyByDoctorUsername,
+    getProfileByDoctorUsername,
+    updateProfileByDoctorUsername
 };
