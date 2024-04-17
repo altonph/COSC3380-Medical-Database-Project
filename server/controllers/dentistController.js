@@ -23,6 +23,29 @@ const assignDentistSchedule = (officeID, dentistID, schedule, res) => {
 
 };
 
+const editDentistSchedule = (req, res) => {
+    const { dentistID, officeID, schedule } = req.body;
+
+    // Update the dentist's schedule
+    pool.query(
+        'UPDATE schedule SET Monday = ?, Tuesday = ?, Wednesday = ?, Thursday = ?, Friday = ? WHERE dentistID = ? AND officeID = ?',
+        [schedule.Monday, schedule.Tuesday, schedule.Wednesday, schedule.Thursday, schedule.Friday, dentistID, officeID],
+        (error, results) => {
+            if (error) {
+                console.error('Error updating dentist schedule:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            } else {
+                console.log('Dentist schedule updated successfully');
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Dentist schedule updated successfully' }));
+                return;
+            }
+        }
+    );
+};
+
 const getDentistsByOfficeAndDay = (req, res) => {
 
     const parsedUrl = parse(req.url, true);
@@ -52,6 +75,33 @@ const getDentistsByOfficeAndDay = (req, res) => {
 
     });
     
+};
+
+const getAllDentistsByOfficeAndDay = (req, res) => {
+    const parsedUrl = parse(req.url, true);
+    const { query } = parsedUrl;
+    const { officeID, dayOfWeek } = query;
+
+    const sqlQuery = `
+        SELECT DISTINCT d.*, d.Specialty
+        FROM dentist d
+        INNER JOIN office_dentist od ON d.dentistID = od.dentistID
+        INNER JOIN schedule s ON d.dentistID = s.dentistID
+        WHERE (od.officeID = ? OR ? IS NULL)
+            AND (s.${dayOfWeek} = TRUE OR ? IS NULL)
+            AND (d.Specialty = 'Endodontist' OR d.Specialty = 'General Dentistry')
+    `;
+
+    pool.query(sqlQuery, [officeID, officeID, dayOfWeek], (error, results) => {
+        if (error) {
+            console.error('Error fetching dentists:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+        } else {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(results));
+        }
+    });
 };
 
 const updateAppointmentWithStaff = (dentistID, patientID, date, startTime, staffID, res) => {
@@ -184,9 +234,12 @@ const calculateAvailableTimeBlocks = (workStartTime, workEndTime, existingAppoin
     return availableTimeBlocks;
 };
 
+
 module.exports = { 
     assignDentistSchedule,
     getDentistsByOfficeAndDay,
     updateAppointmentWithStaff,
-    getAvailableTimeBlocks
+    getAvailableTimeBlocks,
+    getAllDentistsByOfficeAndDay,
+    editDentistSchedule
 };

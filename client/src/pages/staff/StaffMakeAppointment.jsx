@@ -193,42 +193,47 @@ const StaffMakeAppointment = () => {
     const sqlFormattedDate = preferredDate.toISOString().split('T')[0];
 
     try {
-        const response = await fetch('http://localhost:5000/api/doctor/appointments', {
-            method: 'POST',
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                officeID: location,
-                dentistID: practitioner,
-                staffID: staffID, 
-                patientID: patientID,
-                Date: sqlFormattedDate,
-                Start_time: formattedStartTime,
-                End_time: formattedEndTime,
-                Appointment_Type: reasonForAppointment,
-                Appointment_Status: "Scheduled",
-                Primary_Approval: false,
-                Is_active: true
-            }),
-        });
+      const response = await fetch('http://localhost:5000/api/doctor/appointments', {
+          method: 'POST',
+          headers: {
+              "Authorization": `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              officeID: location,
+              dentistID: practitioner,
+              staffID: staffID, 
+              patientID: patientID,
+              Date: sqlFormattedDate,
+              Start_time: formattedStartTime,
+              End_time: formattedEndTime,
+              Appointment_Type: reasonForAppointment,
+              Appointment_Status: "Scheduled",
+              Primary_Approval: false,
+              Is_active: true
+          }),
+      });
 
-        if (response.ok) {
-            console.log('Appointment successfully scheduled!');
-            setNotification('Appointment scheduled successfully!');
-            setTimeout(() => {
-                setNotification('');
-                navigateTo('/staff/appointments');
-            }, 1000);
+      if (response.ok) {
+          console.log('Appointment successfully scheduled!');
+          setNotification('Appointment scheduled successfully!');
+          setTimeout(() => {
+              setNotification('');
+              navigateTo('/staff/appointments');
+          }, 1000);
 
-        } else {
-            console.error('Failed to make appointment:', response.statusText);
-        }
+      } else {
+          const responseData = await response.json();
+          if (responseData.error === 'Overlapping appointments detected. Please choose another time slot.') {
+              alert(responseData.error);
+          } else {
+              console.error('Failed to make appointment:', responseData.error || response.statusText);
+          }
+      }
 
-    } catch (error) {
-        console.error('Error making appointment:', error);
-    }
+  } catch (error) {
+      console.error('Error making appointment:', error);
+  }
   };
 
 

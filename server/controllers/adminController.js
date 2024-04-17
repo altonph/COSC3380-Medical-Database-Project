@@ -84,7 +84,7 @@ const generateAppointmentDataReport = (req, res, office_id, start_date, end_date
     });
 };
 
-const generateRevenueReport = (req, res, office, startDate, endDate) => {
+const generateRevenueReport = (req, res, office, type, startDate, endDate) => {
     let sqlQuery = `
         SELECT 
             a.Appointment_Type,
@@ -110,6 +110,11 @@ const generateRevenueReport = (req, res, office, startDate, endDate) => {
     if (startDate && endDate) {
         sqlQuery += ` AND a.Date BETWEEN ? AND ?`;
         queryParams.push(startDate, endDate);
+    }
+
+    if (type && type !== 'All') {
+        sqlQuery += ` AND a.Appointment_Type = ?`;
+        queryParams.push(type);
     }
 
     sqlQuery += ` ORDER BY a.Appointment_Type`;
@@ -258,7 +263,33 @@ function getAllStaff(res) {
     );
 }
 
+const getAllOfficeDentists = (res) => {
+    pool.query('SELECT * FROM office_dentist', (error, results) => {
+        if (error) {
+            console.error('Error fetching office_dentist entries:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Error fetching staff information' }));
+        } else {
+            //console.log('Fetched all office_dentist entries successfully');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(results));
+        }
+    });
+};
 
+const getAllSchedules = (res) => {
+    pool.query('SELECT * FROM schedule', (error, results) => {
+        if (error) {
+            console.error('Error fetching schedule entries:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Error fetching staff information' }));
+        } else {
+            console.log('Fetched all schedule entries successfully');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(results));
+        }
+    });
+};
 
 module.exports = {
     generateRevenueReport,
@@ -266,5 +297,7 @@ module.exports = {
     generateDemographicReport,
     getAllDentists,
     getAllPatients,
-    getAllStaff
+    getAllStaff,
+    getAllOfficeDentists,
+    getAllSchedules
 };

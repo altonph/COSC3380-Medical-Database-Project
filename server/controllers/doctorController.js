@@ -1,4 +1,5 @@
 const pool = require('../models/db');
+const jwt = require('jsonwebtoken');
 
 const getAllPatients = (req, res) => {
     pool.query('SELECT * FROM patient', (error, results) => {
@@ -398,9 +399,14 @@ const insertAppointment = (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         pool.query(query, [officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status, Cancellation_Reason, Specialist_Approval, Is_active], (error, results) => {
             if (error) {
-                console.error('Error inserting appointment:', error);
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                if (error.sqlState === '45000') { // Check if the SQLSTATE code indicates an exception
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Overlapping appointments detected. Please choose another time slot.' }));
+                } else {
+                    console.error('Error inserting appointment:', error);
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                }
                 return;
             }
             res.writeHead(201, { 'Content-Type': 'application/json' });
@@ -408,6 +414,7 @@ const insertAppointment = (req, res) => {
         });
     });
 };
+
 
 const checkVisitDetailsCount = (req, res) => {
     let body = '';
@@ -575,7 +582,7 @@ const generateInvoice = (req, res) => {
         try {
             const requestData = JSON.parse(body);
             const { visitID, dentistID, patientID, visitDate, Start_time } = requestData;
-            
+
             pool.query(
                 'SELECT * FROM visit_details WHERE visitID = ?',
                 [visitID],
@@ -653,13 +660,17 @@ const generateInvoice = (req, res) => {
                                             break;
                                     }
 
-                                    netAmount = grossAmount - insuranceCoverage + 20.00;
-                                    grossAmount = grossAmount + 20.00;
+                                    netAmount = grossAmount - insuranceCoverage;
+                                    grossAmount = parseFloat(grossAmount.toFixed(2));
+                                    insuranceCoverage = parseFloat(insuranceCoverage.toFixed(2));
+                                    netAmount = parseFloat(netAmount.toFixed(2));
 
                                     const currentDate = new Date().toISOString().split('T')[0];
+                                    const query = 'INSERT INTO invoice (Policy_number, patientID, visitID, Date, Description, Gross_Amount, Insurance_coverage, Net_Amount, Paid_Amount, Is_paid, cleaning_discount_applied) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
                                     pool.query(
-                                        'INSERT INTO invoice (Policy_number, patientID, visitID, Date, Gross_Amount, Insurance_coverage, Net_Amount, Paid_Amount, Is_paid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                                        [patientPolicyNumber, patientID, visitID, currentDate, grossAmount, insuranceCoverage, netAmount, 0, false],
+                                        query,
+                                        [patientPolicyNumber, patientID, visitID, currentDate, appointmentType, grossAmount, insuranceCoverage, netAmount, 0, false, 0], 
                                         (error, results) => {
                                             if (error) {
                                                 console.error('Error generating invoice:', error);
@@ -668,8 +679,41 @@ const generateInvoice = (req, res) => {
                                                 return;
                                             }
 
-                                            res.writeHead(201, { 'Content-Type': 'application/json' });
-                                            res.end(JSON.stringify({ message: 'Invoice generated successfully', invoiceID: results.insertId }));
+                                            const insertedInvoiceId = results.insertId;
+
+                                            pool.query(
+                                                'UPDATE invoice SET Net_Amount = ? WHERE invoiceID = ?',
+                                                [grossAmount - insuranceCoverage + 20.00, insertedInvoiceId],
+                                                (error, results) => {
+                                                    if (error) {
+                                                        console.error('Error updating invoice:', error);
+                                                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                                                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                                        return;
+                                                    }
+
+                                                    pool.query(
+                                                        'SELECT * FROM invoice WHERE invoiceID = ?',
+                                                        [insertedInvoiceId],
+                                                        (error, results) => {
+                                                            if (error) {
+                                                                console.error('Error retrieving inserted invoice:', error);
+                                                                res.writeHead(500, { 'Content-Type': 'application/json' });
+                                                                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                                                return;
+                                                            }
+
+                                                            const insertedInvoice = results[0];
+                                                            let message = 'Invoice generated successfully';
+                                                            if (requestData.cleaning_discount_applied) {
+                                                                message += ' with cleaning discount';
+                                                            }
+                                                            res.writeHead(201, { 'Content-Type': 'application/json' });
+                                                            res.end(JSON.stringify({ message: message, invoice: insertedInvoice, cleaning_discount_applied: requestData.cleaning_discount_applied }));
+                                                        }
+                                                    );
+                                                }
+                                            );
                                         }
                                     );
                                 }
@@ -744,6 +788,103 @@ const getAvailableStaff = (req, res) => {
     });
 };
 
+const verifyPrimaryApproval = (req, res) => {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        try {
+            const requestData = JSON.parse(body);
+            const { patientID, dentistID } = requestData;
+
+            pool.query(
+                'SELECT Specialty FROM dentist WHERE dentistID = ?',
+                [dentistID],
+                (error, results) => {
+                    if (error) {
+                        console.error('Error checking doctor specialty:', error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                        return;
+                    }
+
+                    const doctorSpecialty = results[0].Specialty;
+                    console.log(doctorSpecialty);
+
+                    if (doctorSpecialty !== 'Endodontist') {
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ verified: false }));
+                    } else {
+                        pool.query(
+                            'SELECT COUNT(*) AS approvedCount FROM appointment WHERE patientID = ? AND Primary_approval = "Approved"',
+                            [patientID],
+                            (error, results) => {
+                                if (error) {
+                                    console.error('Error checking primary approval:', error);
+                                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                    return;
+                                }
+
+                                const approvedCount = results[0].approvedCount;
+                                const verified = approvedCount > 0;
+
+                                res.writeHead(200, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ verified }));
+                            }
+                        );
+                    }
+                }
+            );
+        } catch (error) {
+            console.error('Error parsing request body:', error);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Bad Request' }));
+        }
+    });
+};
+
+const getSpecialtyByDoctorUsername = (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const { username } = decodedToken;
+
+    pool.query('SELECT dentistID FROM login WHERE Username = ?', [username], (error, results) => {
+        if (error) {
+            console.error('Error retrieving doctor ID:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+            return;
+        }
+
+        if (results.length === 0) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Doctor not found' }));
+            return;
+        }
+
+        const doctorId = results[0].dentistID;
+        pool.query('SELECT Specialty FROM dentist WHERE dentistID = ?', [doctorId], (error, results) => {
+            if (error) {
+                console.error('Error retrieving dentist specialty:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                return;
+            }
+
+            if (results.length === 0) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Dentist specialty not found' }));
+                return;
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(results[0]));
+        });
+    });
+};
 
 module.exports = {
     getAllPatients,
@@ -768,5 +909,7 @@ module.exports = {
     checkPatientExistence,
     generateInvoice,
     updatePrimaryApproval,
-    getAvailableStaff
+    getAvailableStaff,
+    verifyPrimaryApproval,
+    getSpecialtyByDoctorUsername
 };

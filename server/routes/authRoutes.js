@@ -224,6 +224,7 @@ function handleArchiveDentist(req, res) {
     });
 
     req.on('end', () => {
+        console.log('Received data:', data);
         try {
             const parsedUrl = url.parse(req.url, true);
             const dentistID = parsedUrl.pathname.split('/').pop(); // Extract dentistID from the URL

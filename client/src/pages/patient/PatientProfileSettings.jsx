@@ -64,21 +64,31 @@ const PatientProfileSetting = () => {
     });
   };
 
-  
+  const handleInsuranceCompanyNameChange = (e) => {
+    const value = e.target.value;
+    setEditedProfile({
+      ...editedProfile,
+      Insurance_Company_Name: value
+    });
+  };
 
   const handleProfileUpdate = async () => {
+    // Format Date of Birth
+    const formattedDOB = formatDOB(editedProfile.DOB);
   
     try {
       const response = await fetch("http://localhost:5000/api/patient/profile/update", {
         method: "PATCH",
-
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(editedProfile)
+        body: JSON.stringify({
+          ...editedProfile,
+          DOB: formattedDOB // Replace DOB with formatted date of birth
+        })
       });
-
+  
       if (response.ok) {
         console.log('Profile updated successfully');
         setIsEditing(false);
@@ -88,7 +98,7 @@ const PatientProfileSetting = () => {
     } catch (error) {
       console.error("Error updating patient profile:", error);
     }
-  };
+  };  
 
   const handlePasswordChange = () => {
     console.log('Password changed');
@@ -217,17 +227,22 @@ const PatientProfileSetting = () => {
             )}
           </div>
 
-          {/* Insurance Name */}
+         {/* Insurance Name */}
           <div>
             <label className="block mb-2">Insurance Name:</label>
             {isEditing ? (
-              <input
-                type="text"
+              <select
                 name="Insurance_Company_Name"
                 value={editedProfile.Insurance_Company_Name}
-                onChange={handleInputChange}
+                onChange={handleInsuranceCompanyNameChange} 
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              />
+              >
+                <option value="Anthem">Anthem</option>
+                <option value="Guardian">Guardian</option>
+                <option value="Ameritas">Ameritas</option>
+                <option value="Humana">Humana</option>
+                <option value="Spirit Dental">Spirit Dental</option>
+              </select>
             ) : (
               <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.Insurance_Company_Name}</div>
             )}
@@ -281,57 +296,6 @@ const PatientProfileSetting = () => {
         )}
       </div>
 
-        {/* Password Management */}
-        <div className="mt-8">
-          <h2 className="text-3xl font-bold mb-4 text-base">Password Management</h2>
-          {isChangingPassword ? (
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <label className="block mb-2">Current Password:</label>
-                <input
-                  type="password"
-                  name="currentPassword"
-                  value={editedProfile.currentPassword}
-                  onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block mb-2">New Password:</label>
-                <input
-                  type="password"
-                  name="newPassword"
-                  value={editedProfile.newPassword}
-                  onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block mb-2">Confirm Password:</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={editedProfile.confirmPassword}
-                  onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                />
-              </div>
-              <button
-                onClick={handlePasswordChange}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-              >
-                Change Password
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setIsChangingPassword(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-            >
-              Change Password
-            </button>
-          )}
-        </div>
       </div>
     </div>
   );

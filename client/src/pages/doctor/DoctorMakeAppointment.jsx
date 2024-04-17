@@ -22,6 +22,20 @@ const DoctorMakeAppointment = () => {
   const [selectedEndTime, setSelectedEndTime] = useState('');
   const [availableStaff, setAvailableStaff] = useState([]);
   const [selectedAssistingHygienist, setSelectedAssistingHygienist] = useState('');
+  const [specialty, setSpecialty] = useState('');
+
+  useEffect(() => {
+    console.log(dentists);
+    console.log(practitioner);
+    if (practitioner && dentists.length > 0) {
+      const selectedDentist = dentists.find(dentist => dentist.dentistID === parseInt(practitioner));
+      console.log(selectedDentist);
+      if (selectedDentist) {
+        setSpecialty(selectedDentist.Specialty);
+        console.log("Specialty:", selectedDentist.Specialty);
+      }
+    }
+  }, [practitioner, dentists]);
 
   useEffect(() => {
     if (location && preferredDate) {
@@ -43,8 +57,8 @@ const DoctorMakeAppointment = () => {
 
   const fetchDentistsByOfficeAndDay = async (officeID, dayOfWeek) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/dentist/getDentist?officeID=${officeID}&dayOfWeek=${dayOfWeek}`);
-
+      const response = await fetch(`http://localhost:5000/api/dentist/getAllDentistsByOfficeAndDay?officeID=${officeID}&dayOfWeek=${dayOfWeek}`);
+  
       if (response.ok) {
         const data = await response.json();
         setDentists(data);
@@ -55,6 +69,7 @@ const DoctorMakeAppointment = () => {
       console.error('Error fetching dentists:', error);
     }
   };
+  
 
   const fetchDentistAvailability = async (dentistID, date) => {
     try {
@@ -145,6 +160,42 @@ const DoctorMakeAppointment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log(specialty);
+
+    if (practitioner !== "" && practitioner !== null) {
+      if (specialty === "Endodontist") {
+          try {
+              const response = await fetch('http://localhost:5000/api/doctor/appointments/verify-primary-approval', {
+                  method: 'POST',
+                  headers: {
+                      "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                      patientID: patientID,
+                      dentistID: practitioner
+                  }),
+              });
+
+              console.log(patientID);
+              console.log(practitioner);
+
+              if (response.ok) {
+                  const verificationResult = await response.json();
+                  if (!verificationResult.verified) {
+                      console.log('Primary approval not verified or required. Appointment cannot be scheduled.');
+                      return;
+                  }
+              } else {
+                  console.error('Failed to verify primary approval:', response.statusText);
+                  return;
+              }
+          } catch (error) {
+              console.error('Error verifying primary approval:', error);
+              return;
+          }
+      }
+  }
     const staffID = selectedAssistingHygienist !== "" ? selectedAssistingHygienist : null;
 
     const startTimeParts = selectedStartTime.split(' ');
@@ -193,42 +244,47 @@ const DoctorMakeAppointment = () => {
     const sqlFormattedDate = preferredDate.toISOString().split('T')[0];
 
     try {
-        const response = await fetch('http://localhost:5000/api/doctor/appointments', {
-            method: 'POST',
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                officeID: location,
-                dentistID: practitioner,
-                staffID: staffID, 
-                patientID: patientID,
-                Date: sqlFormattedDate,
-                Start_time: formattedStartTime,
-                End_time: formattedEndTime,
-                Appointment_Type: reasonForAppointment,
-                Appointment_Status: "Scheduled",
-                Primary_Approval: false,
-                Is_active: true
-            }),
-        });
+      const response = await fetch('http://localhost:5000/api/doctor/appointments', {
+          method: 'POST',
+          headers: {
+              "Authorization": `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              officeID: location,
+              dentistID: practitioner,
+              staffID: staffID, 
+              patientID: patientID,
+              Date: sqlFormattedDate,
+              Start_time: formattedStartTime,
+              End_time: formattedEndTime,
+              Appointment_Type: reasonForAppointment,
+              Appointment_Status: "Scheduled",
+              Primary_Approval: false,
+              Is_active: true
+          }),
+      });
 
-        if (response.ok) {
-            console.log('Appointment successfully scheduled!');
-            setNotification('Appointment scheduled successfully!');
-            setTimeout(() => {
-                setNotification('');
-                navigateTo('/doctor/appointments');
-            }, 1000);
+      if (response.ok) {
+          console.log('Appointment successfully scheduled!');
+          setNotification('Appointment scheduled successfully!');
+          setTimeout(() => {
+              setNotification('');
+              navigateTo('/doctor/appointments');
+          }, 1000);
 
-        } else {
-            console.error('Failed to make appointment:', response.statusText);
-        }
+      } else {
+          const responseData = await response.json();
+          if (responseData.error === 'Overlapping appointments detected. Please choose another time slot.') {
+              alert(responseData.error);
+          } else {
+              console.error('Failed to make appointment:', responseData.error || response.statusText);
+          }
+      }
 
-    } catch (error) {
-        console.error('Error making appointment:', error);
-    }
+  } catch (error) {
+      console.error('Error making appointment:', error);
+  }
   };
 
 
@@ -315,16 +371,23 @@ const DoctorMakeAppointment = () => {
               </div>
   
               <div className="mb-4">
-                <label className="block text-sm font-bold mb-2">Primary Practitioner:</label>
+                <label className="block text-sm font-bold mb-2">Dentist:</label>
                 <select
                   value={practitioner}
-                  onChange={(e) => setPractitioner(e.target.value)}
+                  onChange={(e) => {
+                    setPractitioner(e.target.value);
+                    const selectedDentist = dentists.find(dentist => dentist.dentistID === e.target.value);
+                    if (selectedDentist) {
+                      setSpecialty(selectedDentist.Specialty);
+                      console.log("Specialty:", selectedDentist.Specialty);
+                    }
+                  }}
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                 >
                   <option value="" disabled>Select Practitioner</option>
                   {dentists.map(dentist => (
                     <option key={dentist.dentistID} value={dentist.dentistID}>
-                      {`Dr. ${dentist.FName} ${dentist.LName}`}
+                      {`Dr. ${dentist.FName} ${dentist.LName} - ${dentist.Specialty}`}
                     </option>
                   ))}
                 </select>

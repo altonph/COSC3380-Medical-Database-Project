@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { getAllPatients, getPatientById, getMedicalHistoryByPatientId, insertMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePatientInformationByPatientId,getInformationByPatientId, updatePrescriptionsByPatientId, updateVisitDetailsByPatientId, getAppointmentsByDoctorUsername, insertVisitDetails, insertPrescription, insertAppointment, checkVisitDetailsCount, updateAppointmentStatus, checkPatientExistence, generateInvoice, updatePrimaryApproval, getAvailableStaff } = require('../controllers/doctorController');
+const { getAllPatients, getPatientById, getMedicalHistoryByPatientId, insertMedicalHistoryByPatientId, getPrescriptionsByPatientId, getInvoicesByPatientId, getVisitDetailsByPatientId, updateMedicalHistoryByPatientId, updatePatientInformationByPatientId,getInformationByPatientId, updatePrescriptionsByPatientId, updateVisitDetailsByPatientId, getAppointmentsByDoctorUsername, insertVisitDetails, insertPrescription, insertAppointment, checkVisitDetailsCount, updateAppointmentStatus, checkPatientExistence, generateInvoice, updatePrimaryApproval, getAvailableStaff, verifyPrimaryApproval, getSpecialtyByDoctorUsername } = require('../controllers/doctorController');
 
 const doctorRoutes = (req, res) => {
     const { url, method } = req;
@@ -134,6 +134,17 @@ const doctorRoutes = (req, res) => {
         }
         const { username } = decodedToken; 
         getAppointmentsByDoctorUsername(req, res, username);
+    } else if (method === 'GET' && url === '/api/doctor/appointments/get-specialty') {
+        const decodedToken = verifyToken(authHeader);
+        if (!decodedToken) {
+            return unauthorizedResponse(res);
+        }
+        const userRole = decodedToken.role;
+        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff') {
+            return forbiddenResponse(res);
+        }
+        const { username } = decodedToken; 
+        getSpecialtyByDoctorUsername(req, res, username);
     } else if (method === 'GET' && url.startsWith('/api/doctor/patients/') && url.endsWith('/information')) {
         const decodedToken = verifyToken(authHeader);
         if (!decodedToken) {
@@ -184,7 +195,7 @@ const doctorRoutes = (req, res) => {
             return unauthorizedResponse(res);
         }
         const userRole = decodedToken.role;
-        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff') {
+        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff' && userRole !== 'Patient') {
             return forbiddenResponse(res);
         }
         console.log(req.body);
@@ -216,7 +227,7 @@ const doctorRoutes = (req, res) => {
             return unauthorizedResponse(res);
         }
         const userRole = decodedToken.role;
-        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff') {
+        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff' && userRole !== 'Patient') {
             return forbiddenResponse(res);
         }
         checkPatientExistence(req, res);
@@ -246,10 +257,20 @@ const doctorRoutes = (req, res) => {
             return unauthorizedResponse(res);
         }
         const userRole = decodedToken.role;
-        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff') {
+        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff' && userRole !== 'Patient') {
             return forbiddenResponse(res);
         }
         getAvailableStaff(req, res);
+    } else if (method === 'POST' && url === '/api/doctor/appointments/verify-primary-approval') {
+        const decodedToken = verifyToken(authHeader);
+        if (!decodedToken) {
+            return unauthorizedResponse(res);
+        }
+        const userRole = decodedToken.role;
+        if (userRole !== 'Dentist' && userRole !== 'Admin' && userRole !== 'Staff') {
+            return forbiddenResponse(res);
+        }
+        verifyPrimaryApproval(req, res); 
     }
     else {
         return notFoundResponse(res);

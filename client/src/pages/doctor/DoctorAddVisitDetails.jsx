@@ -16,6 +16,34 @@ const DoctorAddVisitDetails = () => {
   const [isInsertSuccessPrescriptions, setIsInsertSuccessPrescriptions] = useState(false);
   const [scheduleFollowUp, setScheduleFollowUp] = useState(false);
   const [approveForSpecialist, setApproveForSpecialist] = useState(false);
+  const [doctorSpecialty, setDoctorSpecialty] = useState(null);
+  const [discountMessage, setDiscountMessage] = useState("");
+
+    useEffect(() => {
+      const fetchDoctorSpecialty = async () => {
+          try {
+              const token = localStorage.getItem('token');
+
+              const response = await fetch('http://localhost:5000/api/doctor/appointments/get-specialty', {
+                  method: 'GET',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}`
+                  }
+              });
+
+              if (!response.ok) {
+                  throw new Error('Failed to fetch doctor specialty');
+              }
+              const data = await response.json();
+              setDoctorSpecialty(data.Specialty);
+              console.log('Doctor Specialty:', data.Specialty);
+          } catch (error) {
+              console.error('Error fetching doctor specialty:', error);
+          }
+      };
+      fetchDoctorSpecialty();
+  }, []);
 
   useEffect(() => {
     const storedAppointment = localStorage.getItem('appointmentDetails');
@@ -99,24 +127,24 @@ const DoctorAddVisitDetails = () => {
         }
 
         if (approveForSpecialist) {
-          const patchRequestBody = {
-              dentistID: appointmentDetails.dentistID,
-              patientID: appointmentDetails.patientID,
-              Date: formatDate(appointmentDetails.Date),
-              Start_time: appointmentDetails.Start_time
-          };
-          const patchResponse = await fetch('http://localhost:5000/api/doctor/appointments/update-primary-approval', {
-              method: 'PATCH',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify(patchRequestBody)
-          });
-          if (!patchResponse.ok) {
-              throw new Error('Failed to update primary approval');
-          }
-      }
+            const patchRequestBody = {
+                dentistID: appointmentDetails.dentistID,
+                patientID: appointmentDetails.patientID,
+                Date: formatDate(appointmentDetails.Date),
+                Start_time: appointmentDetails.Start_time
+            };
+            const patchResponse = await fetch('http://localhost:5000/api/doctor/appointments/update-primary-approval', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(patchRequestBody)
+            });
+            if (!patchResponse.ok) {
+                throw new Error('Failed to update primary approval');
+            }
+        }
 
         const invoiceRequestData = {
             visitID: visitID,
@@ -142,11 +170,15 @@ const DoctorAddVisitDetails = () => {
         const invoiceData = await invoiceResponse.json();
         console.log('Invoice generated successfully:', invoiceData);
 
+        if (invoiceData.invoice.cleaning_discount_applied) {
+          setDiscountMessage(`Patient ${appointmentDetails.patientID} just received a 20% discount on their first cleaning!`);
+      } 
+
         setIsInsertSuccess(true);
     } catch (error) {
         console.error('Error confirming visit details:', error);
     }
-  };
+};
 
   const handleConfirmPrescriptions = () => {
     const { visitID } = appointmentDetails;
@@ -285,6 +317,12 @@ const DoctorAddVisitDetails = () => {
               </ul>
             </nav>
           </aside>
+
+          {discountMessage && (
+        <div className="fixed top-0 left-0 w-full bg-green-200 text-green-800 p-4 shadow-md z-50">
+          {discountMessage}
+        </div>
+          )}
           
           <main className="flex-1 p-4">
             <div className="max-w-4xl mx-auto mt-8 p-4">
@@ -365,7 +403,8 @@ const DoctorAddVisitDetails = () => {
                 />
               </div>
 
-              <div>
+              {doctorSpecialty === 'General Dentistry' && (
+                <div>
                   <label className="block mt-2 text-lg">
                     <input
                       type="checkbox"
@@ -375,6 +414,7 @@ const DoctorAddVisitDetails = () => {
                     Approve for patient to see specialist
                   </label>
                 </div>
+              )}
   
               <div className="col-span-2">
               <button

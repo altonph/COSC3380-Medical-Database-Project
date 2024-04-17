@@ -1,8 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
 import HeaderPortalStaff from "../../components/HeaderPortalStaff";
 import Footer from "../../components/Footer";
 
 const StaffPortal = () => {
+    const [staffName, setStaffName] = useState('Staff Name');
+
+    useEffect(() => {
+        // Retrieve first and last name from local storage
+        const firstName = localStorage.getItem('firstName');
+        const lastName = localStorage.getItem('lastName');
+        // Check if both first and last name are available
+        if (firstName && lastName) {
+            setStaffName(`${firstName} ${lastName}`);
+        }
+    }, []);
+
     return (
         <>
             <div className="flex h-screen flex-col">
@@ -24,8 +36,7 @@ const StaffPortal = () => {
                     
                     
                     <main className="flex-1 p-4">
-                        <h1 className="text-3xl font-bold mb-4 p-8">Staff Portal</h1>
-                        
+                        <h1 className="text-3xl font-bold mb-4 p-8">Welcome {staffName}!</h1>
                     </main>
                 </div>
 

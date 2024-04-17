@@ -20,6 +20,11 @@ VALUES (1, 1);
 INSERT INTO office_dentist (officeID, dentistID)
 VALUES (2, 1);
 
+-- @block
+INSERT INTO office_dentist (officeID, dentistID)
+VALUES (1, 7);
+
+
 
 -- @block
 INSERT INTO office_dentist (officeID, dentistID)
@@ -39,6 +44,15 @@ VALUES (2, 1, FALSE, TRUE, FALSE, TRUE, FALSE);
 -- @block
 INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
 VALUES (1, 2, TRUE, FALSE, TRUE, FALSE, TRUE);
+
+-- @block
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
+VALUES (1, 7, TRUE, FALSE, TRUE, FALSE, TRUE);
+
+-- @block
+INSERT INTO schedule (officeID, dentistID, Monday, Tuesday, Wednesday, Thursday, Friday)
+VALUES (2, 7, TRUE, FALSE, TRUE, FALSE, TRUE);
+
 
 -- @block
 SELECT * FROM schedule;
@@ -114,7 +128,7 @@ SELECT * FROM APPOINTMENT;
 
 -- @block
 INSERT INTO visit_details (patientID, dentistID, Diagnosis, Treatment, Notes)
-VALUES (1, 1, 'Checkup', 'No specific diagnosis', 'Patient seems to be in good health overall.');
+VALUES (2, 1, 'Checkup', 'No specific diagnosis', 'Patient seems to be in good health overall.');
 
 -- @block
 SELECT * FROM visit_details;
@@ -181,3 +195,29 @@ DELETE FROM visit_details;
 
 -- @block
 DELETE FROM appointment;
+-- @block
+DELETE FROM invoice;
+
+-- @block
+SELECT * FROM invoice;
+
+-- @block
+SELECT dentistID FROM login WHERE Username = 'jane_doe';
+
+-- @block
+DELETE FROM medical_records WHERE patientID = 2;
+
+-- @block
+DELETE FROM visit_details WHERE patientID = 2;
+
+-- @block
+DELETE FROM prescription WHERE patientID = 2;
+
+-- @block
+SELECT * FROM APPOINTMENT WHERE patientID = 2;
+
+-- @block
+DELETE FROM staff;
+
+-- @block
+DELETE FROM login WHERE Username = 'randomstaff';

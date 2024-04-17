@@ -88,16 +88,16 @@ const DoctorPatients = () => {
         <>
             <div className="flex h-screen flex-col">
                 <nav>
-                    <HeaderPortalStaff />
+                    <HeaderPortalAdmin />
                 </nav>
 
                 <div className="flex flex-1">
                     <aside className="w-1/6 bg-gray-200 text-black">
                         <nav className="p-4 text-xl">
                             <ul>
-                                <li><a href="/staff/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
-                                <li><a href="/staff/appointments" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
-                                <li><a href="/staff/patients" className="block py-2 text-center font-bold underline">Patients</a></li>
+                                <li><a href="/doctor/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
+                                <li><a href="/doctor/appointments" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
+                                <li><a href="/doctor/patients" className="block py-2 text-center font-bold underline">Patients</a></li>
                             </ul>
                         </nav>
                     </aside>
@@ -123,7 +123,7 @@ const DoctorPatients = () => {
                                 {patients.map(patient => (
                                     <tr key={patient.patientID}>
                                         <td className="border px-4 py-2 text-xs">
-                                            <Link to={`/staff/patients/${patient.patientID}`}>{patient.patientID}</Link>
+                                            <Link to={`/doctor/patients/${patient.patientID}`}>{patient.patientID}</Link>
                                         </td>
                                         <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="insuranceID" value={editedPatients.Policy_number || ''} onChange={handleInputChange} /> : patient.Policy_number}</td>
                                         <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="insuranceID" value={editedPatients.Insurance_Company_Name || ''} onChange={handleInputChange} /> : patient.Insurance_Company_Name}</td>

@@ -1,6 +1,5 @@
 // adminRoutes.js
-const { query } = require('express');
-const { generateAppointmentDataReport, generateRevenueReport, getAllDentists, getAllPatients, getAllStaff } = require('../controllers/adminController');
+const { generateAppointmentDataReport, generateRevenueReport, getAllDentists, getAllPatients, getAllStaff, getAllOfficeDentists, getAllSchedules } = require('../controllers/adminController');
 const url = require('url');
 
 const handleGenerateAppointmentReport = (req, res) => {
@@ -31,10 +30,11 @@ const handleGenerateRevenueReport = (req, res) => {
         const queryParams = new URLSearchParams(queryParamss[1]);
 
         const office = queryParams.get('office');
+        const type = queryParams.get('type');
         const startDate = queryParams.get('startDate');
         const endDate = queryParams.get('endDate');
 
-        generateRevenueReport(req, res, office, startDate, endDate);
+        generateRevenueReport(req, res, office, type, startDate, endDate);
 
     } else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
@@ -92,6 +92,26 @@ const handleGetAllStaff = (req, res) => {
     }
 };
 
+const handleGetAllOfficeDentists = (req, res) => {
+    if (req.url === '/api/admin/getOfficeDentists' && req.method === 'GET') {
+        getAllOfficeDentists(res);
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
+const handleGetAllSchedules = (req, res) => {
+    if (req.url === '/api/admin/getSchedules' && req.method === 'GET') {
+        getAllSchedules(res);
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Route not found' }));
+    }
+};
+
+
+
 
 module.exports = {
     handleGenerateRevenueReport,
@@ -99,5 +119,7 @@ module.exports = {
     handleGenerateDemographicReport,
     handleGetAllDentists,
     handleGetAllPatients,
-    handleGetAllStaff
+    handleGetAllStaff,
+    handleGetAllOfficeDentists,
+    handleGetAllSchedules
 };

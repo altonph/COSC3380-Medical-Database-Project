@@ -31,9 +31,8 @@ import StaffAppointment from "./pages/staff/StaffAppointments";
 import StaffMakeAppointment from "./pages/staff/StaffMakeAppointment";
 import StaffAddVisitDetails from "./pages/staff/StaffAddVisitDetails";
 import PatientPrescriptions from "./pages/patient/PatientPrescriptions"
-import HistoryPortal from "./pages/patient/HistoryPortal"; 
+import PatientMedicalHistory from "./pages/patient/PatientMedicalHistory"; 
 import PatientVisitDetails from "./pages/patient/PatientVisitDetails";
-import PatientMedicalHistory from "./pages/patient/PatientMedicalHistory";
 import AdminPortal from "./pages/admin/AdminPortal";
 import AdminAppointment from "./pages/admin/AdminAppointments";
 import AdminPatients from "./pages/admin/AdminPatients";
@@ -48,6 +47,8 @@ import ContactPage from "./pages/ContactPage";
 import AdminRegisterDentist from "./pages/admin/AdminRegisterDentist";
 import AdminRegisterStaff from "./pages/admin/AdminRegisterStaff";
 import DemographicDataReport from "./pages/admin/DemographicDataReport";
+import AdminRegisterPatient from "./pages/admin/AdminRegisterPatient";
+import AdminDentist from "./pages/admin/AdminDentist";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -66,7 +67,6 @@ function App() {
             <Route path="/patient/home" element= {<HomePortal/>} />
             <Route path="/patient/payment" element= {<PaymentPortal/>} />
             <Route path="/patient/profile" element= {<PatientProfile/>} />
-            <Route path= "/patient/history" element= {<HistoryPortal/>} />
             <Route path="/patient/prescriptions" element= {<PatientPrescriptions/>} />
             <Route path="/patient/settings" element= {<PatientProfileSettings/>} />
             <Route path="/patient/visit" element= {<PatientVisitDetails/>} />
@@ -106,6 +106,8 @@ function App() {
             <Route path="/admin/profile" element={<AdminProfile/>}/>
             <Route path="/admin/register-dentist" element={<AdminRegisterDentist/>}/>
             <Route path="/admin/register-staff" element={<AdminRegisterStaff/>}/>
+            <Route path="/admin/register-patient" element={<AdminRegisterPatient/>}/>
+            <Route path="/admin/dentists" element={<AdminDentist/>}/>
           </Routes>
         </Router>
   );

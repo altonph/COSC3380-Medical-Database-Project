@@ -81,6 +81,7 @@ const ViewStaff = () => {
                 <li><a href="#" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
                 <li><a href="/admin/appointments" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
                 <li><a href="/admin/patients" className="block py-2 text-center text-gray-600 hover:text-black">Patients</a></li>
+                <li><a href="/admin/dentists" className="block py-2 text-center text-gray-600 hover:text-black">Dentists</a></li>
                 <li><a href="/admin/staff" className="block py-2 text-center font-bold underline">Staff</a></li>
                 <li><a href="/admin/appointment-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Appointment Data Report</a></li>
                 <li><a href="/admin/finance-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Finance Data Report</a></li>
