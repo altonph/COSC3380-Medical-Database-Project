@@ -199,7 +199,13 @@ const AdminPatients = () => {
                                     {patients.map((patient, index) => (
                                         <tr key={patient.patientID}>
                                             <td className="border px-4 py-2">{patient.patientID}</td>
-                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Policy_number" value={userData.Policy_number} onChange={(e) => handleInputChange(e, 'Policy_number')} /> : patient.Policy_number}</td>
+                                            <td className="border px-4 py-2">
+                                                {editedIndex === index ? (
+                                                    <input type="text" name="Policy_number" value={userData.Policy_number} onChange={(e) => handleInputChange(e, 'Policy_number')} />
+                                                ) : (
+                                                    patient.Policy_number ? patient.Policy_number : "None"
+                                                )}
+                                            </td>
                                             <td className="border px-4 py-2">
                                                 {editedIndex === index ? (
                                                     <select name="Insurance_Company_Name" value={userData.Insurance_Company_Name} onChange={(e) => handleInputChange(e, 'Insurance_Company_Name')}>
@@ -211,9 +217,10 @@ const AdminPatients = () => {
                                                         <option value="Spirit Dental">Spirit Dental</option>
                                                     </select>
                                                 ) : (
-                                                    patient.Insurance_Company_Name
+                                                    patient.Insurance_Company_Name ? patient.Insurance_Company_Name : "None"
                                                 )}
                                             </td>
+
                                             <td className="border px-4 py-2">
                                                 {editedIndex === index ? (
                                                     <select name="Gender" value={userData.Gender} onChange={(e) => handleInputChange(e, 'Gender')}>

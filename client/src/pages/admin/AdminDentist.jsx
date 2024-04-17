@@ -167,7 +167,7 @@ const AdminDentist = () => {
                         </nav>
                     </aside>
                     
-                    <main className="flex-1 p-4">
+                    <main className="flex-1 p-4 overflow-x-auto">
                         <div className="flex gap-4 mb-8">
                             <h1 className="text-3xl font-bold">Dentists Overview</h1>
                             <button className="bg-blue-500 hover:bg-blue-700 text-white text-lg py-1 px-4 rounded focus:outline-none focus:ring focus:border-green-300"><a href= "/admin/register-dentist">+ Add Dentist</a></button>
