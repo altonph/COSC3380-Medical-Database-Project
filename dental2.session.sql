@@ -195,7 +195,6 @@ DELETE FROM visit_details;
 
 -- @block
 DELETE FROM appointment;
-
 -- @block
 DELETE FROM invoice;
 
