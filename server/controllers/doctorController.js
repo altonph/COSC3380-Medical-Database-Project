@@ -955,14 +955,15 @@ const updateProfileByDoctorUsername = (req, res) => {
         });
         req.on('end', () => {
             const profileData = JSON.parse(body);
-            const { FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary } = profileData;
+            console.log(profileData);
+            const { firstName, lastName, specialty, email, phoneNumber, address, dob, Start_date, End_date, Is_active, Salary } = profileData;
             
             const query = `
                 UPDATE dentist 
                 SET FName = ?, LName = ?, Specialty = ?, Email = ?, Phone_num = ?, Address = ?, DOB = ?, Start_date = ?, End_date = ?, Is_active = ?, Salary = ? 
                 WHERE dentistID = ?`;
 
-            pool.query(query, [FName, LName, Specialty, Email, Phone_num, Address, DOB, Start_date, End_date, Is_active, Salary, dentistId], (error, results) => {
+            pool.query(query, [firstName, lastName, specialty, email, phoneNumber, address, dob, Start_date, End_date, Is_active, Salary, dentistId], (error, results) => {
                 if (error) {
                     console.error('Error updating dentist profile:', error);
                     res.writeHead(500, { 'Content-Type': 'application/json' });
