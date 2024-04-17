@@ -162,6 +162,7 @@ const AdminPatients = () => {
                                 <li><a href="/admin/home" className="block py-2 text-center text-gray-600 hover:text-black">Home</a></li>
                                 <li><a href="/admin/appointments" className="block py-2 text-center text-gray-600 hover:text-black">Appointments</a></li>
                                 <li><a href="/admin/patients" className="block py-2 text-center font-bold underline">Patients</a></li>
+                                <li><a href="/admin/dentists" className="block py-2 text-center text-gray-600 hover:text-black">Dentists</a></li>
                                 <li><a href="/admin/staff" className="block py-2 text-center text-gray-600 hover:text-black">Staff</a></li>
                                 <li><a href="/admin/appointment-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Appointment Data Report</a></li>
                                 <li><a href="/admin/finance-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Finance Data Report</a></li>
@@ -171,7 +172,7 @@ const AdminPatients = () => {
                     </aside>
                     
                     {/* Main Section */}
-                    <main className="flex-1 p-4">
+                    <main className="flex-1 p-4 overflow-x-auto">
                         <div className="flex gap-4 mb-8">
                             <h1 className="text-3xl font-bold">Patients Overview</h1>
                             <button className="bg-blue-500 hover:bg-blue-700 text-white text-lg py-1 px-4 rounded focus:outline-none focus:ring focus:border-green-300"><a href= "/admin/register-patient">+ Add Patient</a></button>
