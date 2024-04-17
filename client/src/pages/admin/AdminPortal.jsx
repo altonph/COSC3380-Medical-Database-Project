@@ -4,6 +4,16 @@ import Footer from "../../components/Footer";
 
 const AdminPortal = () => {
     const [dentists, setDentists] = useState([]);
+    const [adminName, setAdminName] = useState('Admin Name');
+
+    useEffect(() => {
+        const firstName = localStorage.getItem('firstName');
+        const lastName = localStorage.getItem('lastName');
+        
+        if (firstName && lastName) {
+            setAdminName(`${firstName} ${lastName}`);
+        }
+    }, []);
 
     const [editedDentist, setEditedDentist] = useState({
         dentistID: null,
@@ -353,6 +363,7 @@ const AdminPortal = () => {
                     </aside>
                     
                     <main className="flex-1 p-4">
+                        <h1 className="text-3xl font-bold mb-4 p-8">Welcome {adminName}!</h1>
                         <h1 className="text-2xl font-bold mb-4 p-8">Dentist Offices Management</h1>
                         
                         {/* Dentist table */}
