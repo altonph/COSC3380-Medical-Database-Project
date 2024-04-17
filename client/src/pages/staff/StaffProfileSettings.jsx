@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import HeaderPortalPatient from "../../components/HeaderPortalPatient";
+import HeaderPortalStaff from "../../components/HeaderPortalStaff";
 
 const StaffProfileSetting = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -87,7 +87,7 @@ const StaffProfileSetting = () => {
 
   return (
     <div>
-      <HeaderPortalPatient />
+      <HeaderPortalStaff />
       <div className="max-w-4xl mx-auto mt-8 p-4">
         <h1 className="text-3xl font-bold mb-4">Settings</h1>
         <h2 className="text-3xl font-bold mb-0 text-base">Staff Information</h2>
