@@ -8,6 +8,18 @@ const AdminPatients = () => {
     const [patients, setPatients] = useState([]);
     const [editedIndex, setEditedIndex] = useState(null);
     const [deletedIndex, setDeletedIndex] = useState(null);
+    const [userData, setUserData] = useState({
+        Policy_number: "",
+        Insurance_Company_Name: "",
+        Gender: "",
+        FName: "",
+        LName: "",
+        DOB: new Date(),
+        Email: "",
+        Phone_num: "",
+        Address: "",
+        is_active: true // Assuming default value for isActive
+    });
 
     useEffect(() => {
         fetchPatients();
@@ -28,8 +40,16 @@ const AdminPatients = () => {
     };
 
     const handleEdit = (index) => {
+        // Set editedIndex
         setEditedIndex(index);
+        // Set userData to the values of the patient being edited
+        const editedPatient = patients[index];
+        // Parse the initial DOB value to the correct format
+        editedPatient.DOB = new Date(editedPatient.DOB);
+        setUserData(editedPatient);
     };
+    
+    
 
     const handleDelete = (index) => {
         setDeletedIndex(index);
@@ -43,18 +63,44 @@ const AdminPatients = () => {
         setDeletedIndex(null);
     };
 
-    const handleConfirmEdit = async (patientID, userData) => {
+    const parseDateToSQLFormat = (date) => {
+        // Ensure date is a valid Date object
+        if (!(date instanceof Date)) {
+            throw new Error("Invalid date format");
+        }
+    
+        // Get date components
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
+        const day = String(date.getDate()).padStart(2, '0');
+    
+        // Return date in SQL format (YYYY-MM-DD)
+        return `${year}-${month}-${day}`;
+    };
+    
+    const handleConfirmEdit = async (patientID) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/dentist/editDentist/${patientID}`, {
+            // Parse date to SQL format
+            const dobSQLFormat = parseDateToSQLFormat(userData.DOB);
+            // Update userData with parsed date
+            const updatedUserData = {
+                ...userData,
+                DOB: dobSQLFormat
+            };
+    
+            console.log("Sending userData to server:", updatedUserData); // Log before sending data
+            const response = await fetch(`http://localhost:5000/api/patient/editPatient/${patientID}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(userData)
+                body: JSON.stringify(updatedUserData)
             });
             if (response.ok) {
                 // Handle success response
                 console.log('Patient profile updated successfully');
+                fetchPatients();
+                setEditedIndex(null);
             } else {
                 // Handle error response
                 console.error('Failed to update patient profile');
@@ -63,6 +109,9 @@ const AdminPatients = () => {
             console.error('Error updating patient profile:', error);
         }
     };
+    
+    
+    
     
     const handleConfirmDelete = async (patientID) => {
         try {
@@ -85,16 +134,18 @@ const AdminPatients = () => {
         }
     };
     
-    const handleInputChange = (date, index) => {
-        setPatients(prevPatients => {
-            return prevPatients.map((patient, i) => {
-                if (i === index) {
-                    return { ...patient, DOB: date };
-                }
-                return patient;
-            });
+    const handleInputChange = (value, field) => {
+        console.log("Previous userData:", userData);
+        setUserData(prevUserData => {
+            const updatedUserData = {
+                ...prevUserData,
+                [field]: field === 'DOB' ? value : value.target.value
+            };
+            console.log("Updated userData:", updatedUserData);
+            return updatedUserData;
         });
     };
+    
 
     return (
         <>
@@ -147,10 +198,10 @@ const AdminPatients = () => {
                                     {patients.map((patient, index) => (
                                         <tr key={patient.patientID}>
                                             <td className="border px-4 py-2">{patient.patientID}</td>
-                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Policy_number" value={patient.Policy_number} onChange={(e) => handleInputChange(e, index)} /> : patient.Policy_number}</td>
+                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Policy_number" value={userData.Policy_number} onChange={(e) => handleInputChange(e, 'Policy_number')} /> : patient.Policy_number}</td>
                                             <td className="border px-4 py-2">
                                                 {editedIndex === index ? (
-                                                    <select name="Insurance_Company_Name" value={patient.Insurance_Company_Name} onChange={(e) => handleInputChange(e, index)}>
+                                                    <select name="Insurance_Company_Name" value={userData.Insurance_Company_Name} onChange={(e) => handleInputChange(e, 'Insurance_Company_Name')}>
                                                         <option value="">Select</option>
                                                         <option value="Anthem">Anthem</option>
                                                         <option value="Guardian">Guardian</option>
@@ -164,7 +215,7 @@ const AdminPatients = () => {
                                             </td>
                                             <td className="border px-4 py-2">
                                                 {editedIndex === index ? (
-                                                    <select name="Gender" value={patient.Gender} onChange={(e) => handleInputChange(e, index)}>
+                                                    <select name="Gender" value={userData.Gender} onChange={(e) => handleInputChange(e, 'Gender')}>
                                                         <option value="">Select</option>
                                                         <option value="Male">Male</option>
                                                         <option value="Female">Female</option>
@@ -173,22 +224,22 @@ const AdminPatients = () => {
                                                     patient.Gender
                                                 )}
                                             </td>
-                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="FName" value={patient.FName} onChange={(e) => handleInputChange(e, index)} /> : patient.FName}</td>
-                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="LName" value={patient.LName} onChange={(e) => handleInputChange(e, index)} /> : patient.LName}</td>
+                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="FName" value={userData.FName} onChange={(e) => handleInputChange(e, 'FName')} /> : patient.FName}</td>
+                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="LName" value={userData.LName} onChange={(e) => handleInputChange(e, 'LName')} /> : patient.LName}</td>
                                             <td className="border px-4 py-2">
                                                 {editedIndex === index ? (
                                                     <DatePicker
-                                                        selected={new Date(patient.DOB)}
-                                                        onChange={(date) => handleInputChange(date, index)}
+                                                        selected={userData.DOB}
+                                                        onChange={(date) => handleInputChange(date, 'DOB')}
                                                         dateFormat="MM/dd/yyyy"
                                                     />
                                                 ) : (
                                                     new Date(patient.DOB).toLocaleDateString()
                                                 )}
                                             </td>
-                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Email" value={patient.Email} onChange={(e) => handleInputChange(e, index)} /> : patient.Email}</td>
-                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Phone_num" value={patient.Phone_num} onChange={(e) => handleInputChange(e, index)} /> : patient.Phone_num}</td>
-                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Address" value={patient.Address} onChange={(e) => handleInputChange(e, index)} /> : patient.Address}</td>
+                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Email" value={userData.Email} onChange={(e) => handleInputChange(e, 'Email')} /> : patient.Email}</td>
+                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Phone_num" value={userData.Phone_num} onChange={(e) => handleInputChange(e, 'Phone_num')} /> : patient.Phone_num}</td>
+                                            <td className="border px-4 py-2">{editedIndex === index ? <input type="text" name="Address" value={userData.Address} onChange={(e) => handleInputChange(e, 'Address')} /> : patient.Address}</td>
                                             <td className="border px-4 py-2">{patient.is_active === 1 ? "Active" : "Inactive"}</td>
                                             <td className="border px-4 py-2">
                                                 {(editedIndex !== index && deletedIndex !== index) && (
@@ -199,7 +250,7 @@ const AdminPatients = () => {
                                                 )}
                                                 {editedIndex === index && (
                                                     <>
-                                                        <button onClick={handleConfirmEdit(patient.patientID, userData)} className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-green-300">Confirm</button>
+                                                        <button onClick={() => handleConfirmEdit(patient.patientID, userData)} className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-green-300">Confirm</button>
                                                         <button onClick={handleCancelEdit} className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:ring focus:border-red-300 ml-2">Cancel</button>
                                                     </>
                                                 )}
@@ -210,7 +261,6 @@ const AdminPatients = () => {
                                                     </>
                                                 )}
                                             </td>
-
                                         </tr>
                                     ))}
                                 </tbody>
