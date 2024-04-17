@@ -13,6 +13,7 @@ const { handleAssignDentistToOffice , handleUpdateDentistOffice} = require('./ro
 const { handleAssignDentistSchedule, handleGetDentistsByOfficeAndDay, handleUpdateAppointmentWithStaff, handleGetAvailableTimeBlocks, handleGetAllDentistsByOfficeAndDay, handleEditDentistSchedule } = require('./routes/dentistRoutes');
 const { handleGenerateRevenueReport } = require('./routes/adminRoutes');    
 const { getSpecialtyByDoctorUsername } = require('./controllers/doctorController');
+const { handleGenerateDemographicReport } = require('./routes/adminRoutes');
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, UPDATE, PATCH, OPTIONS');
@@ -116,7 +117,7 @@ const server = http.createServer((req, res) => {
         handleUpdateDentistOffice(req, res);
     } else if (req.url === '/api/admin/updateSchedule' && req.method === 'POST') {
         handleEditDentistSchedule(req, res);
-    }  else if (req.url.startsWith('api/admin/demographics-data-report') && req.method === 'GET') {
+    }  else if (req.url.startsWith('/api/admin/demographics-data-report') && req.method === 'GET') {
         handleGenerateDemographicReport(req,res);
     }
     

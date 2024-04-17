@@ -145,8 +145,8 @@ return (
                                 >
                                     <option value="" disabled>Select Gender</option>
                                     <option value="All">All</option>
-                                    <option value="1">Male</option>
-                                    <option value="2">Female</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
                                 </select>
                             </div>
 
