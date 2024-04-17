@@ -39,6 +39,7 @@ const PatientProfileSetting = () => {
       if (response.ok) {
         const data = await response.json();
         console.log(data);
+        data.DOB = data.DOB.split('T')[0];
         setEditedProfile(data);
       } else {
         console.error("Failed to fetch patient profile:", response.statusText);
@@ -168,12 +169,12 @@ const PatientProfileSetting = () => {
             <label className="block mb-2">Date of Birth:</label>
             {isEditing ? (
               <input
-                type="date"
-                name="DOB"
-                value={editedProfile.DOB}
-                onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              />
+              type="date"
+              name="DOB"
+              value={editedProfile.DOB} // Set the value directly without formatting
+              onChange={handleInputChange}
+              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+            />            
             ) : (
               <div className="border border-gray-300 rounded-md py-2 px-3">{formatDOB(editedProfile.DOB)}</div>
             )}
