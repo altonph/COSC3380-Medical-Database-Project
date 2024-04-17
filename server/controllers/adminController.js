@@ -84,7 +84,7 @@ const generateAppointmentDataReport = (req, res, office_id, start_date, end_date
     });
 };
 
-const generateRevenueReport = (req, res, office, startDate, endDate) => {
+const generateRevenueReport = (req, res, office, type, startDate, endDate) => {
     let sqlQuery = `
         SELECT 
             a.Appointment_Type,
@@ -110,6 +110,11 @@ const generateRevenueReport = (req, res, office, startDate, endDate) => {
     if (startDate && endDate) {
         sqlQuery += ` AND a.Date BETWEEN ? AND ?`;
         queryParams.push(startDate, endDate);
+    }
+
+    if (type && type !== 'All') {
+        sqlQuery += ` AND a.Appointment_Type = ?`;
+        queryParams.push(type);
     }
 
     sqlQuery += ` ORDER BY a.Appointment_Type`;

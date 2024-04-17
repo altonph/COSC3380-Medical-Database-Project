@@ -30,10 +30,11 @@ const handleGenerateRevenueReport = (req, res) => {
         const queryParams = new URLSearchParams(queryParamss[1]);
 
         const office = queryParams.get('office');
+        const type = queryParams.get('type');
         const startDate = queryParams.get('startDate');
         const endDate = queryParams.get('endDate');
 
-        generateRevenueReport(req, res, office, startDate, endDate);
+        generateRevenueReport(req, res, office, type, startDate, endDate);
 
     } else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
