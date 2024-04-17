@@ -120,8 +120,6 @@ const server = http.createServer((req, res) => {
         handleGenerateDemographicReport(req,res);
     }
     
-    
-    
     //handleUpdateAppointmentWithStaff
     // doctor pages
     else if (req.url === '/api/doctor/patients' || req.url.startsWith('/api/doctor/patients/') || req.url.startsWith('/api/doctor/appointments/') || req.url === ('/api/doctor/appointments') || req.url === ('/api/doctor/visit-details')) {

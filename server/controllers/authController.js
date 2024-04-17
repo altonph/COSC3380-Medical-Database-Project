@@ -665,25 +665,54 @@ function archiveDentist(dentistID, End_date, res) {
                 return;
             }
 
-            // Invalidate login credentials
+            // Invalidate login credentials by updating password only
             pool.query(
-                'UPDATE login SET Password = NULL, User_role = NULL WHERE dentistID = ?',
-                [dentistID],
+                'UPDATE login SET Password = ? WHERE dentistID = ?',
+                [null, dentistID],
                 (error, results) => {
                     if (error) {
-                        console.error('Error invalidating login credentials for dentist:', error);
+                        console.error('Error updating password for dentist:', error);
                         res.writeHead(500);
-                        res.end('Error invalidating login credentials for dentist');
+                        res.end('Error updating password for dentist');
                         return;
                     }
 
-                    res.writeHead(200);
-                    res.end('Dentist archived successfully');
+                    // Delete associated office_dentist entries
+                    pool.query(
+                        'DELETE FROM office_dentist WHERE dentistID = ?',
+                        [dentistID],
+                        (error, results) => {
+                            if (error) {
+                                console.error('Error deleting associated office_dentist entries:', error);
+                                res.writeHead(500);
+                                res.end('Error deleting associated office_dentist entries');
+                                return;
+                            }
+
+                            // Delete associated schedule entries
+                            pool.query(
+                                'DELETE FROM schedule WHERE dentistID = ?',
+                                [dentistID],
+                                (error, results) => {
+                                    if (error) {
+                                        console.error('Error deleting associated schedule entries:', error);
+                                        res.writeHead(500);
+                                        res.end('Error deleting associated schedule entries');
+                                        return;
+                                    }
+
+                                    res.writeHead(200);
+                                    res.end('Dentist archived successfully');
+                                }
+                            );
+                        }
+                    );
                 }
             );
         }
     );
 }
+
 
 function archivePatient(patientID, res) {
     pool.query(
