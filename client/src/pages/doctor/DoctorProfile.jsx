@@ -74,7 +74,7 @@ const DoctorProfile = () => {
     <div>
       <HeaderPortalDoctor />
       <div className="max-w-4xl mx-auto mt-8 p-4">
-        <h1 className="text-3xl font-bold mb-4">Doctor Profile</h1>
+        <h1 className="text-3xl font-bold mb-4">Dentist Profile</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
