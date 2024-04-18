@@ -14,7 +14,7 @@ const assignDentistSchedule = (officeID, dentistID, schedule, res) => {
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'Internal Server Error' }));
             } else {
-                console.log('Schedule assigned to dentist at office successfully');
+                //console.log('Schedule assigned to dentist at office successfully');
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ message: 'Schedule assigned to dentist at office successfully' }));
             }
@@ -37,7 +37,7 @@ const editDentistSchedule = (req, res) => {
                 res.end(JSON.stringify({ error: 'Internal Server Error' }));
                 return;
             } else {
-                console.log('Dentist schedule updated successfully');
+                //console.log('Dentist schedule updated successfully');
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ message: 'Dentist schedule updated successfully' }));
                 return;
@@ -134,7 +134,7 @@ const updateAppointmentWithStaff = (dentistID, patientID, date, startTime, staff
                             connection.release();
                         });
                     } else {
-                        console.log('Appointment updated with staff member successfully');
+                        //console.log('Appointment updated with staff member successfully');
                         connection.commit(err => {
                             if (err) {
                                 console.error('Error committing transaction:', err);

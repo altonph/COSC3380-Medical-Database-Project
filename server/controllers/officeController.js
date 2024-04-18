@@ -130,7 +130,7 @@ const updateDentistOffice = (dentistID, newOfficeIDs, res) => {
                                                                 });
                                                                 return;
                                                             }
-                                                            console.log('Dentist office updated successfully');
+                                                            //console.log('Dentist office updated successfully');
                                                             res.writeHead(200, { 'Content-Type': 'application/json' });
                                                             res.end(JSON.stringify({ message: 'Dentist assigned to office successfully' }));
                                                             // Release connection back to the pool
@@ -166,7 +166,7 @@ const updateDentistOffice = (dentistID, newOfficeIDs, res) => {
                                                         });
                                                         return;
                                                     }
-                                                    console.log('Dentist office updated successfully');
+                                                    //console.log('Dentist office updated successfully');
                                                     res.writeHead(200, { 'Content-Type': 'application/json' });
                                                     res.end(JSON.stringify({ message: 'Dentist assigned to office successfully' }));
                                                     // Release connection back to the pool
