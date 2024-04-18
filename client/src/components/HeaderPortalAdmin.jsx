@@ -33,7 +33,7 @@ const HeaderPortalAdmin = () => {
 
   return (
     <header className="flex max-w-screen justify-between items-center bg-blue-900 text-white p-4">
-      <div className="font-bold text-xl"><a href="/">ShastaDental Admin Portal</a></div>
+      <div className="font-bold text-xl"><a href="/admin/home">ShastaDental Admin Portal</a></div>
       <nav>
         <ul className="flex space-x-4">
           <li>
