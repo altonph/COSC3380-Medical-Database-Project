@@ -10,29 +10,27 @@ function AppointmentDataReport() {
   const [end_date, setEndDate] = useState('');
   const [specialty, setSpecialty] = useState('');
   const [status, setStatus] = useState('');
-  const [appointmentType, setAppointmentType] = useState(''); // State for appointment type filter
+  const [appointmentType, setAppointmentType] = useState('');
   const [mainResults, setMainResults] = useState([]);
   const [percentageResults, setPercentageResults] = useState({});
   const [showReport, setShowReport] = useState(false);
   const [totalAppointments, setTotalAppointments] = useState(0);
 
-  const [filterLogs, setFilterLogs] = useState({}); // State to store filter logs
+  const [filterLogs, setFilterLogs] = useState({});
 
   const logSetter = (setter, value) => {
-    setFilterLogs({ ...filterLogs, [setter]: value }); // Log the setter and its value
+    setFilterLogs({ ...filterLogs, [setter]: value });
   };
 
   const handleGenerateReport = async () => {
     try {
-      console.log("Sending request with filters:", { office_id, start_date, end_date, status, specialty, appointmentType }); // Log filter values before sending request
-
       const formData = new URLSearchParams();
       formData.append('office_id', office_id);
-      formData.append('start_date', start_date || ''); // Set empty string if start_date is null
-      formData.append('end_date', end_date || ''); // Set empty string if end_date is null
+      formData.append('start_date', start_date || '');
+      formData.append('end_date', end_date || '');
       formData.append('status', status);
       formData.append('specialty', specialty);
-      formData.append('appointmentType', appointmentType); // Include appointment type in the request
+      formData.append('appointmentType', appointmentType);
 
       const response = await fetch('http://localhost:5000/api/admin/appointment-data-report', {
         method: 'POST',
@@ -43,9 +41,12 @@ function AppointmentDataReport() {
         throw new Error('Failed to fetch data');
       }
       const data = await response.json();
-      console.log("Received data:", data.mainResults);
-      setMainResults(data.mainResults);
-      calculatePercentageResults(data.mainResults);
+      
+      // Sort mainResults by date in ascending order
+      const sortedResults = data.mainResults.sort((a, b) => new Date(a.Date) - new Date(b.Date));
+
+      setMainResults(sortedResults);
+      calculatePercentageResults(sortedResults);
       setShowReport(true);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -89,7 +90,7 @@ function AppointmentDataReport() {
   };
 
   const handleApplyFilters = () => {
-    setShowReport(false); // Hide the report until the data is fetched with new filters
+    setShowReport(false);
     handleGenerateReport();
   };
 
@@ -100,7 +101,6 @@ function AppointmentDataReport() {
       </nav>
 
       <div className="flex flex-1">
-        {/* Sidebar */}
         <aside className="w-1/6 bg-gray-200 text-black">
           <nav className="p-4 text-xl">
             <ul>
@@ -112,7 +112,6 @@ function AppointmentDataReport() {
               <li><a href="/admin/appointment-data-report" className="block py-2 text-center font-bold underline">Appointment Data Report</a></li>
               <li><a href="/admin/finance-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Finance Data Report</a></li>
               <li><a href="/admin/demographic-data-report" className="block py-2 text-center text-gray-600 hover:text-black">Demographic Data Report</a></li>
-
             </ul>
           </nav>
         </aside>
@@ -122,7 +121,6 @@ function AppointmentDataReport() {
           <div className="mt-8">
             <h2 className="text-xl font-bold mb-4">Filters:</h2>
             <div className="flex flex-wrap gap-4">
-              {/* Office Filter */}
               <div className="flex items-center">
                 <select
                   value={office_id}
@@ -134,28 +132,24 @@ function AppointmentDataReport() {
                   <option value="2">Arizona Office</option>
                 </select>
               </div>
-              {/* Start Date Filter */}
               <div className="flex items-center">
                 <DatePicker
                   selected={start_date ? new Date(start_date) : null}
                   onChange={(date) => { setStartDate(date ? date.toISOString() : ''); logSetter('setStartDate', date ? date.toISOString() : ''); }}
                   className="border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300 bg-gray-100"
-                  isClearable={true} // Allow unselecting dates
+                  isClearable={true}
                   placeholderText="Select Date"
                 />
               </div>
-
-              {/* End Date Filter */}
               <div className="flex items-center">
                 <DatePicker
                   selected={end_date ? new Date(end_date) : null}
                   onChange={(date) => { setEndDate(date ? date.toISOString() : ''); logSetter('setEndDate', date ? date.toISOString() : ''); }}
                   className="border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300 bg-gray-100"
-                  isClearable={true} // Allow unselecting dates
+                  isClearable={true}
                   placeholderText="Select Date"
                 />
               </div>
-              {/* Specialty Filter */}
               <div className="flex items-center">
                 <select
                   value={specialty}
@@ -167,7 +161,6 @@ function AppointmentDataReport() {
                   <option value="Endodontist">Endodontist</option>
                 </select>
               </div>
-              {/* Status Filter */}
               <div className="flex items-center">
                 <select
                   value={status}
@@ -180,7 +173,6 @@ function AppointmentDataReport() {
                   <option value="Completed">Completed</option>
                 </select>
               </div>
-              {/* Appointment Type Filter */}
               <div className="flex items-center">
                 <select
                   value={appointmentType}
@@ -191,33 +183,32 @@ function AppointmentDataReport() {
                   <option value="Cleaning">Cleaning</option>
                   <option value="Extraction">Extraction</option>
                   <option value="Root Canal">Root Canal</option>
-                  {/* Add more options as needed */}
                 </select>
               </div>
             </div>
-            {/* Generate Report Button */}
             <div className="mt-4">
               <button onClick={handleApplyFilters} className="bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300 hover:bg-blue-600">Generate Report</button>
             </div>
           </div>
-          {/* Display main results table */}
           {showReport && (
             <div className="mt-8 flex flex-wrap">
-              <div className="w-3/4 pr-4">
+              <div className="w-full pr-4">
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse border border-gray-300">
                     <thead>
                       <tr className="bg-gray-100 border-b border-gray-300">
-                        <th className="py-2 px-4 border-r border-gray-300">Dentist</th>
-                        <th className="py-2 px-4 border-r border-gray-300">Appointment Type</th>
-                        <th className="py-2 px-4 border-r border-gray-300">Start Time</th>
-                        <th className="py-2 px-4 border-r border-gray-300">End Time</th>
-                        <th className="py-2 px-4 border-r border-gray-300">Appointment Status</th>
+                        <th className="py-2 px-4 border-r border-gray-300">Date</th>
+                        <th className="py-2 px-4 border-r border-gray-300 cursor-pointer">Dentist</th>
+                        <th className="py-2 px-4 border-r border-gray-300 cursor-pointer">Appointment Type</th>
+                        <th className="py-2 px-4 border-r border-gray-300 cursor-pointer">Start Time</th>
+                        <th className="py-2 px-4 border-r border-gray-300 cursor-pointer">End Time</th>
+                        <th className="py-2 px-4 border-r border-gray-300 cursor-pointer">Appointment Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {mainResults.map((result, index) => (
                         <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : ""}>
+                          <td className="py-2 px-4 border-r border-gray-300">{new Date(result.Appointment_Date).toLocaleDateString()}</td>
                           <td className="py-2 px-4 border-r border-gray-300">{`${result.Dentist_FirstName} ${result.Dentist_LastName}`}</td>
                           <td className="py-2 px-4 border-r border-gray-300">{result.Appointment_type}</td>
                           <td className="py-2 px-4 border-r border-gray-300">{result.Start_time}</td>
@@ -229,10 +220,9 @@ function AppointmentDataReport() {
                   </table>
                 </div>
               </div>
-              {/* Display percentage results table */}
-              <div className="w-1/4 bg-gray-100 p-4">
+              <div className="w-full bg-gray-100 p-4">
                 <h2 className="text-xl font-bold mb-4">Metrics</h2>
-                <table className="w-full">
+                <table className="w-1/4">
                   <tbody>
                     <tr>
                       <td className="py-2 font-bold">Total Appointments:</td>
@@ -257,7 +247,6 @@ function AppointmentDataReport() {
           )}
         </div>
       </div>
-
       <Footer />
     </div>
   );

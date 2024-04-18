@@ -1,7 +1,7 @@
 // adminController.js
 const pool = require('../models/db');
 
-const generateAppointmentDataReport = (req, res, office_id, start_date, end_date, status, specialty, appointmentType) => { // Add appointmentType parameter
+const generateAppointmentDataReport = (req, res, office_id, start_date, end_date, status, specialty, appointmentType) => {
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error getting database connection:', err);
@@ -35,7 +35,7 @@ const generateAppointmentDataReport = (req, res, office_id, start_date, end_date
             conditions.push('d.Specialty = ?');
             params.push(specialty);
         }
-        if (appointmentType) { // Add condition for appointmentType
+        if (appointmentType) {
             conditions.push('a.Appointment_type = ?');
             params.push(appointmentType);
         }
@@ -48,6 +48,7 @@ const generateAppointmentDataReport = (req, res, office_id, start_date, end_date
                 d.FName AS Dentist_FirstName,
                 d.LName AS Dentist_LastName,
                 a.Appointment_type,
+                a.Date AS Appointment_Date,
                 a.Start_time,
                 a.End_time,
                 a.Appointment_status,
@@ -63,6 +64,7 @@ const generateAppointmentDataReport = (req, res, office_id, start_date, end_date
                 d.FName,
                 d.LName,
                 a.Appointment_type,
+                a.Date,
                 a.Start_time,
                 a.End_time,
                 a.Appointment_status;
@@ -83,6 +85,7 @@ const generateAppointmentDataReport = (req, res, office_id, start_date, end_date
         });
     });
 };
+
 
 const generateRevenueReport = (req, res, office, type, startDate, endDate) => {
     let sqlQuery = `
