@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import HeaderPortalStaff from "../../components/HeaderPortalStaff";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const StaffProfileSetting = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -10,9 +12,13 @@ const StaffProfileSetting = () => {
     Lname: '',
     Email: '',
     Phone_num: '',
-    DOB: '',
+    DOB: new Date(), // Initialize DOB as a Date object
     Address: '',
-    Start_date: ''
+    Start_date: new Date(), // Initialize Start_date as a Date object
+    Position: '',
+    End_date: null,
+    Is_active: true,
+    Salary: 0
   });
 
   useEffect(() => {
@@ -33,7 +39,8 @@ const StaffProfileSetting = () => {
         console.log(data);
         setEditedProfile({
           ...data,
-          DOB: formatDateForInput(data.DOB) // Format DOB for input
+          DOB: new Date(data.DOB), // Set DOB as a Date object
+          Start_date: new Date(data.Start_date) // Set Start_date as a Date object
         });
       } else {
         console.error("Failed to fetch staff profile:", response.statusText);
@@ -41,14 +48,6 @@ const StaffProfileSetting = () => {
     } catch (error) {
       console.error("Error fetching staff profile:", error);
     }
-  };
-
-  const formatDateForInput = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
-    const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if needed
-    return `${year}-${month}-${day}`;
   };
 
   const handleProfileUpdate = async () => {
@@ -61,8 +60,8 @@ const StaffProfileSetting = () => {
         },
         body: JSON.stringify({
           ...editedProfile,
-          DOB: formatDateForInput(editedProfile.DOB), // Format DOB for server
-          Start_date: formatDateForInput(editedProfile.Start_date)
+          DOB: formatDateForServer(editedProfile.DOB), // Format DOB for server
+          Start_date: formatDateForServer(editedProfile.Start_date) // Format Start_date for server
         })
       });
 
@@ -83,6 +82,18 @@ const StaffProfileSetting = () => {
       ...editedProfile,
       [name]: value
     });
+  };
+
+  const formatDateForServer = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  const formatDateForInput = (dateString) => {
+    const date = new Date(dateString);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
   };
 
   return (
@@ -129,15 +140,14 @@ const StaffProfileSetting = () => {
           <div>
             <label className="block mb-2">Date of Birth:</label>
             {isEditing ? (
-              <input
-                type="date"
-                name="DOB"
-                value={editedProfile.DOB} // Set the value directly without formatting
-                onChange={handleInputChange}
+              <DatePicker
+                selected={editedProfile.DOB}
+                onChange={date => setEditedProfile({...editedProfile, DOB: date})}
+                dateFormat="MM/dd/yyyy"
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
               />            
             ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.DOB}</div>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{formatDateForInput(editedProfile.DOB)}</div>
             )}
           </div>
 
