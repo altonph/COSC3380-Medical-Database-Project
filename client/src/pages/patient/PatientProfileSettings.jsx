@@ -1,26 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import HeaderPortalPatient from "../../components/HeaderPortalPatient";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const PatientProfileSetting = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-
   const [editedProfile, setEditedProfile] = useState({
-    patientID: null,
-    insuranceID: null,
-    dentistID: null,
-    Insurance_Company_Name: '',
-    Policy_number: '',
     FName: '',
     LName: '',
     Gender: '',
-    DOB: '',
+    DOB: new Date(),
     Email: '',
     Phone_num: '',
     Address: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    Insurance_Company_Name: '',
+    Policy_number: ''
   });
 
   useEffect(() => {
@@ -39,7 +33,7 @@ const PatientProfileSetting = () => {
       if (response.ok) {
         const data = await response.json();
         console.log(data);
-        data.DOB = data.DOB.split('T')[0];
+        data.DOB = new Date(data.DOB); // Convert string date to Date object
         setEditedProfile(data);
       } else {
         console.error("Failed to fetch patient profile:", response.statusText);
@@ -47,14 +41,6 @@ const PatientProfileSetting = () => {
     } catch (error) {
       console.error("Error fetching patient profile:", error);
     }
-  };
-
-  const formatDOB = (dob) => {
-    const date = new Date(dob);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
-    const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if needed
-    return `${year}-${month}-${day}`;
   };
 
   const handleInputChange = (e) => {
@@ -74,9 +60,9 @@ const PatientProfileSetting = () => {
   };
 
   const handleProfileUpdate = async () => {
-    // Format Date of Birth
-    const formattedDOB = formatDOB(editedProfile.DOB);
-  
+    // Format Date of Birth to YYYY-MM-DD
+    const formattedDOB = editedProfile.DOB.toISOString().split('T')[0];
+    
     try {
       const response = await fetch("http://localhost:5000/api/patient/profile/update", {
         method: "PATCH",
@@ -99,12 +85,8 @@ const PatientProfileSetting = () => {
     } catch (error) {
       console.error("Error updating patient profile:", error);
     }
-  };  
-
-  const handlePasswordChange = () => {
-    console.log('Password changed');
-    setIsChangingPassword(false);
   };
+  
 
   return (
     <div>
@@ -168,15 +150,13 @@ const PatientProfileSetting = () => {
           <div>
             <label className="block mb-2">Date of Birth:</label>
             {isEditing ? (
-              <input
-              type="date"
-              name="DOB"
-              value={editedProfile.DOB} // Set the value directly without formatting
-              onChange={handleInputChange}
-              className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-            />            
+              <DatePicker
+                selected={editedProfile.DOB}
+                onChange={(date) => setEditedProfile({ ...editedProfile, DOB: date })}
+                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+              />
             ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{formatDOB(editedProfile.DOB)}</div>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.DOB.toLocaleDateString()}</div>
             )}
           </div>
 
@@ -185,7 +165,7 @@ const PatientProfileSetting = () => {
             <label className="block mb-2">Email:</label>
             {isEditing ? (
               <input
-                type="Email"
+                type="email"
                 name="Email"
                 value={editedProfile.Email}
                 onChange={handleInputChange}
@@ -228,14 +208,14 @@ const PatientProfileSetting = () => {
             )}
           </div>
 
-         {/* Insurance Name */}
+          {/* Insurance Company Name */}
           <div>
-            <label className="block mb-2">Insurance Name:</label>
+            <label className="block mb-2">Insurance Company Name:</label>
             {isEditing ? (
               <select
                 name="Insurance_Company_Name"
                 value={editedProfile.Insurance_Company_Name}
-                onChange={handleInsuranceCompanyNameChange} 
+                onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
               >
                 <option value="Anthem">Anthem</option>
@@ -264,39 +244,34 @@ const PatientProfileSetting = () => {
               <div className="border border-gray-300 rounded-md py-2 px-3">{editedProfile.Policy_number}</div>
             )}
           </div>
-          
         </div>
-        
+
         {/* Edit Button */}
         <div>
-        {isEditing ? (
-          <div className="flex">
+          {isEditing ? (
+            <div className="flex">
+              <button
+                onClick={handleProfileUpdate}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 block mb-2 mt-4 mr-2"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 block mb-2 mt-4"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
             <button
-              onClick={handleProfileUpdate}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 block mb-2 mt-4 mr-2"
+              onClick={() => setIsEditing(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 block mb-2 mt-4"
             >
-              Save Changes
+              Edit Information
             </button>
-            <button
-              onClick={() => {
-                setIsEditing(false);
-                setEditedProfile(defaultValues); // Reset editedProfile to default values
-              }}
-              className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 block mb-2 mt-4"
-            >
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 block mb-2 mt-4"
-          >
-            Edit Information
-          </button>
-        )}
-      </div>
-
+          )}
+        </div>
       </div>
     </div>
   );

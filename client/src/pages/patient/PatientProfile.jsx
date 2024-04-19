@@ -59,12 +59,17 @@ const PatientProfile = () => {
     }
   };
 
-  const formatDOB = (dob) => {
-    const date = new Date(dob);
+  const formatDOB = (dateString) => {
+    const date = new Date(dateString);
+    const month = date.getMonth() + 1; // Months are zero-indexed
+    const day = date.getDate();
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
-    const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if needed
-    return `${year}-${month}-${day}`;
+  
+    // Pad single digit month or day with leading zero
+    const formattedMonth = month < 10 ? `0${month}` : month;
+    const formattedDay = day < 10 ? `0${day}` : day;
+  
+    return `${formattedMonth}/${formattedDay}/${year}`;
   };
 
   return (

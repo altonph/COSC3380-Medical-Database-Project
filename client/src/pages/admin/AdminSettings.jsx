@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const DoctorSettings = () => {
+const AdminSettings = () => {
     const [editable, setEditable] = useState(false);
     const [doctorInfo, setDoctorInfo] = useState({
         firstName: '',
@@ -106,7 +106,7 @@ const DoctorSettings = () => {
     <div>
       <HeaderPortalDoctor />
       <div className="max-w-4xl mx-auto mt-8 p-4">
-        <h1 className="text-3xl font-bold mb-4">Dentist Settings</h1>
+        <h1 className="text-3xl font-bold mb-4">Admin Settings</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -239,4 +239,4 @@ const DoctorSettings = () => {
   );
 };
 
-export default DoctorSettings;
+export default AdminSettings;

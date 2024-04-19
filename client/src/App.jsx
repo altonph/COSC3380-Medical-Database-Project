@@ -54,6 +54,7 @@ import AdminDentist from "./pages/admin/AdminDentist";
 import AdminAddVisitDetails from "./pages/admin/AdminAddVisitDetails";
 import StaffProfile from "./pages/staff/StaffProfile";
 import StaffProfileSetting from "./pages/staff/StaffProfileSettings";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 //import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
@@ -118,6 +119,7 @@ function App() {
             <Route path="/admin/dentists" element={<AdminDentist/>}/>
             <Route path="/staff/profile" element={<StaffProfile/>}/>
             <Route path="/staff/settings" element={<StaffProfileSetting/>}/>
+            <Route path="/admin/settings" element={<AdminSettings/>}/>
           </Routes>
         </Router>
   );
