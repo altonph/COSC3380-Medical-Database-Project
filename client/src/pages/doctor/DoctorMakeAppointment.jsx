@@ -464,21 +464,23 @@ const DoctorMakeAppointment = () => {
                 </div>
               ))}
 
-              <div className="mb-4">
-                <label className="block text-sm font-bold mb-2">Assisting Hygienist:</label>
-                <select
-                  value={selectedAssistingHygienist}
-                  onChange={(e) => setSelectedAssistingHygienist(e.target.value)}
-                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                >
-                <option value="">None</option>
-                {availableStaff.map((staffID) => (
-                  <option key={staffID} value={staffID}>
-                    {`Staff ID: ${staffID}`}
-                  </option>
-                ))}
-                </select>
-              </div>
+              {(availableStaff.length > 0 && (
+                      <div className="mb-4">
+                        <label className="block text-sm font-bold mb-2">Assisting Hygienist:</label>
+                        <select
+                          value={selectedAssistingHygienist}
+                          onChange={(e) => setSelectedAssistingHygienist(e.target.value)}
+                          className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                        >
+                          <option value="">None</option>
+                          {availableStaff.map((staff) => (
+                            <option key={staff.staffID} value={staff.staffID}>
+                              {`${staff.Fname} ${staff.Lname} - Staff ID: ${staff.staffID}`}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
   
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Reason for Appointment:</label>

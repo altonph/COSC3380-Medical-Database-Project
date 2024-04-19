@@ -227,7 +227,7 @@ const getAppointmentsByDoctorUsername = (req, res, username) => {
         }
 
         const doctorId = results[0].DentistID;
-        pool.query('SELECT * FROM appointment WHERE dentistID = ?', [doctorId], (error, results) => {
+        pool.query('SELECT appointment.*, patient.FName AS PatientFirstName, patient.LName AS PatientLastName, staff.Fname AS StaffFirstName, staff.Lname AS StaffLastName FROM appointment JOIN patient ON appointment.patientID = patient.patientID LEFT JOIN staff ON appointment.staffID = staff.staffID WHERE appointment.dentistID = ?', [doctorId], (error, results) => {
             if (error) {
                 console.error('Error retrieving appointments:', error);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -241,7 +241,7 @@ const getAppointmentsByDoctorUsername = (req, res, username) => {
             });
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(results));
+            res.end(JSON.stringify(formattedResults));
         });
     });
 };
@@ -754,32 +754,31 @@ const getAvailableStaff = (req, res) => {
             `;
 
             const availableStaffQuery = `
-                SELECT DISTINCT staffID
+                SELECT DISTINCT staff.staffID, staff.Fname, staff.Lname
                 FROM staff
-                WHERE officeID = ?
-                AND staffID NOT IN (
-                    SELECT DISTINCT staffID
-                    FROM appointment
-                    WHERE officeID = ?
-                    AND Date = ?
-                    AND Appointment_status <> 'Cancelled'
-                    AND ((Start_time >= ? AND Start_time < ?)
-                    OR (End_time > ? AND End_time <= ?)
-                    OR (Start_time <= ? AND End_time >= ?))
-                )
-                AND position = 'Hygienist'
+                LEFT JOIN appointment ON staff.staffID = appointment.staffID
+                WHERE staff.officeID = ?
+                AND staff.position = 'Hygienist'
+                AND (appointment.staffID IS NULL OR (
+                    appointment.Date != ?
+                    OR NOT (
+                        (appointment.Start_time >= ? AND appointment.Start_time < ?)
+                        OR (appointment.End_time > ? AND appointment.End_time <= ?)
+                        OR (appointment.Start_time <= ? AND appointment.End_time >= ?)
+                    )
+                ))
             `;
 
             const overlappingStaffResults = await pool.promise().query(overlappingStaffQuery, [officeID, date, startTime, endTime, startTime, endTime, startTime, endTime]);
-            const availableStaffResults = await pool.promise().query(availableStaffQuery, [officeID, officeID, date, startTime, endTime, startTime, endTime, startTime, endTime]);
+            const availableStaffResults = await pool.promise().query(availableStaffQuery, [officeID, date, startTime, endTime, startTime, endTime, startTime, endTime]);
 
             const overlappingStaffIDs = overlappingStaffResults[0].map(row => row.staffID);
-            const availableStaffIDs = availableStaffResults[0].map(row => row.staffID);
+            const availableStaff = availableStaffResults[0];
 
-            const availableStaff = availableStaffIDs.filter(staffID => !overlappingStaffIDs.includes(staffID));
+            const filteredAvailableStaff = availableStaff.filter(staff => !overlappingStaffIDs.includes(staff.staffID));
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ availableStaff }));
+            res.end(JSON.stringify({ availableStaff: filteredAvailableStaff }));
         } catch (error) {
             console.error('Error parsing request body:', error);
             res.writeHead(400, { 'Content-Type': 'application/json' });
