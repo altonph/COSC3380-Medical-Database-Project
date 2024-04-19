@@ -547,9 +547,26 @@ const checkPatientExistence = (req, res) => {
                     }
 
                     const patientCount = results[0].patientCount;
-                    const patientExists = patientCount > 0;
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ patientExists }));
+                    if (patientCount > 0) {
+                        pool.query(
+                            'SELECT patientID FROM patient WHERE FName = ? AND LName = ? AND DOB = ?',
+                            [patientFirstName, patientLastName, patientDOB],
+                            (error, results) => {
+                                if (error) {
+                                    console.error('Error retrieving patientID:', error);
+                                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                                    return;
+                                }
+                                const patientID = results[0].patientID;
+                                res.writeHead(200, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify({ patientExists: true, patientID }));
+                            }
+                        );
+                    } else {
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ patientExists: false }));
+                    }
                 }
             );
         } catch (error) {

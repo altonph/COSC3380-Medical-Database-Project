@@ -22,31 +22,9 @@ const StaffMakeAppointment = () => {
   const [availableStaff, setAvailableStaff] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedAssistingHygienist, setSelectedAssistingHygienist] = useState(availableStaff.length > 0 ? availableStaff[0] : '');
-
-  useEffect(() => {
-    fetchPatientID();
-  }, []);
-
-  const fetchPatientID = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/patient/id', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPatientID(data.patientID);
-        console.log(data.patientID);
-      } else {
-        console.error('Failed to fetch patient ID:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error fetching patient ID:', error);
-    }
-  };
+  const [patientFirstName, setPatientFirstName] = useState('');
+  const [patientLastName, setPatientLastName] = useState('');
+  const [patientDOB, setPatientDOB] = useState(null);
 
   useEffect(() => {
     if (location && preferredDate) {
@@ -152,60 +130,68 @@ const StaffMakeAppointment = () => {
   
   const checkPatientExistence = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/doctor/appointments/check-patientID', {
+      const formattedDOB = patientDOB.toISOString().substring(0, 10);
+  
+      const response = await fetch('http://localhost:5000/api/doctor/appointments/check-patient', {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ patientID })
+        body: JSON.stringify({
+          patientFirstName: patientFirstName,
+          patientLastName: patientLastName,
+          patientDOB: formattedDOB,
+        })
       });
+  
       if (response.ok) {
         const data = await response.json();
-        return data.patientExists;
+        console.log('Patient exists:', data); 
+        setPatientID(data.patientID); 
+        return { patientExists: data.patientExists, patientID: data.patientID };
       } else {
         console.error('Error checking patient existence:', response.statusText);
-        return false;
+        return { patientExists: false, patientID: null };
       }
     } catch (error) {
       console.error('Error checking patient existence:', error);
-      return false;
+      return { patientExists: false, patientID: null };
     }
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const staffID = selectedAssistingHygienist !== "" ? selectedAssistingHygienist : null;
 
+    // Convert selected start time to Date object
     const startTimeParts = selectedStartTime.split(' ');
     const startHour = parseInt(startTimeParts[0].split(':')[0]);
     const startMinute = parseInt(startTimeParts[0].split(':')[1]);
     const startPeriod = startTimeParts[1];
-
     const startHour24 = (startPeriod === 'PM' && startHour !== 12) ? startHour + 12 : startHour;
+    const formattedStartTime = new Date(preferredDate);
+    formattedStartTime.setHours(startHour24, startMinute, 0, 0);
 
-    const startTimeInMinutes = startHour24 * 60 + startMinute;
+    // Calculate end time
+    const endTimeInMinutes = formattedStartTime.getMinutes() + 60;
+    const formattedEndTime = new Date(formattedStartTime);
+    formattedEndTime.setMinutes(endTimeInMinutes);
 
-    const endTimeInMinutes = startTimeInMinutes + 60; 
+    const sqlFormattedDate = formattedStartTime.toISOString().split('T')[0];
 
-    const endHour24 = Math.floor(endTimeInMinutes / 60) % 24;
-    const endMinute = endTimeInMinutes % 60;
+    const { patientExists, patientID: fetchedPatientID } = await checkPatientExistence();
 
-    const formattedStartTime = `${startHour24}:${startMinute}:00`;
-    const formattedEndTime = `${endHour24}:${endMinute}:00`;
-
-    console.log("Formatted start time is ", formattedStartTime);
-    console.log("Formatted end time is ", formattedEndTime);
-
-    const sqlFormattedDate = preferredDate.toISOString().split('T')[0];
-
-    const patientExists = await checkPatientExistence();
     if (!patientExists) {
         console.log('Insertion failed, patient does not exist');
         setErrorMessage("This patient does not exist");
         return;
     }
+
+    setPatientID(fetchedPatientID);
+    const formattedDOB = patientDOB.toISOString().substring(0, 10);
 
     try {
         const response = await fetch('http://localhost:5000/api/doctor/appointments', {
@@ -215,17 +201,20 @@ const StaffMakeAppointment = () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                officeID: location,
-                dentistID: practitioner,
-                staffID: staffID, 
-                patientID: patientID,
+                officeID: parseInt(location), 
+                dentistID: parseInt(practitioner), 
+                staffID: staffID ? parseInt(staffID.staffID) : null, 
+                patientID: fetchedPatientID,
                 Date: sqlFormattedDate,
-                Start_time: formattedStartTime,
-                End_time: formattedEndTime,
+                Start_time: formattedStartTime.toTimeString().split(' ')[0], 
+                End_time: formattedEndTime.toTimeString().split(' ')[0], 
                 Appointment_Type: reasonForAppointment,
                 Appointment_Status: "Scheduled",
                 Primary_Approval: false,
-                Is_active: true
+                Is_active: true, 
+                patientFirstName: patientFirstName,
+                patientLastName: patientLastName,
+                patientDOB: formattedDOB,
             }),
         });
 
@@ -244,9 +233,7 @@ const StaffMakeAppointment = () => {
     } catch (error) {
         console.error('Error making appointment:', error);
     }
-  };
-
-
+};
   
   const handleLocationChange = (e) => {
     setLocation(e.target.value);
@@ -296,17 +283,38 @@ const StaffMakeAppointment = () => {
             <form onSubmit={handleSubmit} className="px-4 py-8">  
 
             <div className="mb-4">
-                <label className="block text-sm font-bold mb-2">Patient ID:</label>
+                <label className="block text-sm font-bold mb-2">Patient First Name:</label>
                 <input
                   type="text"
-                  value={patientID}
-                  onChange={(e) => setPatientID(e.target.value)}
+                  value={patientFirstName}
+                  onChange={(e) => setPatientFirstName(e.target.value)}
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                  placeholder="Enter Patient ID"
+                  placeholder="Enter Patient First Name"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Patient Last Name:</label>
+                <input
+                  type="text"
+                  value={patientLastName}
+                  onChange={(e) => setPatientLastName(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                  placeholder="Enter Patient Last Name"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Patient DOB:</label>
+                <DatePicker
+                  selected={patientDOB}
+                  onChange={date => setPatientDOB(date)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                  placeholderText="Select Patient DOB"
                 />
                 {errorMessage === "This patient does not exist" && (
-                <span className="text-red-600">This patient doesn't exist</span>
-              )}
+                  <span className="ml-4 text-red-600">This patient doesn't exist. Please ensure you have correctly added the patient's first name, last name, and date of birth.</span>
+                )}
               </div>
 
               <div className="mb-4">
