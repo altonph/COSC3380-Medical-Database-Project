@@ -25,11 +25,13 @@ const AdminMakeAppointment = () => {
   const [specialty, setSpecialty] = useState('');
   const [appointmentTypes, setAppointmentTypes] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
-  // Define appointment types for each specialty
   const appointmentTypesBySpecialty = {
     'General Dentistry': ['Cleaning', 'Whitening', 'Extraction'],
     'Endodontist': ['Root Canal']
   };
+  const [patientFirstName, setPatientFirstName] = useState('');
+  const [patientLastName, setPatientLastName] = useState('');
+  const [patientDOB, setPatientDOB] = useState(null);
 
   useEffect(() => {
     if (practitioner && dentists.length > 0) {
@@ -153,14 +155,25 @@ const AdminMakeAppointment = () => {
   
   const checkPatientExistence = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/doctor/appointments/check-patientID', {
+      const formattedDOB = patientDOB.toISOString().substring(0, 10);
+  
+      const response = await fetch('http://localhost:5000/api/doctor/appointments/check-patient', {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ patientID })
+        body: JSON.stringify({
+          patientFirstName: patientFirstName,
+          patientLastName: patientLastName,
+          patientDOB: formattedDOB, 
+        })
       });
+      console.log(JSON.stringify({
+        patientFirstName: patientFirstName,
+        patientLastName: patientLastName,
+        patientDOB: formattedDOB, 
+      }));
       if (response.ok) {
         const data = await response.json();
         return data.patientExists;
@@ -261,6 +274,7 @@ const AdminMakeAppointment = () => {
     console.log("Formatted start time is ", formattedStartTime);
     console.log("Formatted end time is ", formattedEndTime);
     const sqlFormattedDate = preferredDate.toISOString().split('T')[0];
+    const formattedDOB = patientDOB.toISOString().substring(0, 10);
 
     try {
       const response = await fetch('http://localhost:5000/api/doctor/appointments', {
@@ -270,18 +284,21 @@ const AdminMakeAppointment = () => {
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-              officeID: location,
-              dentistID: practitioner,
-              staffID: staffID, 
-              patientID: patientID,
-              Date: sqlFormattedDate,
-              Start_time: formattedStartTime,
-              End_time: formattedEndTime,
-              Appointment_Type: reasonForAppointment,
-              Appointment_Status: "Scheduled",
-              Primary_Approval: false,
-              Is_active: true
-          }),
+            officeID: location,
+            dentistID: practitioner,
+            staffID: staffID, 
+            patientID: patientID,
+            Date: sqlFormattedDate,
+            Start_time: formattedStartTime,
+            End_time: formattedEndTime,
+            Appointment_Type: reasonForAppointment,
+            Appointment_Status: "Scheduled",
+            Primary_Approval: false,
+            Is_active: true,
+            patientFirstName: patientFirstName,
+            patientLastName: patientLastName,
+            patientDOB: formattedDOB,
+        }),
       });
 
       if (response.ok) {
@@ -289,7 +306,7 @@ const AdminMakeAppointment = () => {
           setNotification('Appointment scheduled successfully!');
           setTimeout(() => {
               setNotification('');
-              navigateTo('/admin/appointments');
+              navigateTo('/doctor/appointments');
           }, 1000);
 
       } else {
@@ -305,8 +322,6 @@ const AdminMakeAppointment = () => {
       console.error('Error making appointment:', error);
   }
   };
-
-
   
   const handleLocationChange = (e) => {
     setLocation(e.target.value);
@@ -359,18 +374,39 @@ const AdminMakeAppointment = () => {
   
           <div className="container mx-auto mt-4">
             <form onSubmit={handleSubmit} className="px-4 py-8">
-              <div className="mb-4">
-                <label className="block text-sm font-bold mb-2">Patient ID:</label>
+            <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Patient First Name:</label>
                 <input
                   type="text"
-                  value={patientID}
-                  onChange={(e) => setPatientID(e.target.value)}
+                  value={patientFirstName}
+                  onChange={(e) => setPatientFirstName(e.target.value)}
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                  placeholder="Enter Patient ID"
+                  placeholder="Enter Patient First Name"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Patient Last Name:</label>
+                <input
+                  type="text"
+                  value={patientLastName}
+                  onChange={(e) => setPatientLastName(e.target.value)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                  placeholder="Enter Patient Last Name"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Patient DOB:</label>
+                <DatePicker
+                  selected={patientDOB}
+                  onChange={date => setPatientDOB(date)}
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                  placeholderText="Select Patient DOB"
                 />
                 {errorMessage === "This patient does not exist" && (
-                <span className="text-red-600">This patient doesn't exist</span>
-              )}
+                  <span className="ml-4 text-red-600">This patient doesn't exist. Please ensure you have correctly added the patient's first name, last name, and date of birth.</span>
+                )}
               </div>
   
               <div className="mb-4">
@@ -470,21 +506,23 @@ const AdminMakeAppointment = () => {
                 </div>
               ))}
 
-              <div className="mb-4">
-                <label className="block text-sm font-bold mb-2">Assisting Hygienist:</label>
-                <select
-                  value={selectedAssistingHygienist}
-                  onChange={(e) => setSelectedAssistingHygienist(e.target.value)}
-                  className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                >
-                <option value="">None</option>
-                {availableStaff.map((staffID) => (
-                  <option key={staffID} value={staffID}>
-                    {`Staff ID: ${staffID}`}
-                  </option>
-                ))}
-                </select>
-              </div>
+                  {(availableStaff.length > 0 && (
+                      <div className="mb-4">
+                        <label className="block text-sm font-bold mb-2">Assisting Hygienist:</label>
+                        <select
+                          value={selectedAssistingHygienist}
+                          onChange={(e) => setSelectedAssistingHygienist(e.target.value)}
+                          className="block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                        >
+                          <option value="">None</option>
+                          {availableStaff.map((staff) => (
+                            <option key={staff.staffID} value={staff.staffID}>
+                              {`${staff.Fname} ${staff.Lname} - Staff ID: ${staff.staffID}`}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
   
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Reason for Appointment:</label>

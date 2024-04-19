@@ -69,7 +69,7 @@ const AdminAppointments = () => {
     
       return (
         <div className={`${eventClass} ${textColorClass}`}>
-          <p><span className="font-semibold">Patient:</span> {appointment.patientID}</p>
+          <p><span className="font-semibold">Patient:</span> {appointment.PatientFirstName} {appointment.PatientLastName}</p>
           <p><span className="font-semibold">Appointment type:</span> {appointment.Appointment_type}</p>
         </div>
       );
@@ -113,19 +113,27 @@ const AdminAppointments = () => {
 
     const handleAddVisitDetails = async () => {
       try {
-          if (!selectedEvent) return;
-  
-          if (hasVisitDetailsForSelected) {
-              alert("Sorry, this appointment already has an associated visit details.");
-              return;
-          }
-  
-          const appointmentData = selectedEvent.extendedProps.appointment;
-          localStorage.setItem('appointmentDetails', JSON.stringify(appointmentData));
-  
-          window.location.href = "/admin/appointments/add-visit-details";
+        if (!selectedEvent) return;
+    
+        const appointmentDate = new Date(selectedEvent.extendedProps.appointment.Date);
+        const currentDate = new Date();
+    
+        if (appointmentDate > currentDate) {
+          alert("You cannot add visit details for future appointments.");
+          return;
+        }
+    
+        if (hasVisitDetailsForSelected) {
+          alert("Sorry, this appointment already has an associated visit details.");
+          return;
+        }
+    
+        const appointmentData = selectedEvent.extendedProps.appointment;
+        localStorage.setItem('appointmentDetails', JSON.stringify(appointmentData));
+    
+        window.location.href = "/doctor/appointments/add-visit-details";
       } catch (error) {
-          console.error('Error handling add visit details:', error);
+        console.error('Error handling add visit details:', error);
       }
     };
 
@@ -345,8 +353,8 @@ const AdminAppointments = () => {
                     <div>
                       <p><span className="font-semibold">Start Time:</span> {convertTo12HourFormat(selectedEvent.extendedProps.appointment.Start_time)}</p>
                       <p><span className="font-semibold">End Time:</span> {convertTo12HourFormat(selectedEvent.extendedProps.appointment.End_time)}</p>
-                      <p><span className="font-semibold">Patient:</span> {selectedEvent.extendedProps.appointment.patientID}</p>
-                      <p><span className="font-semibold">Staff:</span> {selectedEvent.extendedProps.appointment.staffID}</p>
+                      <p><span className="font-semibold">Patient:</span> {selectedEvent.extendedProps.appointment.PatientFirstName} {selectedEvent.extendedProps.appointment.PatientLastName}</p>
+                      <p><span className="font-semibold">Staff:</span> {selectedEvent.extendedProps.appointment.StaffFirstName} {selectedEvent.extendedProps.appointment.StaffLastName}</p>
                       <p><span className="font-semibold">Appointment Type:</span> {selectedEvent.extendedProps.appointment.Appointment_type}</p>
                       <p><span className="font-semibold">Appointment Status:</span> {selectedEvent.extendedProps.appointment.Appointment_status}</p>
                       <p><span className="font-semibold">Primary Approval:</span> {selectedEvent.extendedProps.appointment.Primary_approval}</p>

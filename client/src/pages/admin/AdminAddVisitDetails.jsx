@@ -339,19 +339,25 @@ const AdminAddVisitDetails = () => {
                 </div>
   
                 <div>
-                  <label className="block mb-2">Patient ID:</label>
-                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? appointmentDetails.patientID : ''}</div>
+                  <label className="block mb-2">Patient:</label>
+                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? appointmentDetails.PatientFirstName : ''} {appointmentDetails ? appointmentDetails.PatientLastName : ''}</div>
                 </div>
   
                 <div>
-                  <label className="block mb-2">Staff ID:</label>
-                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? appointmentDetails.staffID : ''}</div>
+                  <label className="block mb-2">Staff:</label>
+                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? appointmentDetails.StaffFirstName : ''} {appointmentDetails ? appointmentDetails.StaffLastName : ''}</div>
                 </div>
   
                 <div>
-                  <label className="block mb-2">Office:</label>
-                  <div className="border border-gray-300 rounded-md py-2 px-3">{appointmentDetails ? appointmentDetails.officeID : ''}</div>
+                <label className="block mb-2">Office:</label>
+                <div className="border border-gray-300 rounded-md py-2 px-3">
+                  {appointmentDetails ? (
+                    appointmentDetails.officeID === 1 ? "5432 Magnolia Drive" :
+                    appointmentDetails.officeID === 2 ? "9876 Sunflower Boulevard" : 
+                    "Unknown Office"
+                  ) : ''}
                 </div>
+              </div>
   
                 <div>
                   <label className="block mb-2">Date:</label>
