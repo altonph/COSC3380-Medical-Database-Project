@@ -1,93 +1,106 @@
 import React, { useState, useEffect } from 'react';
 import HeaderPortalDoctor from "../../components/HeaderPortalDoctor";
 import { Link } from 'react-router-dom'; 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const DoctorSettings = () => {
-  const [editable, setEditable] = useState(false);
-  const [doctorInfo, setDoctorInfo] = useState({
-    firstName: '',
-    lastName: '',
-    dob: '',
-    email: '',
-    phoneNumber: '',
-    address: '',
-    specialty: ''
-  });
-
-  useEffect(() => {
-    fetchDoctorInfo();
-  }, []); 
-
-  const formatDOB = (dob) => {
-    const date = new Date(dob);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0'); 
-    return `${year}-${month}-${day}`;
-  };
-
-  const fetchDoctorInfo = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/doctor/profile', {
-        method: 'GET',
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem('token')}`,
-        }
-      });
-      const data = await response.json();
-    
-      setDoctorInfo({
-        firstName: data.FName,
-        lastName: data.LName,
-        dob: formatDOB(data.DOB),
-        email: data.Email,
-        phoneNumber: data.Phone_num,
-        address: data.Address,
-        specialty: data.Specialty
-      });
-    } catch (error) {
-      console.error('Error fetching doctor information:', error);
-    }
-  };
-
-  const handleEdit = () => {
-    setEditable(true);
-  };
-
-  const handleSave = async () => {
-    console.log('Doctor Info:', doctorInfo);
-    try {
-      const response = await fetch('http://localhost:5000/api/doctor/profile', {
-        method: 'PATCH',
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem('token')}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(doctorInfo)
-      });
-
-      if (response.ok) {
-        setEditable(false);
-      } else {
-        console.error('Failed to update doctor profile');
-      }
-    } catch (error) {
-      console.error('Error updating doctor profile:', error);
-    }
-  };
-
-  const handleCancel = () => {
-    fetchDoctorInfo(); 
-    setEditable(false);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setDoctorInfo({
-      ...doctorInfo,
-      [name]: value
+    const [editable, setEditable] = useState(false);
+    const [doctorInfo, setDoctorInfo] = useState({
+        firstName: '',
+        lastName: '',
+        dob: new Date(),
+        email: '',
+        phoneNumber: '',
+        address: '',
+        specialty: '',
+        start_date: null,
+        end_date: null,
+        salary: null,
+        is_active: true
     });
-  };
+
+    useEffect(() => {
+        fetchDoctorInfo();
+    }, []); 
+
+    const fetchDoctorInfo = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/doctor/profile', {
+                method: 'GET',
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                }
+            });
+            const data = await response.json();
+        
+            setDoctorInfo({
+                firstName: data.FName,
+                lastName: data.LName,
+                dob: new Date(data.DOB),
+                email: data.Email,
+                phoneNumber: data.Phone_num,
+                address: data.Address,
+                specialty: data.Specialty,
+                start_date: data.Start_date,
+                end_date: data.End_date,
+                salary: data.Salary,
+                is_active: true
+            });
+        } catch (error) {
+            console.error('Error fetching doctor information:', error);
+        }
+    };
+
+    const handleEdit = () => {
+        setEditable(true);
+    };
+
+    const handleSave = async () => {
+        try {
+            const dobISOFormat = doctorInfo.dob.toISOString().split('T')[0];
+            const updatedDoctorInfo = {
+                ...doctorInfo,
+                dob: dobISOFormat
+            };
+            const response = await fetch('http://localhost:5000/api/doctor/profile', {
+                method: 'PATCH',
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(updatedDoctorInfo)
+            });
+
+            if (response.ok) {
+                setEditable(false);
+            } else {
+                console.error('Failed to update doctor profile');
+            }
+        } catch (error) {
+            console.error('Error updating doctor profile:', error);
+        }
+    };
+
+    const handleCancel = () => {
+        fetchDoctorInfo(); 
+        setEditable(false);
+    };
+
+    const handleChange = (value, name) => {
+        if (name === 'dob') {
+            setDoctorInfo(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        } else {
+            const { name, value } = value.target;
+            setDoctorInfo({
+                ...doctorInfo,
+                [name]: value
+            });
+        }
+    };
 
   return (
     <div>
@@ -127,19 +140,18 @@ const DoctorSettings = () => {
           </div>
 
           <div>
-            <label className="block mb-2">Date of Birth:</label>
-            {editable ? (
-              <input
-                type="date"
-                name="dob"
-                value={doctorInfo.dob}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              />
-            ) : (
-              <div className="border border-gray-300 rounded-md py-2 px-3">{doctorInfo.dob}</div>
-            )}
-          </div>
+                        <label className="block mb-2">Date of Birth:</label>
+                        {editable ? (
+                            <DatePicker
+                                selected={doctorInfo.dob}
+                                onChange={(date) => handleChange(date, 'dob')}
+                                dateFormat="MM/dd/yyyy"
+                                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                            />
+                        ) : (
+                            <div className="border border-gray-300 rounded-md py-2 px-3">{doctorInfo.dob.toLocaleDateString()}</div>
+                        )}
+                    </div>
 
           <div>
             <label className="block mb-2">Email:</label>
