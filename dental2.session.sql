@@ -131,3 +131,6 @@ VALUES
 (3, 18, '2024-05-18', '12:30:00', '13:30:00', 1, 1, 'Whitening', 'Scheduled', NULL, 'Approved', TRUE),
 (3, 19, '2024-05-19', '14:00:00', '15:00:00', 1, 1, 'Extraction', 'Scheduled', NULL, 'Approved', TRUE),
 (3, 1, '2024-05-20', '15:30:00', '16:30:00', 1, 1, 'Root Canal', 'Scheduled', NULL, 'Approved', TRUE);
+
+-- @block
+SELECT COUNT(*) AS patientCount FROM patient WHERE FName = "Jane" AND LName = "Doe" AND DOB = "1990-03-22"

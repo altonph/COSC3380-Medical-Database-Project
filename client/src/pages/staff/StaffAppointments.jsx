@@ -42,7 +42,7 @@ const StaffAppointment = () => {
     
       return (
         <div className={`${eventClass} ${textColorClass}`}>
-          <p><span className="font-semibold">Patient:</span> {appointment.patientID}</p>
+          <p><span className="font-semibold">Patient:</span>  {appointment.PatientFirstName} {appointment.PatientLastName}</p>
           <p><span className="font-semibold">Appointment type:</span> {appointment.Appointment_type}</p>
         </div>
       );
@@ -313,8 +313,8 @@ const StaffAppointment = () => {
                     <div>
                       <p><span className="font-semibold">Start Time:</span> {convertTo12HourFormat(selectedEvent.extendedProps.appointment.Start_time)}</p>
                       <p><span className="font-semibold">End Time:</span> {convertTo12HourFormat(selectedEvent.extendedProps.appointment.End_time)}</p>
-                      <p><span className="font-semibold">Patient:</span> {selectedEvent.extendedProps.appointment.patientID}</p>
-                      <p><span className="font-semibold">Staff:</span> {selectedEvent.extendedProps.appointment.staffID}</p>
+                      <p><span className="font-semibold">Patient:</span> {selectedEvent.extendedProps.appointment.PatientFirstName} {selectedEvent.extendedProps.appointment.PatientLastName}</p>
+                      <p><span className="font-semibold">Dentist:</span> Dr. {selectedEvent.extendedProps.appointment.DentistFirstName} {selectedEvent.extendedProps.appointment.DentistLastName}</p>
                       <p><span className="font-semibold">Appointment Type:</span> {selectedEvent.extendedProps.appointment.Appointment_type}</p>
                       <p><span className="font-semibold">Appointment Status:</span> {selectedEvent.extendedProps.appointment.Appointment_status}</p>
                       <p><span className="font-semibold">Primary Approval:</span> {selectedEvent.extendedProps.appointment.Primary_approval}</p>

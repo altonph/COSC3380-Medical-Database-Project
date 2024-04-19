@@ -262,7 +262,7 @@ const getAppointmentsByStaffUsername = (req, res, username) => {
         }
 
         const staffId = results[0].StaffID;
-        pool.query('SELECT * FROM appointment WHERE staffID = ?', [staffId], (error, results) => {
+        pool.query('SELECT appointment.*, patient.FName AS PatientFirstName, patient.LName AS PatientLastName, staff.Fname AS StaffFirstName, staff.Lname AS StaffLastName, dentist.FName AS DentistFirstName, dentist.LName AS DentistLastName FROM appointment LEFT JOIN patient ON appointment.patientID = patient.patientID LEFT JOIN staff ON appointment.staffID = staff.staffID LEFT JOIN dentist ON appointment.dentistID = dentist.dentistID WHERE appointment.staffID = ?', [staffId], (error, results) => {
             if (error) {
                 console.error('Error retrieving appointments:', error);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -389,28 +389,50 @@ const insertAppointment = (req, res) => {
     req.on('data', chunk => {
         body += chunk.toString();
     });
-
     req.on('end', () => {
         const appointmentData = JSON.parse(body);
-        const { officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status, Cancellation_Reason, Specialist_Approval, Is_active } = appointmentData;
-        const query = `
-            INSERT INTO appointment 
-            (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status, Cancellation_Reason, Primary_Approval, Is_active) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        pool.query(query, [officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status, Cancellation_Reason, Specialist_Approval, Is_active], (error, results) => {
+        console.log(appointmentData);
+        const { officeID, dentistID, staffID, patientFirstName, patientLastName, patientDOB, Date, Start_time, End_time, Appointment_Type, Appointment_Status, Cancellation_Reason, Specialist_Approval, Is_active } = appointmentData;
+
+        const patientQuery = `
+            SELECT patientID FROM patient 
+            WHERE FName = ? AND LName = ? AND DOB = ?`;
+
+        pool.query(patientQuery, [patientFirstName, patientLastName, patientDOB], (error, results) => {
             if (error) {
-                if (error.sqlState === '45000') { // Check if the SQLSTATE code indicates an exception
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Overlapping appointments detected. Please choose another time slot.' }));
-                } else {
-                    console.error('Error inserting appointment:', error);
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: 'Internal Server Error' }));
-                }
+                console.error('Error querying patient:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Internal Server Error' }));
                 return;
             }
-            res.writeHead(201, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ message: 'Appointment inserted successfully', appointmentID: results.insertId }));
+
+            if (results.length === 0) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Patient not found' }));
+                return;
+            }
+
+            const patientID = results[0].patientID;
+
+            const query = `
+                INSERT INTO appointment 
+                (officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status, Cancellation_Reason, Primary_Approval, Is_active) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            pool.query(query, [officeID, dentistID, staffID, patientID, Date, Start_time, End_time, Appointment_Type, Appointment_Status, Cancellation_Reason, Specialist_Approval, Is_active], (error, results) => {
+                if (error) {
+                    if (error.sqlState === '45000') {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Overlapping appointments detected. Please choose another time slot.' }));
+                    } else {
+                        console.error('Error inserting appointment:', error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+                    }
+                    return;
+                }
+                res.writeHead(201, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Appointment inserted successfully', appointmentID: results.insertId }));
+            });
         });
     });
 };
@@ -511,11 +533,11 @@ const checkPatientExistence = (req, res) => {
     req.on('end', () => {
         try {
             const requestData = JSON.parse(body);
-            const { patientID } = requestData;
+            const { patientFirstName, patientLastName, patientDOB } = requestData;
 
             pool.query(
-                'SELECT COUNT(*) AS patientCount FROM patient WHERE patientID = ?',
-                [patientID],
+                'SELECT COUNT(*) AS patientCount FROM patient WHERE FName = ? AND LName = ? AND DOB = ?',
+                [patientFirstName, patientLastName, patientDOB],
                 (error, results) => {
                     if (error) {
                         console.error('Error checking patient existence:', error);

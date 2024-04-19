@@ -221,7 +221,7 @@ const doctorRoutes = (req, res) => {
             return forbiddenResponse(res);
         }
         updateAppointmentStatus(req, res);
-    } else if (method === 'POST' && url === '/api/doctor/appointments/check-patientID') {
+    } else if (method === 'POST' && url === '/api/doctor/appointments/check-patient') {
         const decodedToken = verifyToken(authHeader);
         if (!decodedToken) {
             return unauthorizedResponse(res);
