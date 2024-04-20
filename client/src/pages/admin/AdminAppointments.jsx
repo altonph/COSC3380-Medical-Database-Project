@@ -131,7 +131,7 @@ const AdminAppointments = () => {
         const appointmentData = selectedEvent.extendedProps.appointment;
         localStorage.setItem('appointmentDetails', JSON.stringify(appointmentData));
     
-        window.location.href = "/doctor/appointments/add-visit-details";
+        window.location.href = "/admin/appointments/add-visit-details";
       } catch (error) {
         console.error('Error handling add visit details:', error);
       }
