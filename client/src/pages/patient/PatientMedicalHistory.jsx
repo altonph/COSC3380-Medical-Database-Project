@@ -1,14 +1,42 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import HeaderPortalPatient from "../../components/HeaderPortalPatient";
 import Footer from "../../components/Footer";
 
 const PatientMedicalHistory = () => {
-    const medicalHistory = {
-        lastVisit: "2023-12-10",
-        diagnosis: "No cavities found, mild gum inflammation",
-        treatment: "Teeth cleaning, fluoride treatment",
-        notes: "Recommend regular check-ups every 6 months."
-    };
+    const [medicalHistory, setMedicalHistory] = useState([]);
+
+    useEffect(() => {
+        const fetchMedicalHistory = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/patient/medical-history', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch medical history');
+                }
+
+                const data = await response.json();
+                setMedicalHistory(data);
+                console.log('Medical History:', data);
+            } catch (error) {
+                console.error('Error fetching medical history:', error.message);
+            }
+        };
+
+        fetchMedicalHistory();
+    }, []);
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${month}/${day}/${year}`;
+    }
 
     return (
         <div className="flex h-screen flex-col">
@@ -31,17 +59,27 @@ const PatientMedicalHistory = () => {
                 </aside>
 
                 <main className="flex-1 p-4 mt-4">
-                    <h1 className="text-3xl font-bold p-2 ml-8 mb-4">Your Medical History</h1>
+                <h1 className="text-3xl font-bold p-2 ml-8 mb-4">Your Medical History</h1>
 
-                    <div className="container mx-auto mt-4">
+                <div className="container mx-auto mt-4">
+                    {medicalHistory.length > 0 ? (
+                        medicalHistory.map((historyItem, index) => (
+                            <div key={index} className="border border-gray-200 rounded p-4 mb-4">
+                                <h2 className="text-lg font-semibold">Date Created: {formatDate(historyItem.Date_Created)}</h2>
+                                <p className="text-lg text-gray-600">Allergies: {historyItem.Allergies}</p>
+                                <p className="text-lg text-gray-600">Height: {historyItem.Feet} feet {historyItem.Inches} inches</p>
+                                <p className="text-lg text-gray-600">Weight: {historyItem.Weight} lbs</p>
+                                <p className="text-lg text-gray-600">Notes: {historyItem.Notes}</p>
+                            </div>
+                        ))
+                    ) : (
                         <div className="border border-gray-200 rounded p-4 mb-4">
-                            <h2 className="text-lg font-semibold">Last Visit: {medicalHistory.lastVisit}</h2>
-                            <p className="text-sm text-gray-600">Diagnosis: {medicalHistory.diagnosis}</p>
-                            <p className="text-sm text-gray-600">Treatment: {medicalHistory.treatment}</p>
-                            <p className="text-sm text-gray-600">Notes: {medicalHistory.notes}</p>
+                            <p className="text-lg font-semibold">No medical history found.</p>
                         </div>
-                    </div>
-                </main>
+                    )}
+                </div>
+            </main>
+
             </div>
 
             <nav>

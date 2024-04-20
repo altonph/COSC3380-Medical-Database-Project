@@ -1,15 +1,78 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import Header from "../../components/Header"; 
 import Footer from "../../components/Footer";
 
 const DoctorLoginPage = (props) => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const navigateTo = useNavigate();
 
-    const handleSubmit = (e) => { 
+    const handleSubmit = async (e) => { 
         e.preventDefault();
-        console.log(email);
+        try {
+            const body = {
+                Username: username,
+                Password: password,
+            }
+
+            const response = await fetch("http://localhost:5000/doctor/check-role", { 
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+
+                // Check user role and redirect accordingly
+                if (data.role === 'Staff') {
+                    const staffResponse = await fetch("http://localhost:5000/staff/login", { 
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(body)
+                    });
+                    if (staffResponse.ok) {
+                        const staffData = await staffResponse.json();
+                        console.log(staffData);
+                        localStorage.setItem('token', staffData.token); 
+                        localStorage.setItem('role', staffData.role);
+                        localStorage.setItem('firstName', staffData.firstName);
+                        localStorage.setItem('lastName', staffData.lastName);
+                        navigateTo('/staff/home');
+                    } else {
+                        const staffError = await staffResponse.json();
+                        console.error('Staff login failed:', staffError.message);
+                    }
+                } else if (data.role === 'Dentist') {
+                    const dentistResponse = await fetch("http://localhost:5000/doctor/login", { 
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(body)
+                    });
+                    if (dentistResponse.ok) {
+                        const dentistData = await dentistResponse.json();
+                        console.log(dentistData);
+                        localStorage.setItem('token', dentistData.token); 
+                        localStorage.setItem('role', dentistData.role);
+                        localStorage.setItem('firstName', dentistData.firstName);
+                        localStorage.setItem('lastName', dentistData.lastName);
+
+                        navigateTo('/doctor/home');
+                    } else {
+                        const dentistError = await dentistResponse.json();
+                        console.error('Dentist login failed:', dentistError.message);
+                    }
+                }
+            } else {
+                const roleError = await response.json();
+                console.error('Role check failed:', roleError.message);
+            }
+        } catch (err) {
+            console.log(err.message);
+        }
     }
 
     return (
@@ -20,14 +83,14 @@ const DoctorLoginPage = (props) => {
                     <h2 className="text-2xl font-bold mb-4 text-center">Provider Login</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
-                            <label htmlFor="email" className="block">Email</label>
+                            <label htmlFor="username" className="block">Username</label>
                             <input 
-                                value={email} 
-                                onChange={(e) => setEmail(e.target.value)} 
-                                type="email" 
-                                placeholder="youremail@gmail.com" 
-                                id="email" 
-                                name="email"
+                                value={username} 
+                                onChange={(e) => setUsername(e.target.value)} 
+                                type="text" 
+                                placeholder="Username" 
+                                id="username" 
+                                name="username"
                                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                             />
                         </div>

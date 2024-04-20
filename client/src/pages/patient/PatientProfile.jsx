@@ -7,6 +7,8 @@ const PatientProfile = () => {
     patientID: null,
     insuranceID: null,
     dentistID: null,
+    Insurance_Company_Name: 'Insurance Name',
+    Policy_number: 'Policy Number',
     Gender: 'Gender',
     FName: 'First Name',
     LName: 'Last Name',
@@ -23,7 +25,7 @@ const PatientProfile = () => {
 
   const fetchPatientProfile = async () => {
     try {
-      const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/patient/profile", {
+      const response = await fetch("http://localhost:5000/api/patient/profile", {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`
@@ -41,20 +43,33 @@ const PatientProfile = () => {
     }
   };
 
-  const renderInsurance = () => {
-    if (!patientData || !patientData.insuranceID) {
+  const renderInsuranceName = () => {
+    if (!patientData || !patientData.Insurance_Company_Name) {
       return "None";
     } else {
-      return patientData.insuranceID;
+      return patientData.Insurance_Company_Name;
     }
   };
 
-  const formatDOB = (dob) => {
-    const date = new Date(dob);
+  const renderInsuranceNumber = () => {
+    if (!patientData || !patientData.Policy_number) {
+      return "None";
+    } else {
+      return patientData.Policy_number;
+    }
+  };
+
+  const formatDOB = (dateString) => {
+    const date = new Date(dateString);
+    const month = date.getMonth() + 1; // Months are zero-indexed
+    const day = date.getDate();
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
-    const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if needed
-    return `${year}-${month}-${day}`;
+  
+    // Pad single digit month or day with leading zero
+    const formattedMonth = month < 10 ? `0${month}` : month;
+    const formattedDay = day < 10 ? `0${day}` : day;
+  
+    return `${formattedMonth}/${formattedDay}/${year}`;
   };
 
   return (
@@ -102,7 +117,12 @@ const PatientProfile = () => {
 
             <div>
               <label className="block mb-2">Insurance:</label>
-              <div className="border border-gray-300 rounded-md py-2 px-3">{renderInsurance()}</div>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{renderInsuranceName()}</div>
+            </div>
+
+            <div>
+              <label className="block mb-2">Policy Number:</label>
+              <div className="border border-gray-300 rounded-md py-2 px-3">{renderInsuranceNumber()}</div>
             </div>
           </div>
         )}
