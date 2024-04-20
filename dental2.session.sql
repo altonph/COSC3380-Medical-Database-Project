@@ -134,3 +134,34 @@ VALUES
 
 -- @block
 SELECT COUNT(*) AS patientCount FROM patient WHERE FName = "Jane" AND LName = "Doe" AND DOB = "1990-03-22"
+
+
+-- @block
+INSERT INTO `appointment` (`dentistID`, `patientID`, `Date`, `Start_time`, `End_time`, `officeID`, `staffID`, `Appointment_type`, `Appointment_status`, `Cancellation_reason`, `Primary_approval`, `is_active`) VALUES
+(1, 5, '2024-03-01', '09:00:00', '10:00:00', 1, 1, 'Cleaning', 'Completed', NULL, 'Approved', TRUE),
+(1, 5, '2024-03-04', '09:00:00', '10:00:00', 1, 1, 'Cleaning', 'Completed', NULL, 'Approved', TRUE),
+(2, 12, '2024-03-02', '10:30:00', '11:30:00', 2, 2, 'Extraction', 'Scheduled', NULL, 'Pending', TRUE),
+(1, 7, '2024-03-03', '11:00:00', '12:00:00', 1, 1, 'Whitening', 'Completed', NULL, 'Approved', TRUE),
+(3, 18, '2024-03-04', '14:00:00', '15:00:00', 1, 1, 'Root Canal', 'Scheduled', NULL, 'Pending', TRUE),
+(2, 3, '2024-03-05', '09:30:00', '10:30:00', 1, 2, 'Cleaning', 'Completed', NULL, 'Approved', TRUE),
+(1, 13, '2024-03-06', '12:30:00', '13:30:00', 2, 1, 'Extraction', 'Scheduled', NULL, 'Pending', TRUE),
+(3, 9, '2024-03-07', '13:00:00', '14:00:00', 1, 2, 'Cleaning', 'Completed', NULL, 'Approved', TRUE),
+(2, 10, '2024-03-08', '14:30:00', '15:30:00', 2, 1, 'Whitening', 'Scheduled', NULL, 'Pending', TRUE),
+(1, 6, '2024-03-09', '15:00:00', '16:00:00', 2, 2, 'Root Canal', 'Completed', NULL, 'Approved', TRUE),
+(3, 4, '2024-03-10', '11:30:00', '12:30:00', 1, 1, 'Extraction', 'Scheduled', NULL, 'Pending', TRUE),
+(1, 15, '2024-03-11', '10:00:00', '11:00:00', 2, 2, 'Cleaning', 'Completed', NULL, 'Approved', TRUE),
+(2, 11, '2024-03-12', '12:00:00', '13:00:00', 1, 1, 'Root Canal', 'Scheduled', NULL, 'Pending', TRUE),
+(3, 16, '2024-03-13', '15:30:00', '16:30:00', 1, 2, 'Whitening', 'Completed', NULL, 'Approved', TRUE),
+(1, 2, '2024-03-14', '09:30:00', '10:30:00', 2, 1, 'Cleaning', 'Scheduled', NULL, 'Pending', TRUE),
+(2, 8, '2024-03-15', '14:00:00', '15:00:00', 1, 2, 'Extraction', 'Completed', NULL, 'Approved', TRUE),
+(3, 1, '2024-03-16', '10:30:00', '11:30:00', 2, 1, 'Root Canal', 'Scheduled', NULL, 'Pending', TRUE),
+(1, 17, '2024-03-17', '12:00:00', '13:00:00', 1, 1, 'Whitening', 'Completed', NULL, 'Approved', TRUE),
+(2, 14, '2024-03-18', '09:00:00', '10:00:00', 2, 2, 'Cleaning', 'Scheduled', NULL, 'Pending', TRUE),
+(3, 5, '2024-03-19', '14:30:00', '15:30:00', 1, 1, 'Extraction', 'Completed', NULL, 'Approved', TRUE),
+(1, 18, '2024-03-20', '11:30:00', '12:30:00', 2, 2, 'Root Canal', 'Scheduled', NULL, 'Pending', TRUE),
+(2, 3, '2024-03-21', '13:00:00', '14:00:00', 1, 1, 'Whitening', 'Completed', NULL, 'Approved', TRUE);
+
+
+-- @block
+INSERT INTO `appointment` (`dentistID`, `patientID`, `Date`, `Start_time`, `End_time`, `officeID`, `staffID`, `Appointment_type`, `Appointment_status`, `Cancellation_reason`, `Primary_approval`, `is_active`) VALUES
+(1, 5, '2024-03-04', '09:00:00', '10:00:00', 1, 1, 'Cleaning', 'Completed', NULL, 'Approved', TRUE)
