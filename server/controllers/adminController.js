@@ -136,7 +136,7 @@ const generateRevenueReport = (req, res, office, type, startDate, endDate) => {
     });
 };
 
-const generateDemographicDataReport = (req, res, filters) => {
+const generateDemographicDataReport = (req, res, office, startDate, endDate, gender, insuranceType) => {
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error getting database connection:', err);
@@ -150,53 +150,57 @@ const generateDemographicDataReport = (req, res, filters) => {
         const params = [];
 
         // Push conditions and parameters based on filters
-        if (filters.gender) {
+        if (office) {
+            conditions.push('appt.officeID = ?');
+            params.push(office);
+        }
+        if (startDate) {
+            conditions.push('appt.Date >= ?');
+            params.push(startDate);
+        }
+        if (endDate) {
+            conditions.push('appt.Date <= ?');
+            params.push(endDate);
+        }
+        if (gender) {
             conditions.push('p.Gender = ?');
-            params.push(filters.gender);
+            params.push(gender);
         }
-        if (filters.insurance) {
+        if (insuranceType) {
             conditions.push('p.Insurance_Company_Name = ?');
-            params.push(filters.insurance);
+            params.push(insuranceType);
         }
-        // Add more conditions as needed
 
         // Combine conditions into WHERE clause
         const whereClause = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
-
+        
         const mainQuery = `
-                SELECT
-                Gender,
-                Birth_Year,
-                Age,
-                COUNT(DISTINCT patientID) AS Total_Patients,
-                COUNT(DISTINCT CASE WHEN Appointment_status = 'Scheduled' THEN patientID END) AS Scheduled_Appointments,
-                COUNT(DISTINCT CASE WHEN Appointment_status = 'Completed' THEN patientID END) AS Completed_Appointments,
-                SUM(CASE WHEN Insurance_Company_Name = 'Anthem' THEN 1 ELSE 0 END) AS Anthem_Insured,
-                SUM(CASE WHEN Insurance_Company_Name = 'Guardian' THEN 1 ELSE 0 END) AS Guardian_Insured
-            FROM
-                (
-                    SELECT
-                        p.Gender,
-                        YEAR(p.DOB) AS Birth_Year,
-                        TIMESTAMPDIFF(YEAR, p.DOB, CURDATE()) AS Age,
-                        appt.Appointment_status,
-                        p.patientID,
-                        p.Insurance_Company_Name
-                    FROM
-                        patient p
-                    LEFT JOIN
-                        appointment appt ON p.patientID = appt.patientID
-                    WHERE
-                        p.Gender = 'male' AND p.Insurance_Company_Name = 'Anthem'
-                ) AS subquery
-            GROUP BY
-                Gender,
-                Birth_Year,
-                Age
-            ORDER BY
-                Birth_Year DESC;
-            
-        `;
+        SELECT
+            FName,
+            LName,
+            Gender,
+            YEAR(p.DOB) AS Birth_Year,
+            TIMESTAMPDIFF(YEAR, p.DOB, CURDATE()) AS Age,
+            Insurance_Company_Name,
+            COUNT(DISTINCT p.patientID) AS Total_Patients,
+            COUNT(DISTINCT CASE WHEN appt.Appointment_status = 'Scheduled' THEN p.patientID END) AS Scheduled_Appointments,
+            COUNT(DISTINCT CASE WHEN appt.Appointment_status = 'Completed' THEN p.patientID END) AS Completed_Appointments
+        FROM
+            patient p
+        LEFT JOIN
+            appointment appt ON p.patientID = appt.patientID
+        ${whereClause}
+        GROUP BY
+            FName,
+            LName,
+            Gender,
+            Birth_Year,
+            Age,
+            Insurance_Company_Name
+        ORDER BY
+            Birth_Year DESC;
+    `;
+    
 
         connection.query(mainQuery, params, (error, mainResults) => {
             if (error) {

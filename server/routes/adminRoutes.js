@@ -46,9 +46,9 @@ const handleGenerateRevenueReport = (req, res) => {
 
 
 const handleGenerateDemographicReport = (req, res) => {
-    const { url, method } = req;
+    const { url: requestUrl, method } = req;
     
-    if (url.startsWith('/api/admin/demographic-data-report') && method === 'POST'){
+    if (requestUrl === '/api/admin/demographic-data-report' && method === 'POST'){
         let body = '';
         req.on('data', (chunk) => {
             body += chunk.toString(); // convert Buffer to string
@@ -56,8 +56,9 @@ const handleGenerateDemographicReport = (req, res) => {
 
         req.on('end', () => {
             try {
-                const filters = JSON.parse(body);
-                generateDemographicDataReport(req, res, filters);
+                const parsedBody = url.parse(`?${body}`, true).query;
+                const { office, startDate, endDate, gender, insuranceType } = parsedBody;
+                generateDemographicDataReport(req, res, office, startDate, endDate, gender, insuranceType);
             } catch (error) {
                 console.error('Error parsing request body:', error);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
