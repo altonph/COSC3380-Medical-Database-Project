@@ -58,6 +58,8 @@ import AdminSettings from "./pages/admin/AdminSettings";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
+import DentistRoute from "./components/DentistRoute";
+import StaffRoute from "./components/StaffRoute";
 
 function App() {
   return (
@@ -88,30 +90,50 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/doctor/settings" element={<DoctorSettings/>} />
-            <Route path="/doctor/appointments" element={<DoctorAppointment/>}/>
-            <Route path="/doctor/appointments/make-appointment" element={<DoctorMakeAppointment />} />
-            <Route path="doctor/appointments/add-visit-details" element={<DoctorAddVisitDetails />} />
-            <Route path="/doctor/patients" element={<DoctorPatients/>}/>
-            <Route path="/doctor/patients/:patientID" element={<PatientDetails />} />
-            <Route path="/doctor/patients/:patientID/medical-history" element={<DoctorEditMedicalHistory />} />
-            <Route path="/doctor/patients/:patientID/add-medical-history" element={<DoctorAddMedicalHistory />} />
-            <Route path="/doctor/patients/:patientID/prescriptions" element={<DoctorEditPrescriptions />} />
-            <Route path="/doctor/patients/:patientID/visit-details" element={<DoctorEditVisitDetails />} />
-            <Route path="/doctor/patients/:patientID/patient-information" element={<DoctorEditPatientInformation />} />
-            <Route path="/doctor/home" element= {<DoctorPortal/>} />
-            <Route path="/doctor/profile" element= {<DoctorProfile/>} />
-            <Route path="/staff/home" element={<StaffPortal />} />
-            <Route path="/staff/patients" element={<StaffPatients />} />
-            <Route path="/staff/patients/:patientID" element={<StaffPatientDetails />} />
-            <Route path="/staff/patients/:patientID/patient-information" element={<StaffEditPatientInformation/>} />
-            <Route path="/staff/patients/:patientID/visit-details" element={<StaffEditVisitDetails/>} />
-            <Route path="/staff/patients/:patientID/add-medical-history" element={<StaffAddMedicalHistory/>} />
-            <Route path="/staff/patients/:patientID/medical-history" element={<StaffEditMedicalHistory />} />
-            <Route path="/staff/patients/:patientID/prescriptions" element={<StaffEditPrescriptions />} />
-            <Route path="/staff/appointments" element={<StaffAppointment />} />
-            <Route path="/staff/appointments/make-appointment" element={<StaffMakeAppointment/>} />
-            <Route path="/staff/appointments/add-visit-details" element={<StaffAddVisitDetails />} />
+            <Route
+              path="/doctor/*"
+              element={
+                <DentistRoute>
+                  <Routes>
+                  <Route path="/settings" element={<DoctorSettings/>} />
+                  <Route path="/appointments" element={<DoctorAppointment/>}/>
+                  <Route path="/appointments/make-appointment" element={<DoctorMakeAppointment />} />
+                  <Route path="/appointments/add-visit-details" element={<DoctorAddVisitDetails />} />
+                  <Route path="/patients" element={<DoctorPatients/>}/>
+                  <Route path="/patients/:patientID" element={<PatientDetails />} />
+                  <Route path="/patients/:patientID/medical-history" element={<DoctorEditMedicalHistory />} />
+                  <Route path="/patients/:patientID/add-medical-history" element={<DoctorAddMedicalHistory />} />
+                  <Route path="/patients/:patientID/prescriptions" element={<DoctorEditPrescriptions />} />
+                  <Route path="/patients/:patientID/visit-details" element={<DoctorEditVisitDetails />} />
+                  <Route path="/patients/:patientID/patient-information" element={<DoctorEditPatientInformation />} />
+                  <Route path="/home" element= {<DoctorPortal/>} />
+                  <Route path="/profile" element= {<DoctorProfile/>} />
+                  </Routes>
+                </DentistRoute>
+              }
+            />
+            <Route
+              path="/staff/*"
+              element={
+                <StaffRoute>
+                  <Routes>
+                  <Route path="/home" element={<StaffPortal />} />
+                  <Route path="/patients" element={<StaffPatients />} />
+                  <Route path="/patients/:patientID" element={<StaffPatientDetails />} />
+                  <Route path="/patients/:patientID/patient-information" element={<StaffEditPatientInformation/>} />
+                  <Route path="/patients/:patientID/visit-details" element={<StaffEditVisitDetails/>} />
+                  <Route path="/patients/:patientID/add-medical-history" element={<StaffAddMedicalHistory/>} />
+                  <Route path="/patients/:patientID/medical-history" element={<StaffEditMedicalHistory />} />
+                  <Route path="/patients/:patientID/prescriptions" element={<StaffEditPrescriptions />} />
+                  <Route path="/appointments" element={<StaffAppointment />} />
+                  <Route path="/appointments/make-appointment" element={<StaffMakeAppointment/>} />
+                  <Route path="/appointments/add-visit-details" element={<StaffAddVisitDetails />} />
+                  <Route path="/profile" element={<StaffProfile/>}/>
+                  <Route path="/settings" element={<StaffProfileSetting/>}/>
+                  </Routes>
+                </StaffRoute>
+              }
+            />
             <Route
               path="/admin/*"
               element={
@@ -136,8 +158,6 @@ function App() {
                 </AdminRoute>
               }
             />
-            <Route path="/staff/profile" element={<StaffProfile/>}/>
-            <Route path="/staff/settings" element={<StaffProfileSetting/>}/>
           </Routes>
         </Router>
   );
