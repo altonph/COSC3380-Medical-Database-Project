@@ -782,6 +782,25 @@ function handleProtectedRoute(req, res, jwt) {
     res.end('Protected route accessed successfully for Patient role');
 }
 
+function handleProtectedRouteAdmin(req, res, jwt) {
+
+    const decodedToken = verifyToken(req, jwt);
+    if (!decodedToken) {
+        res.writeHead(401);
+        res.end('Unauthorized');
+        return;
+    }
+
+    if (decodedToken.role !== 'Admin') {
+        res.writeHead(403);
+        res.end('Forbidden');
+        return;
+    }
+
+    res.writeHead(200);
+    res.end('Protected route accessed successfully for Admin role');
+}
+
 function registerStaff(userData, res) {
     bcrypt.hash(userData.Password, 10, (err, hashedPassword) => {
         if (err) {
@@ -952,5 +971,6 @@ module.exports = {
     archiveStaff,
     getUserRole,
     getStaffProfile,
-    updateStaffProfile
+    updateStaffProfile,
+    handleProtectedRouteAdmin
 };

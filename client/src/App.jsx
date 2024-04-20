@@ -57,7 +57,7 @@ import StaffProfileSetting from "./pages/staff/StaffProfileSettings";
 import AdminSettings from "./pages/admin/AdminSettings";
 
 import ProtectedRoute from "./components/ProtectedRoute";
-//import AdminRoute from "./components/AdminRoute";
+import AdminRoute from "./components/AdminRoute";
 
 function App() {
   return (
@@ -69,25 +69,25 @@ function App() {
             <Route path="/patient/login" element={<LoginPage />} />
             <Route path="/patient/register" element={<RegisterPage />} />
             <Route path="/contact" element={<ContactPage />} />
-            <Route path="/patient/appointment" element= {<MakeAppointment/>} />
-            <Route
-          path="/patient/*"
-          element={
-            <ProtectedRoute>
-              <Routes>
-                <Route path="/appointment" element={<MakeAppointment />} />
-                <Route path="/home" element={<HomePortal />} />
-                <Route path="/payment" element={<PaymentPortal />} />
-                <Route path="/profile" element={<PatientProfile />} />
-                <Route path="/prescriptions" element={<PatientPrescriptions />} />
-                <Route path="/settings" element={<PatientProfileSettings />} />
-                <Route path="/visit" element={<PatientVisitDetails />} />
-                <Route path="/history" element={<PatientMedicalHistory />} />
-              </Routes>
-            </ProtectedRoute>
-          }
-        />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
+            <Route path="/admin/login" element={<AdminLogin/>}/>
+            <Route
+              path="/patient/*"
+              element={
+                <ProtectedRoute>
+                  <Routes>
+                    <Route path="/appointment" element={<MakeAppointment />} />
+                    <Route path="/home" element={<HomePortal />} />
+                    <Route path="/payment" element={<PaymentPortal />} />
+                    <Route path="/profile" element={<PatientProfile />} />
+                    <Route path="/prescriptions" element={<PatientPrescriptions />} />
+                    <Route path="/settings" element={<PatientProfileSettings />} />
+                    <Route path="/visit" element={<PatientVisitDetails />} />
+                    <Route path="/history" element={<PatientMedicalHistory />} />
+                  </Routes>
+                </ProtectedRoute>
+              }
+            />
             <Route path="/doctor/settings" element={<DoctorSettings/>} />
             <Route path="/doctor/appointments" element={<DoctorAppointment/>}/>
             <Route path="/doctor/appointments/make-appointment" element={<DoctorMakeAppointment />} />
@@ -112,24 +112,32 @@ function App() {
             <Route path="/staff/appointments" element={<StaffAppointment />} />
             <Route path="/staff/appointments/make-appointment" element={<StaffMakeAppointment/>} />
             <Route path="/staff/appointments/add-visit-details" element={<StaffAddVisitDetails />} />
-            <Route path="/admin/home" element= {<AdminPortal/>} />
-            <Route path="/admin/appointments" element={<AdminAppointment/>}/>
-            <Route path="/admin/appointments/make-appointment" element={<AdminMakeAppointment />} />
-            <Route path="/admin/appointments/add-visit-details" element={<AdminAddVisitDetails />} />
-            <Route path="/admin/patients" element={<AdminPatients/>}/>
-            <Route path="/admin/login" element={<AdminLogin/>}/>
-            <Route path="/admin/appointment-data-report" element={<AppointmentDataReport/>}/>
-            <Route path="/admin/finance-data-report" element={<FinanceDataReport/>}/>
-            <Route path="/admin/demographic-data-report" element={<DemographicDataReport/>}/>
-            <Route path="/admin/staff" element={<AdminStaff/>}/>
-            <Route path="/admin/profile" element={<AdminProfile/>}/>
-            <Route path="/admin/register-dentist" element={<AdminRegisterDentist/>}/>
-            <Route path="/admin/register-staff" element={<AdminRegisterStaff/>}/>
-            <Route path="/admin/register-patient" element={<AdminRegisterPatient/>}/>
-            <Route path="/admin/dentists" element={<AdminDentist/>}/>
+            <Route
+              path="/admin/*"
+              element={
+                <AdminRoute>
+                  <Routes>
+                  <Route path="/home" element= {<AdminPortal/>} />
+                  <Route path="/appointments" element={<AdminAppointment/>}/>
+                  <Route path="/appointments/make-appointment" element={<AdminMakeAppointment />} />
+                  <Route path="/appointments/add-visit-details" element={<AdminAddVisitDetails />} />
+                  <Route path="/patients" element={<AdminPatients/>}/>
+                  <Route path="/appointment-data-report" element={<AppointmentDataReport/>}/>
+                  <Route path="/finance-data-report" element={<FinanceDataReport/>}/>
+                  <Route path="/demographic-data-report" element={<DemographicDataReport/>}/>
+                  <Route path="/staff" element={<AdminStaff/>}/>
+                  <Route path="/profile" element={<AdminProfile/>}/>
+                  <Route path="/register-dentist" element={<AdminRegisterDentist/>}/>
+                  <Route path="/register-staff" element={<AdminRegisterStaff/>}/>
+                  <Route path="/register-patient" element={<AdminRegisterPatient/>}/>
+                  <Route path="/dentists" element={<AdminDentist/>}/>
+                  <Route path="/settings" element={<AdminSettings/>}/>
+                  </Routes>
+                </AdminRoute>
+              }
+            />
             <Route path="/staff/profile" element={<StaffProfile/>}/>
             <Route path="/staff/settings" element={<StaffProfileSetting/>}/>
-            <Route path="/admin/settings" element={<AdminSettings/>}/>
           </Routes>
         </Router>
   );
