@@ -198,11 +198,11 @@ function AppointmentDataReport() {
                     <thead>
                       <tr className="bg-gray-100 border-b border-gray-300">
                         <th className="py-2 px-4 border-r border-gray-300">Date</th>
-                        <th className="py-2 px-4 border-r border-gray-300 cursor-pointer">Dentist</th>
-                        <th className="py-2 px-4 border-r border-gray-300 cursor-pointer">Appointment Type</th>
-                        <th className="py-2 px-4 border-r border-gray-300 cursor-pointer">Start Time</th>
-                        <th className="py-2 px-4 border-r border-gray-300 cursor-pointer">End Time</th>
-                        <th className="py-2 px-4 border-r border-gray-300 cursor-pointer">Appointment Status</th>
+                        <th className="py-2 px-4 border-r border-gray-300">Dentist</th>
+                        <th className="py-2 px-4 border-r border-gray-300">Appointment Type</th>
+                        <th className="py-2 px-4 border-r border-gray-300">Start Time</th>
+                        <th className="py-2 px-4 border-r border-gray-300">End Time</th>
+                        <th className="py-2 px-4 border-r border-gray-300">Appointment Status</th>
                       </tr>
                     </thead>
                     <tbody>
