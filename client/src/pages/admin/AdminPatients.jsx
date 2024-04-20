@@ -27,7 +27,7 @@ const AdminPatients = () => {
 
     const fetchPatients = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/admin/getPatients");
+            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/admin/getPatients");
             if (response.ok) {
                 const data = await response.json();
                 setPatients(data);
@@ -89,7 +89,7 @@ const AdminPatients = () => {
             };
     
             console.log("Sending userData to server:", updatedUserData); // Log before sending data
-            const response = await fetch(`http://localhost:5000/api/patient/editPatient/${patientID}`, {
+            const response = await fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/patient/editPatient/${patientID}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -115,7 +115,7 @@ const AdminPatients = () => {
     
     const handleConfirmDelete = async (patientID) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/patient/archive/${patientID}`, {
+            const response = await fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/patient/archive/${patientID}`, {
                 method: 'PATCH'
             });
             if (response.ok) {

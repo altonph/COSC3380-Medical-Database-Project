@@ -15,7 +15,7 @@ const StaffPatients = () => {
             return;
         }
 
-        fetch('http://localhost:5000/api/staff/patients', {
+        fetch('https://cosc3380-medical-database-project-server.onrender.com/api/staff/patients', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -12,7 +12,7 @@ const StaffProfile = () => {
 
   const fetchStaffProfile = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/staff/profile", {
+      const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/staff/profile", {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`

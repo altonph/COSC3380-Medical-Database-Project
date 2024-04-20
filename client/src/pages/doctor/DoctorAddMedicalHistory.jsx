@@ -32,7 +32,7 @@ const DoctorAddMedicalHistory = () => {
       }
       console.log("Sending request to backend");
       const response = await fetch(
-        `http://localhost:5000/api/doctor/patients/${patientID}/medical-history`,
+        `https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}/medical-history`,
         {
           method: "POST",
           headers: {

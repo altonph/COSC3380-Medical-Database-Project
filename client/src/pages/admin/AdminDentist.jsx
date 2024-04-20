@@ -27,7 +27,7 @@ const AdminDentist = () => {
 
     const fetchDentists = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/admin/getDentists");
+            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/admin/getDentists");
             if (response.ok) {
                 const data = await response.json();
                 setDentists(data);
@@ -91,7 +91,7 @@ const AdminDentist = () => {
                 Start_date: startDateSQLFormat
             };
             console.log("Sending userData to server:", updatedUserData);
-            const response = await fetch(`http://localhost:5000/api/dentist/editDentist/${dentistID}`, {
+            const response = await fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/dentist/editDentist/${dentistID}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -118,7 +118,7 @@ const AdminDentist = () => {
             const day = String(now.getDate()).padStart(2, '0');
             const End_date = `${year}-${month}-${day}`;
     
-            const response = await fetch(`http://localhost:5000/api/dentist/archive/${dentistID}`, {
+            const response = await fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/dentist/archive/${dentistID}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'

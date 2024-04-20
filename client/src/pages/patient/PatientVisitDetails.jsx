@@ -27,7 +27,7 @@ const PatientVisitDetails = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token"); 
-        fetch("http://localhost:5000/api/patient/visit-details", {
+        fetch("https://cosc3380-medical-database-project-server.onrender.com/api/patient/visit-details", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`

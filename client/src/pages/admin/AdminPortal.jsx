@@ -30,8 +30,8 @@ const AdminPortal = () => {
 
     const fetchDentistsAndOffices = async () => {
         try {
-            const dentistsResponse = await fetch("http://localhost:5000/api/admin/getDentists");
-            const officesResponse = await fetch("http://localhost:5000/api/admin/getOfficeDentists");
+            const dentistsResponse = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/admin/getDentists");
+            const officesResponse = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/admin/getOfficeDentists");
     
             if (dentistsResponse.ok && officesResponse.ok) {
                 const dentistsData = await dentistsResponse.json();
@@ -87,7 +87,7 @@ const AdminPortal = () => {
             // Implement logic to update the offices for the edited dentist
             console.log(`New offices for Dentist ${editedDentist.dentistID}:`, editedDentist.originalOffices);
     
-            const response = await fetch("http://localhost:5000/api/admin/updateDentistOffice", {
+            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/admin/updateDentistOffice", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -116,7 +116,7 @@ const AdminPortal = () => {
     const handleAssignOffice = async (dentistID, officeID) => {
         try {
             // Make a POST request to assign the dentist to the office
-            const response = await fetch("http://localhost:5000/api/office/assignDentist", {
+            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/office/assignDentist", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -131,7 +131,7 @@ const AdminPortal = () => {
                 console.log("Dentist assigned to office successfully!");
     
                 // Assign schedule with all days set to false
-                const scheduleResponse = await fetch("http://localhost:5000/api/dentist/assignSchedule", {
+                const scheduleResponse = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/dentist/assignSchedule", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -167,7 +167,7 @@ const AdminPortal = () => {
     const handleAssignBothOffices = async (dentistID) => {
         try {
             // Make two POST requests to assign the dentist to both offices
-            const response1 = await fetch("http://localhost:5000/api/office/assignDentist", {
+            const response1 = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/office/assignDentist", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -178,7 +178,7 @@ const AdminPortal = () => {
                 })
             });
     
-            const response2 = await fetch("http://localhost:5000/api/office/assignDentist", {
+            const response2 = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/office/assignDentist", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -193,7 +193,7 @@ const AdminPortal = () => {
                 console.log("Dentist assigned to both offices successfully!");
     
                 // Assign schedules for both offices
-                const scheduleResponse1 = await fetch("http://localhost:5000/api/dentist/assignSchedule", {
+                const scheduleResponse1 = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/dentist/assignSchedule", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -211,7 +211,7 @@ const AdminPortal = () => {
                     })
                 });
     
-                const scheduleResponse2 = await fetch("http://localhost:5000/api/dentist/assignSchedule", {
+                const scheduleResponse2 = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/dentist/assignSchedule", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -265,7 +265,7 @@ const AdminPortal = () => {
 
     const fetchSchedules = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/admin/getSchedules");
+            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/admin/getSchedules");
             if (response.ok) {
                 const data = await response.json();
                 setSchedules(data);
@@ -319,7 +319,7 @@ const AdminPortal = () => {
             };
     
             // Send the request with the updated payload
-            const response = await fetch("http://localhost:5000/api/admin/updateSchedule", {
+            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/admin/updateSchedule", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

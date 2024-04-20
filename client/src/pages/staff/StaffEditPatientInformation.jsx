@@ -18,7 +18,7 @@ const StaffEditPatientInformation = () => {
         }
 
         const response = await fetch(
-            `http://localhost:5000/api/staff/patients/${patientID}`,
+            `https://cosc3380-medical-database-project-server.onrender.com/api/staff/patients/${patientID}`,
           {
             method: "GET",
             headers: {
@@ -62,7 +62,7 @@ const StaffEditPatientInformation = () => {
         const formattedDOB = formatDateForBackend(editablePatientInfo.DOB);
 
         const response = await fetch(
-            `http://localhost:5000/api/staff/patients/${patientID}/information`,
+            `https://cosc3380-medical-database-project-server.onrender.com/api/staff/patients/${patientID}/information`,
             {
                 method: "PUT",
                 headers: {

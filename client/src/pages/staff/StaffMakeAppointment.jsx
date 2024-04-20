@@ -52,7 +52,7 @@ const StaffMakeAppointment = () => {
 
   const fetchDentistsByOfficeAndDay = async (officeID, dayOfWeek) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/dentist/getDentist?officeID=${officeID}&dayOfWeek=${dayOfWeek}`);
+      const response = await fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/dentist/getDentist?officeID=${officeID}&dayOfWeek=${dayOfWeek}`);
 
       if (response.ok) {
         const data = await response.json();
@@ -69,7 +69,7 @@ const StaffMakeAppointment = () => {
     try {
       const formattedDate = date.toISOString().split('T')[0];
   
-      const response = await fetch(`http://localhost:5000/api/dentist/getAvailableTimeBlocks?dentistID=${dentistID}&date=${formattedDate}`);
+      const response = await fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/dentist/getAvailableTimeBlocks?dentistID=${dentistID}&date=${formattedDate}`);
       if (response.ok) {
         const data = await response.json();
         console.log('Dentist availability:', data);
@@ -84,7 +84,7 @@ const StaffMakeAppointment = () => {
 
   const fetchAvailableStaff = async (officeID, date, startTime, endTime) => {
     try {
-        const response = await fetch('http://localhost:5000/api/doctor/appointments/available-staff', {
+        const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments/available-staff', {
             method: 'POST',
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem('token')}`,
@@ -132,7 +132,7 @@ const StaffMakeAppointment = () => {
     try {
       const formattedDOB = patientDOB.toISOString().substring(0, 10);
   
-      const response = await fetch('http://localhost:5000/api/doctor/appointments/check-patient', {
+      const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments/check-patient', {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`,
@@ -194,7 +194,7 @@ const StaffMakeAppointment = () => {
     const formattedDOB = patientDOB.toISOString().substring(0, 10);
 
     try {
-        const response = await fetch('http://localhost:5000/api/doctor/appointments', {
+        const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments', {
             method: 'POST',
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem('token')}`,

@@ -25,7 +25,7 @@ const PatientDetails = () => {
 
     const fetchData = async () => {
       try {
-        const patientPromise = fetch(`http://localhost:5000/api/doctor/patients/${patientID}`, {
+        const patientPromise = fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ const PatientDetails = () => {
           }
         });
 
-        const medicalHistoryPromise = fetch(`http://localhost:5000/api/doctor/patients/${patientID}/medical-history`, {
+        const medicalHistoryPromise = fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}/medical-history`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ const PatientDetails = () => {
           }
         });
 
-        const prescriptionsPromise = fetch(`http://localhost:5000/api/doctor/patients/${patientID}/prescriptions`, {
+        const prescriptionsPromise = fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}/prescriptions`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ const PatientDetails = () => {
           }
         });
 
-        const billingHistoryPromise = fetch(`http://localhost:5000/api/doctor/patients/${patientID}/invoices`, {
+        const billingHistoryPromise = fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}/invoices`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ const PatientDetails = () => {
           }
         });
 
-        const visitDetailsPromise = fetch(`http://localhost:5000/api/doctor/patients/${patientID}/visit-details`, {
+        const visitDetailsPromise = fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}/visit-details`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

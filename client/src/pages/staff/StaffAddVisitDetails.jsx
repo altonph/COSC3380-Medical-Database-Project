@@ -43,7 +43,7 @@ const StaffAddVisitDetails = () => {
         Notes: notes
     };
 
-    fetch('http://localhost:5000/api/staff/appointments/visit-details', {
+    fetch('https://cosc3380-medical-database-project-server.onrender.com/api/staff/appointments/visit-details', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ const StaffAddVisitDetails = () => {
             Date_prescribed: new Date().toISOString().split('T')[0]
         };
 
-        fetch('http://localhost:5000/api/staff/appointments/prescriptions', {
+        fetch('https://cosc3380-medical-database-project-server.onrender.com/api/staff/appointments/prescriptions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

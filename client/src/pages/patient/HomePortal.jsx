@@ -18,7 +18,7 @@ const HomePortal = () => {
     }, []);
 
     const fetchAppointments = () => {
-        fetch('http://localhost:5000/api/patient/appointments', {
+        fetch('https://cosc3380-medical-database-project-server.onrender.com/api/patient/appointments', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -57,7 +57,7 @@ const HomePortal = () => {
         setCancellationReason(reason);
         console.log(reason);
 
-        fetch('http://localhost:5000/api/patient/cancel-appointment', {
+        fetch('https://cosc3380-medical-database-project-server.onrender.com/api/patient/cancel-appointment', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

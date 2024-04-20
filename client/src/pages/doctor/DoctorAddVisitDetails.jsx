@@ -24,7 +24,7 @@ const DoctorAddVisitDetails = () => {
           try {
               const token = localStorage.getItem('token');
 
-              const response = await fetch('http://localhost:5000/api/doctor/appointments/get-specialty', {
+              const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments/get-specialty', {
                   method: 'GET',
                   headers: {
                       'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ const DoctorAddVisitDetails = () => {
         Cancellation_Reason: cancellationReason
       };
 
-      const response = await fetch('http://localhost:5000/api/doctor/appointments/update-status', {
+      const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments/update-status', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ const DoctorAddVisitDetails = () => {
     };
 
     try {
-        const response = await fetch('http://localhost:5000/api/doctor/appointments/visit-details', {
+        const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments/visit-details', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ const DoctorAddVisitDetails = () => {
                 Date: formatDate(appointmentDetails.Date),
                 Start_time: appointmentDetails.Start_time
             };
-            const patchResponse = await fetch('http://localhost:5000/api/doctor/appointments/update-primary-approval', {
+            const patchResponse = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments/update-primary-approval', {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ const DoctorAddVisitDetails = () => {
             Start_time: appointmentDetails.Start_time
         };
 
-        const invoiceResponse = await fetch('http://localhost:5000/api/doctor/appointments/generate-invoice', {
+        const invoiceResponse = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments/generate-invoice', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -196,7 +196,7 @@ const DoctorAddVisitDetails = () => {
             Date_prescribed: new Date().toISOString().split('T')[0]
         };
 
-        fetch('http://localhost:5000/api/doctor/appointments/prescriptions', {
+        fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments/prescriptions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

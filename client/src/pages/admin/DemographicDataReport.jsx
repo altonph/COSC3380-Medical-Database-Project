@@ -33,7 +33,7 @@ function DemographicDataReport() {
             formData.append('gender', gender);
             formData.append('insuranceType', insuranceType);
 
-            const response = await fetch('http://localhost:5000/api/admin/demographic-data-report', {
+            const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/admin/demographic-data-report', {
                 method: 'POST',
                 body: formData
             });

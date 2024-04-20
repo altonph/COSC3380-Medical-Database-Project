@@ -26,7 +26,7 @@ const AdminSettings = () => {
 
     const fetchDoctorInfo = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/doctor/profile', {
+            const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/profile', {
                 method: 'GET',
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`,
@@ -63,7 +63,7 @@ const AdminSettings = () => {
                 ...doctorInfo,
                 dob: dobISOFormat
             };
-            const response = await fetch('http://localhost:5000/api/doctor/profile', {
+            const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/profile', {
                 method: 'PATCH',
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem('token')}`,

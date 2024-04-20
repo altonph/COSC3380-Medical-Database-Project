@@ -24,7 +24,7 @@ const DoctorAppointment = () => {
           try {
               const token = localStorage.getItem('token');
 
-              const response = await fetch('http://localhost:5000/api/doctor/appointments/get-specialty', {
+              const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments/get-specialty', {
                   method: 'GET',
                   headers: {
                       'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ const DoctorAppointment = () => {
           Cancellation_Reason: cancellationReason 
         };
     
-        const response = await fetch(`http://localhost:5000/api/doctor/appointments/update-status`, {
+        const response = await fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments/update-status`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -211,7 +211,7 @@ const DoctorAppointment = () => {
           appointmentData.Date = formattedDate;
   
           const token = localStorage.getItem('token');
-          const response = await fetch('http://localhost:5000/api/doctor/appointments/check-visit-details', {
+          const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments/check-visit-details', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
@@ -236,7 +236,7 @@ const DoctorAppointment = () => {
       const fetchAppointments = async () => {
         try {
           const token = localStorage.getItem('token'); 
-          const response = await fetch('http://localhost:5000/api/doctor/appointments', {
+          const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/appointments', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

@@ -12,7 +12,7 @@ const PatientPrescriptions = () => {
 
     const fetchPrescriptions = () => {
         const token = localStorage.getItem("token");
-        fetch("http://localhost:5000/api/patient/prescriptions", {
+        fetch("https://cosc3380-medical-database-project-server.onrender.com/api/patient/prescriptions", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`

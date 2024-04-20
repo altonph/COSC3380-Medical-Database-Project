@@ -17,7 +17,7 @@ const DoctorLoginPage = (props) => {
                 Password: password,
             }
 
-            const response = await fetch("http://localhost:5000/doctor/check-role", { 
+            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/doctor/check-role", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)
@@ -29,7 +29,7 @@ const DoctorLoginPage = (props) => {
 
                 // Check user role and redirect accordingly
                 if (data.role === 'Staff') {
-                    const staffResponse = await fetch("http://localhost:5000/staff/login", { 
+                    const staffResponse = await fetch("https://cosc3380-medical-database-project-server.onrender.com/staff/login", { 
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(body)
@@ -47,7 +47,7 @@ const DoctorLoginPage = (props) => {
                         console.error('Staff login failed:', staffError.message);
                     }
                 } else if (data.role === 'Dentist') {
-                    const dentistResponse = await fetch("http://localhost:5000/doctor/login", { 
+                    const dentistResponse = await fetch("https://cosc3380-medical-database-project-server.onrender.com/doctor/login", { 
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(body)

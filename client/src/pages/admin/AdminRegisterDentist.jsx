@@ -37,7 +37,7 @@ const AdminRegisterDentist = () => {
                 User_role: "Dentist"
             }
             
-            const response = await fetch("http://localhost:5000/doctor/register", {
+            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/doctor/register", {
 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

@@ -14,7 +14,7 @@ function FinanceDataReport() {
     
     const handleGenerateReport2 = async () => {
         try {
-            const apiUrl = `http://localhost:5000/api/admin/finance-revenue-report?office=${office}&type=${type}`;
+            const apiUrl = `https://cosc3380-medical-database-project-server.onrender.com/api/admin/finance-revenue-report?office=${office}&type=${type}`;
             let dateParams = '';
             
             if (startDate && endDate) {

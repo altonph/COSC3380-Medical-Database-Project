@@ -17,7 +17,7 @@ const DoctorEditMedicalHistory = () => {
         }
 
         const response = await fetch(
-          `http://localhost:5000/api/doctor/patients/${patientID}/medical-history`,
+          `https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}/medical-history`,
           {
             method: "GET",
             headers: {
@@ -64,7 +64,7 @@ const DoctorEditMedicalHistory = () => {
 
       const updatedHistory = editableMedicalHistory[index];
       const response = await fetch(
-        `http://localhost:5000/api/doctor/patients/${patientID}/medical-history`,
+        `https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}/medical-history`,
         {
           method: "PUT",
           headers: {
