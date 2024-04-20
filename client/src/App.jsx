@@ -56,7 +56,7 @@ import StaffProfile from "./pages/staff/StaffProfile";
 import StaffProfileSetting from "./pages/staff/StaffProfileSettings";
 import AdminSettings from "./pages/admin/AdminSettings";
 
-//import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 //import AdminRoute from "./components/AdminRoute";
 
 function App() {
@@ -70,13 +70,23 @@ function App() {
             <Route path="/patient/register" element={<RegisterPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/patient/appointment" element= {<MakeAppointment/>} />
-            <Route path="/patient/home" element= {<HomePortal/>} />
-            <Route path="/patient/payment" element= {<PaymentPortal/>} />
-            <Route path="/patient/profile" element= {<PatientProfile/>} />
-            <Route path="/patient/prescriptions" element= {<PatientPrescriptions/>} />
-            <Route path="/patient/settings" element= {<PatientProfileSettings/>} />
-            <Route path="/patient/visit" element= {<PatientVisitDetails/>} />
-            <Route path="/patient/history" element= {<PatientMedicalHistory/>} />
+            <Route
+          path="/patient/*"
+          element={
+            <ProtectedRoute>
+              <Routes>
+                <Route path="/appointment" element={<MakeAppointment />} />
+                <Route path="/home" element={<HomePortal />} />
+                <Route path="/payment" element={<PaymentPortal />} />
+                <Route path="/profile" element={<PatientProfile />} />
+                <Route path="/prescriptions" element={<PatientPrescriptions />} />
+                <Route path="/settings" element={<PatientProfileSettings />} />
+                <Route path="/visit" element={<PatientVisitDetails />} />
+                <Route path="/history" element={<PatientMedicalHistory />} />
+              </Routes>
+            </ProtectedRoute>
+          }
+        />
             <Route path="/doctor/login" element= {<DoctorLoginPage/>} />
             <Route path="/doctor/settings" element={<DoctorSettings/>} />
             <Route path="/doctor/appointments" element={<DoctorAppointment/>}/>
