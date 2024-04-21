@@ -21,10 +21,17 @@
 <li>Import the schema from the provided SQL file</li>
 </ul>
 <h3>Configuring the application (locally)</h3>
-<li>Open the terminal</li>
-<li>Type 'cd client' inside of your terminal</li>
-<li>Type 'npm run dev' inside of your terminal</li>
 
+<li>Open the terminal</li>
+<li>Type 'cd server' inside of your terminal</li>
+<li>Type 'npm i' inside of your terminal to download necessary packages</li>
+<li>create a '.env' file and paste the database credentials provided in the submission document</li>
+<li>Type 'cd ..' into the terminal</li> 
+<li>Type 'cd client' inside of your terminal</li>
+<li>Type 'npm i' inside of your terminal to download necessary packages</li>
+<li>Type 'npm run dev' inside of your terminal</li>
+<li>Click on the provided localhost weblink</li>
+  
 <h1>Contributors</h1>
 <ul>
 <li>Alton Phan: https://github.com/altonph</li>
