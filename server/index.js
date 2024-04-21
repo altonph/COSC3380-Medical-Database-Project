@@ -4,7 +4,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { handleRegisterPatient, handleLoginPatient, handleRegisterDoctor, handleLoginDoctor, handleRegisterAdmin, handleLoginAdmin, handleRegisterStaff,
     handleLoginStaff, handleEditDentist, handleEditStaff, handleEditPatient, handleArchiveDentist, handleArchiveStaff, handleArchivePatient, handleGetUserRole, handleGetStaffProfile, handleUpdateStaffProfile } = require('./routes/authRoutes');
-const { handleProtectedRoute } = require('./controllers/authController');
+const { handleProtectedRoute, handleProtectedRouteAdmin, handleProtectedRouteDentist, handleProtectedRouteStaff } = require('./controllers/authController');
 const { handleGetPatient, handlePatientUpdate, handlePatientAppointment, handleGetInvoicesByPatientUsername, handleGetVisitDetailsByPatient, handleGetMedicalHistoryByPatient, handleGetPrescriptionsByPatient, handleGetAppointmentsByPatient, handleGetPatientID, handleCancelAppointment, handlePayInvoice } = require('./routes/patientRoutes');
 const { doctorRoutes, verifyToken } = require('./routes/doctorRoutes'); 
 const { staffRoutes, staffverifyToken } = require('./routes/staffRoutes');
@@ -31,6 +31,12 @@ const server = http.createServer((req, res) => {
         handleLoginPatient(req, res, jwt);
     } else if (req.url === '/api/patient/protected' && req.method === 'GET') {
         handleProtectedRoute(req, res, jwt);
+    } else if (req.url === '/api/dentist/protected' && req.method === 'GET') {
+        handleProtectedRouteDentist(req, res, jwt);
+    } else if (req.url === '/api/staff/protected' && req.method === 'GET') {
+        handleProtectedRouteStaff(req, res, jwt);
+    } else if (req.url === '/api/admin/protected' && req.method === 'GET') {
+        handleProtectedRouteAdmin(req, res, jwt);
     } else if (req.url === '/api/staff/register' && req.method === 'POST') {
         handleRegisterStaff(req, res, jwt);
     } else if (req.url === '/api/staff/login' && req.method === 'POST') {
