@@ -14,6 +14,8 @@ const RegisterPage = () => {
     const [Phone_num, setPhone_num] = useState('');
     const [Address, setAddress] = useState('');
     const [Username, setUsername] = useState('');
+    const [Insurance, setInsurance] = useState(null);
+    const [PolicyNumber, setPolicyNumber] = useState('');
     const navigateTo = useNavigate(); 
 
     const handleSubmit = async (e) => {
@@ -34,10 +36,13 @@ const RegisterPage = () => {
                 Phone_num: Phone_num,
                 Address: Address,
                 Is_admin: false,
+                Insurance_Company_Name: Insurance,
+                Policy_number: PolicyNumber,
                 User_role: "Patient"
             }
             
-            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/patient/register", {
+            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/patient/register", {
+
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)
@@ -172,6 +177,38 @@ const RegisterPage = () => {
                                 className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
                             />
                         </div>
+
+                        <div className="mb-4">
+                            <label htmlFor="Insurance" className="block">Insurance Company</label>
+                            <select
+                                value={Insurance}
+                                onChange={(e) => setInsurance(e.target.value)}
+                                id="Insurance"
+                                name="Insurance"
+                                className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
+                            >
+                                <option value={null}>None</option> 
+                                <option value="Anthem">Anthem</option>
+                                <option value="Guardian">Guardian</option>
+                                <option value="Ameritas">Ameritas</option>
+                                <option value="Humana">Humana</option>
+                                <option value="Spirit Dental">Spirit Dental</option>
+                            </select>
+                        </div>
+                        {Insurance !== "None" && (
+                            <div className="mb-4">
+                                <label htmlFor="PolicyNumber" className="block">Policy Number</label>
+                                <input
+                                    value={PolicyNumber}
+                                    onChange={(e) => setPolicyNumber(e.target.value)}
+                                    type="text"
+                                    placeholder="Policy Number"
+                                    id="PolicyNumber"
+                                    name="PolicyNumber"
+                                    className="w-full border py-2 px-3 rounded focus:outline-none focus:ring focus:border-blue-300"
+                                />
+                            </div>
+                        )}
                         
                         <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300">Register</button>
                     </form>

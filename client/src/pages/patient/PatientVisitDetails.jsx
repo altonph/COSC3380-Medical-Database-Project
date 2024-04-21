@@ -1,20 +1,52 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import HeaderPortalPatient from "../../components/HeaderPortalPatient";
 import Footer from "../../components/Footer";
 
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+}
+
+function formatTime(timeString) {
+    const [hours, minutes] = timeString.split(':');
+    let hour = parseInt(hours, 10);
+    const period = hour >= 12 ? 'PM' : 'AM';
+    if (hour > 12) {
+        hour -= 12;
+    } else if (hour === 0) {
+        hour = 12;
+    }
+    return `${hour}:${minutes} ${period}`;
+}
+
 const PatientVisitDetails = () => {
-    // Sample for now
-    const visitDetails = {
-        dentistName: "Dr. Smith",
-        staffName: "Mrs. Jones",
-        date: "03-15-2024",
-        time: "10:00 AM",
-        type: "Routine Checkup",
-        diagnosis: "Cavity forming on tooth 5",
-        treatment: "Teeth Cleaning",
-        location: "Dentist Office",
-        notes: "No specific notes for this visit."
-    };
+    const [visitDetails, setVisitDetails] = useState([]);
+
+    useEffect(() => {
+        const token = localStorage.getItem("token"); 
+        fetch("https://cosc3380-medical-database-project-server.onrender.com/api/patient/visit-details", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then(data => {
+            setVisitDetails(data);
+            console.log(data);
+        })
+        .catch(error => {
+            console.error("Error fetching visit details:", error);
+        });
+    }, []);
 
     return (
         <div className="flex h-screen flex-col">
@@ -37,23 +69,30 @@ const PatientVisitDetails = () => {
                 </aside>
 
                 <main className="flex-1 p-4 mt-4">
-                    <h1 className="text-3xl font-bold p-2 ml-8 mb-4">Your Visit Details</h1>
+                <h1 className="text-3xl font-bold p-2 ml-8 mb-4">Your Visit Details</h1>
 
-                    <div className="container mx-auto mt-4">
+                <div className="container mx-auto mt-4">
+                    {visitDetails.length > 0 ? (
+                        visitDetails.map((detail, index) => (
+                            <div key={index} className="border border-gray-200 rounded p-4 mb-4">
+                                <h2 className="text-lg font-semibold">Doctor: {detail.Dentist_FirstName} {detail.Dentist_LastName}</h2>
+                                <h2 className="text-lg font-semibold">Assisting Staff: {detail.Staff_FirstName} {detail.Staff_LastName}</h2>
+                                <p className="text-sm text-gray-600">Date: {formatDate(detail.Date)}</p>
+                                <p className="text-sm text-gray-600">Appointment Type: {detail.Appointment_type}</p>
+                                <p className="text-sm text-gray-600">Start Time: {formatTime(detail.Start_time)}</p>
+                                <p className="text-sm text-gray-600">Diagnosis: {detail.Diagnosis}</p>
+                                <p className="text-sm text-gray-600">Treatment: {detail.Treatment}</p>
+                                <p className="text-sm text-gray-600">Notes: {detail.Notes}</p>
+                            </div>
+                        ))
+                    ) : (
                         <div className="border border-gray-200 rounded p-4 mb-4">
-                            <h2 className="text-lg font-semibold">Dentist: {visitDetails.dentistName}</h2>
-                            <h2 className="text-lg font-semibold">Assisting Staff: {visitDetails.staffName}</h2>
-                            <p className="text-sm text-gray-600">Date: {visitDetails.date}</p>
-                            <p className="text-sm text-gray-600">Time: {visitDetails.time}</p>
-                            {/* <p className="text-sm text-gray-600">Duration: {visitDetails.duration}</p> */}
-                            <p className="text-sm text-gray-600">Visit Type: {visitDetails.type}</p>
-                            <p className="text-sm text-gray-600">Diagnosis: {visitDetails.diagnosis}</p>
-                            <p className="text-sm text-gray-600">Treatment: {visitDetails.treatment}</p>
-                            <p className="text-sm text-gray-600">Location: {visitDetails.location}</p>
-                            <p className="text-sm text-gray-600">Notes: {visitDetails.notes}</p>
+                            <p className="text-lg font-semibold">No visit details found.</p>
                         </div>
-                    </div>
-                </main>
+                    )}
+                </div>
+            </main>
+
             </div>
 
             <nav>

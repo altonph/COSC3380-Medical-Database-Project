@@ -17,7 +17,8 @@ const AdminLogin = () => {
         Password: Password,
       };
 
-      const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/login/admin', {
+
+      const response = await fetch('https://cosc3380-medical-database-project-server.onrender.com/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -27,6 +28,8 @@ const AdminLogin = () => {
         const data = await response.json();
         localStorage.setItem('token', data.token);
         localStorage.setItem('role', data.role);
+        localStorage.setItem('firstName', data.firstName);
+        localStorage.setItem('lastName', data.lastName);
         navigateTo('/admin/home');
         console.log('Login Successful');
       } else {

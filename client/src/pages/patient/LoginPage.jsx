@@ -17,7 +17,7 @@ const LoginPage = (props) => {
                 Password: Password,
             }
     
-            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/login", {
+            const response = await fetch("https://cosc3380-medical-database-project-server.onrender.com/api/patient/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)

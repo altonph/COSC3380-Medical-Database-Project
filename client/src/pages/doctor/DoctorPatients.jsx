@@ -1,19 +1,48 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom"; 
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import HeaderPortalAdmin from "../../components/HeaderPortalDoctor";
 import Footer from "../../components/Footer";
 
 const DoctorPatients = () => {
-
     const [editingPatientID, setEditingPatientID] = useState(null);
     const [editedPatients, setEditedPatients] = useState({});
-    const [patients, setPatients] = useState([
-        {patientID: 12345, insuranceID: 1, dentistID: 2, Gender: "Male", FName: "John", LName: "Apple", DOB: "05/06/1991", Email: "johnapple@gmail.com", Phone_num: 123456789, Address: "12 Calhoun Rd"},
-        {patientID: 54321, insuranceID: 2, dentistID: 1, Gender: "Female", FName: "Jane", LName: "Apple", DOB: "10/05/1981", Email: "janeapple@gmail.com", Phone_num: 987654321, Address: "5543 Houston St"},
-        {patientID: 9876, insuranceID: 3, dentistID: 3, Gender: "Male", FName: "Michael", LName: "Smith", DOB: "03/15/1975", Email: "michaelsmith@gmail.com", Phone_num: 5551234567, Address: "789 Elm St"},
-        {patientID: 5432, insuranceID: 4, dentistID: 4, Gender: "Female", FName: "Emily", LName: "Johnson", DOB: "07/20/1988", Email: "emilyjohnson@gmail.com", Phone_num: 4449876543, Address: "456 Pine St"},
-        {patientID: 4567, insuranceID: 2, dentistID: 1, Gender: "Male", FName: "David", LName: "Brown", DOB: "11/25/1965", Email: "davidbrown@gmail.com", Phone_num: 2223456789, Address: "234 Oak St"}
-    ]);
+    const [patients, setPatients] = useState([]);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('Token not found in local storage');
+            return;
+        }
+    
+        fetch('https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => setPatients(data))
+        .catch(error => console.error('Error fetching patients:', error));
+    }, []);
+    
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; 
+        const year = date.getFullYear();
+        const formattedDay = day < 10 ? '0' + day : day;
+        const formattedMonth = month < 10 ? '0' + month : month;
+        return formattedMonth + '/' + formattedDay + '/' + year;
+    };
+
 
     const handleEdit = (patientID) => {
         setEditingPatientID(patientID);
@@ -72,86 +101,47 @@ const DoctorPatients = () => {
                             </ul>
                         </nav>
                     </aside>
-                    
+
                     <main className="flex-1 p-4">
                         <h1 className="text-3xl font-bold mb-4 p-8">Patients Overview</h1>
                         <table className="table-auto">
                             <thead>
                                 <tr>
-                                    <th className="px-4 py-2 text-sm">PatientID</th>
-                                    <th className="px-4 py-2 text-sm">InsuranceID</th>
-                                    <th className="px-4 py-2 text-sm">DentistID</th>
+                                    <th className="px-4 py-2 text-sm">Patient ID</th>
+                                    <th className="px-4 py-2 text-sm">Policy Number</th>
+                                    <th className="px-4 py-2 text-sm">Insurance Company Name</th>
                                     <th className="px-4 py-2 text-sm">Gender</th>
-                                    <th className="px-4 py-2 text-sm">FirstName</th>
-                                    <th className="px-4 py-2 text-sm">LastName</th>
+                                    <th className="px-4 py-2 text-sm">First Name</th>
+                                    <th className="px-4 py-2 text-sm">Last Name</th>
                                     <th className="px-4 py-2 text-sm">DOB</th>
                                     <th className="px-4 py-2 text-sm">Email</th>
-                                    <th className="px-4 py-2 text-sm">PhoneNumber</th>
+                                    <th className="px-4 py-2 text-sm">Phone Number</th>
                                     <th className="px-4 py-2 text-sm">Address</th>
-                                    <th className="px-4 py-2 text-sm">Actions</th> 
                                 </tr>
                             </thead>
                             <tbody>
                                 {patients.map(patient => (
                                     <tr key={patient.patientID}>
                                         <td className="border px-4 py-2 text-xs">
-                                            <Link to={`/doctor/patients/${patient.patientID}`}>{patient.patientID}</Link> 
+                                            <Link to={`/doctor/patients/${patient.patientID}`}>{patient.patientID}</Link>
                                         </td>
-                                        <td className="border px-4 py-2 text-xs">
-                                            {isEditing(patient.patientID) ? 
-                                                <input type="text" name="insuranceID" value={editedPatients.insuranceID || ''} onChange={handleInputChange} style={{ width: "75px" }} /> 
-                                                : patient.insuranceID}
-                                        </td>
-                                        <td className="border px-4 py-2 text-xs">
-                                            {isEditing(patient.patientID) ? 
-                                                <input type="text" name="dentistID" value={editedPatients.dentistID || ''} onChange={handleInputChange} style={{ width: "75px" }} /> 
-                                                : patient.dentistID}
-                                        </td>
-                                        <td className="border px-4 py-2 text-xs">
-                                            {isEditing(patient.patientID) ? 
-                                                <input type="text" name="Gender" value={editedPatients.Gender || ''} onChange={handleInputChange} style={{ width: "75px" }} /> 
-                                                : patient.Gender}
-                                        </td>
-                                        <td className="border px-4 py-2 text-xs">
-                                            {isEditing(patient.patientID) ? 
-                                                <input type="text" name="FName" value={editedPatients.FName || ''} onChange={handleInputChange} style={{ width: "75px" }} /> 
-                                                : patient.FName}
-                                        </td>
-                                        <td className="border px-4 py-2 text-xs">
-                                            {isEditing(patient.patientID) ? 
-                                                <input type="text" name="LName" value={editedPatients.LName || ''} onChange={handleInputChange} style={{ width: "75px" }} /> 
-                                                : patient.LName}
-                                        </td>
-                                        <td className="border px-4 py-2 text-xs">
-                                            {isEditing(patient.patientID) ? 
-                                                <input type="date" name="DOB" value={editedPatients.DOB || ''} onChange={handleDateChange} style={{ width: "75px" }} /> 
-                                                : patient.DOB}
-                                        </td>
-                                        <td className="border px-4 py-2 text-xs">
-                                            {isEditing(patient.patientID) ? 
-                                                <input type="text" name="Email" value={editedPatients.Email || ''} onChange={handleInputChange} style={{ width: "75px" }} /> 
-                                                : patient.Email}
-                                        </td>
-                                        <td className="border px-4 py-2 text-xs">
-                                            {isEditing(patient.patientID) ? 
-                                                <input type="text" name="Phone_num" value={editedPatients.Phone_num || ''} onChange={handleInputChange} style={{ width: "75px" }} /> 
-                                                : patient.Phone_num}
-                                        </td>
-                                        <td className="border px-4 py-2 text-xs">
-                                            {isEditing(patient.patientID) ? 
-                                                <input type="text" name="Address" value={editedPatients.Address || ''} onChange={handleInputChange} style={{ width: "75px" }} /> 
-                                                : patient.Address}
-                                        </td>
+                                        <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="insuranceID" value={editedPatients.Policy_number || ''} onChange={handleInputChange} /> : patient.Policy_number}</td>
+                                        <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="insuranceID" value={editedPatients.Insurance_Company_Name || ''} onChange={handleInputChange} /> : patient.Insurance_Company_Name}</td>
+                                        <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="Gender" value={editedPatients.Gender || ''} onChange={handleInputChange} /> : patient.Gender}</td>
+                                        <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="FName" value={editedPatients.FName || ''} onChange={handleInputChange} /> : patient.FName}</td>
+                                        <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="LName" value={editedPatients.LName || ''} onChange={handleInputChange} /> : patient.LName}</td>
+                                        <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="date" name="DOB" value={editedPatients.DOB || ''} onChange={handleDateChange} /> : formatDate(patient.DOB)}</td>
+                                        <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="Email" value={editedPatients.Email || ''} onChange={handleInputChange} /> : patient.Email}</td>
+                                        <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="Phone_num" value={editedPatients.Phone_num || ''} onChange={handleInputChange} /> : patient.Phone_num}</td>
+                                        <td className="border px-4 py-2 text-xs">{isEditing(patient.patientID) ? <input type="text" name="Address" value={editedPatients.Address || ''} onChange={handleInputChange} /> : patient.Address}</td>
                                         <td className="border px-4 py-2 text-xs">
                                             {isEditing(patient.patientID) ? (
                                                 <>
-                                                    <button className="bg-blue-500 text-white px-2 py-1 mr-2" onClick={() => handleSave(patient.patientID)}>Save</button>
-                                                    <button className="bg-red-500 text-white px-2 py-1 mr-2" onClick={handleCancel}>Cancel</button>
+                                                    
                                                 </>
                                             ) : (
                                                 <>
-                                                    <button className="bg-blue-500 text-white px-2 py-1 mr-2" onClick={() => handleEdit(patient.patientID)}>Edit</button>
-                                                    <button className="bg-red-500 text-white px-2 py-1 mr-2" onClick={() => handleDelete(patient.patientID)}>Delete</button>
+                                                
                                                 </>
                                             )}
                                         </td>

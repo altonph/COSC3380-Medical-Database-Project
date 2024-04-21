@@ -1,56 +1,127 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import HeaderPortalAdmin from "../../components/HeaderPortalDoctor"; 
 import Footer from "../../components/Footer"; 
 
 const PatientDetails = () => {
   const { patientID } = useParams();
-
-  const patients = [
-    {patientID: 12345, insuranceID: 1, dentistID: 2, Gender: "Male", FName: "John", LName: "Apple", DOB: "05/06/1991", Email: "johnapple@gmail.com", Phone_num: 123456789, Address: "12 Calhoun Rd"},
-    {patientID: 54321, insuranceID: 2, dentistID: 1, Gender: "Female", FName: "Jane", LName: "Apple", DOB: "10/05/1981", Email: "janeapple@gmail.com", Phone_num: 987654321, Address: "5543 Houston St"},
-    {patientID: 9876, insuranceID: 3, dentistID: 3, Gender: "Male", FName: "Michael", LName: "Smith", DOB: "03/15/1975", Email: "michaelsmith@gmail.com", Phone_num: 5551234567, Address: "789 Elm St"},
-    {patientID: 5432, insuranceID: 4, dentistID: 4, Gender: "Female", FName: "Emily", LName: "Johnson", DOB: "07/20/1988", Email: "emilyjohnson@gmail.com", Phone_num: 4449876543, Address: "456 Pine St"},
-    {patientID: 4567, insuranceID: 2, dentistID: 1, Gender: "Male", FName: "David", LName: "Brown", DOB: "11/25/1965", Email: "davidbrown@gmail.com", Phone_num: 2223456789, Address: "234 Oak St"}
-  ];
-
-  const patient = patients.find(p => p.patientID === parseInt(patientID));
-
-  const visitDetails = {
-    patientID: 12345,
-    visitId: "V123456",
-    dentistId: 2,
-    dentistName: "Dr. Smith",
-    patientName: `${patient ? patient.FName : ''} ${patient ? patient.LName : ''}`,
-    visitType: "Regular checkup",
-    diagnosis: "Healthy",
-    treatment: "No treatment required",
-    notes: "Patient is in good health condition"
-  };
-
-  const medicalHistory = {
-    patientID: 12345,
-    allergies: "None",
-    height: "180 cm",
-    weight: "75 kg",
-    medicalNotes: "No significant medical history"
-  };
-
-  const prescriptions = [
-    { id: 1, patientID: 12345, medication: "Medication A", dosage: "10mg", instructions: "Take twice daily" },
-    { id: 2, patientID: 12345, medication: "Medication B", dosage: "20mg", instructions: "Take once daily" },
-    { id: 3, patientID: 54321, medication: "Medication C", dosage: "5mg", instructions: "Take with food" }
-  ];
+  const [patient, setPatient] = useState(null);
+  const [editedPatient, setEditedPatient] = useState(null);
+  const [medicalHistory, setMedicalHistory] = useState([]);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [billingHistory, setBillingHistory] = useState([]);
+  const [visitDetails, setVisitDetails] = useState([]);
 
   const patientPrescriptions = prescriptions.filter(prescription => prescription.patientID === parseInt(patientID));
 
-  const billingHistory = [
-    { patientID: 12345, date: "03/12/2024", description: "Dental Checkup", status: "Paid", amount: "$50.00" },
-    { patientID: 54321, date: "03/15/2024", description: "X-ray", status: "Pending", amount: "$100.00" },
-    { patientID: 12345, date: "03/20/2024", description: "Dental Cleaning", status: "Paid", amount: "$80.00" },
-  ];
-
   const patientBillingHistory = billingHistory.filter(entry => entry.patientID === parseInt(patientID));
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('Token not found in local storage');
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        const patientPromise = fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        const medicalHistoryPromise = fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}/medical-history`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        const prescriptionsPromise = fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}/prescriptions`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        const billingHistoryPromise = fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}/invoices`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        const visitDetailsPromise = fetch(`https://cosc3380-medical-database-project-server.onrender.com/api/doctor/patients/${patientID}/visit-details`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+        const [patientResponse, medicalHistoryResponse, prescriptionsResponse, billingHistoryResponse, visitDetailsResponse] = await Promise.all([
+          patientPromise,
+          medicalHistoryPromise,
+          prescriptionsPromise,
+          billingHistoryPromise,
+          visitDetailsPromise
+        ]);
+
+        if (!patientResponse.ok || !medicalHistoryResponse.ok || !prescriptionsResponse.ok || !billingHistoryResponse.ok || !visitDetailsResponse.ok) {
+          throw new Error('One or more network responses were not ok');
+        }
+
+        const patientData = await patientResponse.json();
+        const medicalHistoryData = await medicalHistoryResponse.json();
+        const prescriptionsData = await prescriptionsResponse.json();
+        const billingHistoryData = await billingHistoryResponse.json();
+        const visitDetailsData = await visitDetailsResponse.json();
+
+        setPatient(patientData);
+        setMedicalHistory(medicalHistoryData);
+        setPrescriptions(prescriptionsData);
+        setBillingHistory(billingHistoryData);
+        setVisitDetails(visitDetailsData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [patientID]);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1; 
+    const year = date.getFullYear();
+    const formattedDay = day < 10 ? '0' + day : day;
+    const formattedMonth = month < 10 ? '0' + month : month;
+    return formattedMonth + '/' + formattedDay + '/' + year;
+  };
+
+  const handleEditPatientInformation = () => {
+    setEditedPatient({ ...patient });
+  };
+
+  const handleSavePatientInformation = () => {
+    setPatient({ ...editedPatient });
+    setEditedPatient(null);
+  };
+
+  const handleCancelPatientInformation = () => {
+    setEditedPatient(null);
+  };
+
+  if (!patient) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -70,79 +141,78 @@ const PatientDetails = () => {
           <h1 className="text-3xl font-bold mb-4 p-8">Patient Details</h1>
           <div className="mt-8">
             <h2 className="text-lg font-semibold mb-2">Patient Information:</h2>
-            {patient ? (
-              <>
-                <p><span className="font-semibold">ID:</span> {patient.patientID}</p>
-                <p><span className="font-semibold">Name:</span> {patient.FName} {patient.LName}</p>
-                <p><span className="font-semibold">Gender:</span> {patient.Gender}</p>
-                <p><span className="font-semibold">Date of Birth:</span> {patient.DOB}</p>
-                <p><span className="font-semibold">Email:</span> {patient.Email}</p>
-                <p><span className="font-semibold">Phone Number:</span> {patient.Phone_num}</p>
-                <p><span className="font-semibold">Address:</span> {patient.Address}</p>
-              </>
-            ) : (
-              <div>No patient information found</div>
-            )}
-            <div className="mt-4">
-              <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit Patient Information</button>
-            </div>
+            <>
+              <p><span className="font-semibold">ID:</span> {patient.patientID}</p>
+              <p><span className="font-semibold">Name:</span> {patient.FName} {patient.LName}</p>
+              <p><span className="font-semibold">Gender:</span> {patient.Gender}</p>
+              <p><span className="font-semibold">Date of Birth:</span> {formatDate(patient.DOB)}</p>
+              <p><span className="font-semibold">Email:</span> {patient.Email}</p>
+              <p><span className="font-semibold">Phone Number:</span> {patient.Phone_num}</p>
+              <p><span className="font-semibold">Address:</span> {patient.Address}</p>
+            </>
           </div>
-          
+          <div className="mt-4">
+            <Link to={`/doctor/patients/${patientID}/patient-information`} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit Patient Information</Link>
+          </div>
+
           <div className="mt-8">
             <h2 className="text-lg font-semibold mb-2">Visit Details:</h2>
-            {visitDetails.patientID === (patient ? patient.patientID : null) && patientPrescriptions.length > 0 ? (
+            {visitDetails && visitDetails.length > 0 ? (
               <ul>
-                <li>
-                  <p><span className="font-semibold">Visit ID:</span> {visitDetails.visitId}</p>
-                  <p><span className="font-semibold">Dentist ID and Name:</span> {visitDetails.dentistId} - {visitDetails.dentistName}</p>
-                  <p><span className="font-semibold">Patient Name:</span> {visitDetails.patientName}</p>
-                  <p><span className="font-semibold">Patient ID:</span> {visitDetails.patientID}</p>
-                  <p><span className="font-semibold">Visit Type:</span> {visitDetails.visitType}</p>
-                  <p><span className="font-semibold">Diagnosis:</span> {visitDetails.diagnosis}</p>
-                  <p><span className="font-semibold">Treatment:</span> {visitDetails.treatment}</p>
-                  <p><span className="font-semibold">Notes:</span> {visitDetails.notes}</p>
-                </li>
+                {visitDetails.map((visitDetail, index) => (
+                  <li key={index} className="mb-4">
+                    <p><span className="font-semibold">Visit ID:</span> {visitDetail.visitID}</p>
+                    <p><span className="font-semibold">Dentist ID:</span> {visitDetail.dentistID}</p>
+                    <p><span className="font-semibold">Diagnosis:</span> {visitDetail.Diagnosis}</p>
+                    <p><span className="font-semibold">Treatment:</span> {visitDetail.Treatment}</p>
+                    <p><span className="font-semibold">Notes:</span> {visitDetail.Notes}</p>
+                  </li>
+                ))}
               </ul>
             ) : (
-              <div>No visit details found</div>
-            )}
-            {visitDetails.patientID && patientPrescriptions.length > 0 && (
-              <div className="mt-4">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit Visit Details</button>
-              </div>
-            )}
-          </div>
+          <div>No visit details found</div>
+          )}
+          <div className="mt-4">
+              <Link to={`/doctor/patients/${patientID}/visit-details`} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit Visit Details</Link>
+            </div>
+        </div>          
           
-          <div className="mt-8">
-            <h2 className="text-lg font-semibold mb-2">Medical History:</h2>
-            {medicalHistory.patientID === (patient ? patient.patientID : null) && patientPrescriptions.length > 0 ? (
-              <ul>
-                <li>
-                  <p><span className="font-semibold">Allergies:</span> {medicalHistory.allergies}</p>
-                  <p><span className="font-semibold">Height:</span> {medicalHistory.height}</p>
-                  <p><span className="font-semibold">Weight:</span> {medicalHistory.weight}</p>
-                  <p><span className="font-semibold">Notes:</span> {medicalHistory.medicalNotes}</p>
-                </li>
-              </ul>
-            ) : (
-              <div>No medical history found</div>
-            )}
-            {medicalHistory.patientID && patientPrescriptions.length > 0 && (
-              <div className="mt-4">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit Medical History</button>
-              </div>
-            )}
-          </div>
-          
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold mb-2">Medical History:</h2>
+          {medicalHistory && medicalHistory.length > 0 ? (
+            <ul>
+            {medicalHistory.map((record, index) => (
+              <li key={index}>
+                <p><span className="font-semibold">Allergies:</span> {record.Allergies}</p>
+                <p><span className="font-semibold">Height:</span> {record.Feet} feet {record.Inches} inches</p>
+                <p><span className="font-semibold">Weight:</span> {record.Weight} lbs</p>
+                <p><span className="font-semibold">Notes:</span> {record.Notes}</p>
+                <p><span className="font-semibold">Date created:</span> {formatDate(record.Date_Created)}</p>
+              </li>
+            ))}
+            </ul>
+          ) : (
+        <div>No medical history found</div>
+        )}
+        <div className="mt-4">
+          <Link to={`/doctor/patients/${patientID}/medical-history`} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit Medical History</Link>
+        </div>
+      </div>
+
+
           <div className="mt-8">
             <h2 className="text-lg font-semibold mb-2">Prescriptions:</h2>
             {patientPrescriptions.length > 0 ? (
               <ul>
                 {patientPrescriptions.map(prescription => (
-                  <li key={prescription.id}>
-                    <p><span className="font-semibold">Medication:</span> {prescription.medication}</p>
-                    <p><span className="font-semibold">Dosage:</span> {prescription.dosage}</p>
-                    <p><span className="font-semibold">Instructions:</span> {prescription.instructions}</p>
+                  <li key={prescription.id} className="mb-4">
+                    <p><span className="font-semibold">Prescription ID:</span> {prescription.prescriptionID}</p>
+                    <p><span className="font-semibold">Medication name:</span> {prescription.Medication_Name}</p>
+                    <p><span className="font-semibold">National Drug Code:</span> {prescription.National_Drug_Code}</p>
+                    <p><span className="font-semibold">Dosage:</span> {prescription.Medication_Dosage}</p>
+                    <p><span className="font-semibold">Refills:</span> {prescription.Refills}</p>
+                    <p><span className="font-semibold">Notes:</span> {prescription.notes}</p>
+                    <p><span className="font-semibold">Date prescribed:</span> {formatDate(prescription.Date_prescribed)}</p>
                   </li>
                 ))}
               </ul>
@@ -151,34 +221,34 @@ const PatientDetails = () => {
             )}
             {patientPrescriptions.length > 0 && (
               <div className="mt-4">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit Prescriptions</button>
+                <Link to={`/doctor/patients/${patientID}/prescriptions`} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit Prescriptions</Link>
               </div>
             )}
           </div>
           
           <div className="mt-8">
             <h2 className="text-lg font-semibold mb-2">Billing History:</h2>
-            {patientBillingHistory.length > 0 ? (
+            {patient && patientBillingHistory.length > 0 ? (
               <table className="border-collapse border border-gray-400">
                 <thead>
                   <tr>
-                    <th className="border border-gray-400 px-20 py-2">Date</th>
-                    <th className="border border-gray-400 px-20 py-2">Description</th>
-                    <th className="border border-gray-400 px-20 py-2">Status</th>
-                    <th className="border border-gray-400 px-32 py-2">Amount</th>
-                    <th className="border border-gray-400 px-20 py-2">Actions</th> 
+                    <th className="border border-gray-400 px-20 py-2">Date Created</th>
+                    <th className="border border-gray-400 px-20 py-2">Policy Number</th>
+                    <th className="border border-gray-400 px-20 py-2">Gross Amount</th>
+                    <th className="border border-gray-400 px-20 py-2">Insurance Coverage</th>
+                    <th className="border border-gray-400 px-20 py-2">Net Amount</th>
+                    <th className="border border-gray-400 px-20 py-2">Paid Amount</th>
                   </tr>
                 </thead>
                 <tbody>
                   {patientBillingHistory.map(entry => (
                     <tr key={entry.date}>
-                      <td className="border border-gray-400 px-20 py-4">{entry.date}</td>
-                      <td className="border border-gray-400 px-20 py-4">{entry.description}</td>
-                      <td className="border border-gray-400 px-20 py-4">{entry.status}</td>
-                      <td className="border border-gray-400 px-32 py-4">{entry.amount}</td>
-                      <td className="border border-gray-400 px-20 py-4"> 
-                        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit</button> 
-                      </td>
+                      <td className="border border-gray-400 px-20 py-4">{formatDate(entry.Date)}</td>
+                      <td className="border border-gray-400 px-20 py-4">{entry.Policy_number}</td>
+                      <td className="border border-gray-400 px-20 py-4">{entry.Gross_Amount}</td>
+                      <td className="border border-gray-400 px-20 py-4">{entry.Insurance_coverage}</td>
+                      <td className="border border-gray-400 px-20 py-4">{entry.Net_Amount}</td>
+                      <td className="border border-gray-400 px-20 py-4">{entry.Paid_Amount}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -196,6 +266,6 @@ const PatientDetails = () => {
       <Footer /> 
     </div>
   );
-};
+}
 
 export default PatientDetails;
